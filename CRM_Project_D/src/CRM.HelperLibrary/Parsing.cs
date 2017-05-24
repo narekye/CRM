@@ -48,9 +48,6 @@ namespace CRM.HelperLibrary
                                         contact.Email = xlRange.Cells[i, j].Value2.ToString();
                                         break;
                                     case 6:
-                                        contact.GuID = (Guid)xlRange.Cells[i, j].Value2;
-                                        break;
-                                    case 7:
                                         contact.DateInserted = (DateTime)xlRange.Cells[i, j].Value2.ToString();
                                         break;
                                 }
@@ -59,6 +56,7 @@ namespace CRM.HelperLibrary
                                 break;
 
                         }
+                        contact.GuID = Guid.NewGuid();
                         contactslist.Add(contact);
                     }
                     else
