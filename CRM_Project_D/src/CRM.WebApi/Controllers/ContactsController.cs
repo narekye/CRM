@@ -18,7 +18,7 @@
             // TODO: login/auth check with token
             try
             {
-                var data = _database.Contacts.Include(p => p.EmailLists).ToList();
+                var data = _database.Contacts.Include(p => p.EmailLists).ToListAsync().Result;
                 var dt = CreateObject(data) as IEnumerable;
                 if (ReferenceEquals(dt, null)) return NotFound();
                 return Ok(dt);
@@ -45,7 +45,7 @@
                     c.GuID,
                     c.DateInserted,
                     EmailLists = c.EmailLists.Select(k => k.EmailListName).ToList()
-                }).ToList();
+                }).ToListAsync().Result;
                 if (!(data.Count > 0)) return NotFound();
                 return Ok(data);
             }
@@ -63,6 +63,7 @@
 
         public IHttpActionResult PutContact([FromBody] Contact c)
         {
+            // x-www-form-urlencoded
             // TODO: login/auth check with token
             if (ReferenceEquals(c, null) || !ModelState.IsValid) return BadRequest();
 
@@ -72,8 +73,10 @@
             {
                 try
                 {
+                    c.GuID = Guid.NewGuid();
+                    c.DateInserted = contact.DateInserted;
                     _database.Entry(contact).CurrentValues.SetValues(c);
-                    _database.SaveChangesAsync();
+                    _database.SaveChanges();
                     transaction.Commit();
                     return Ok();
                 }
@@ -87,6 +90,7 @@
 
         public IHttpActionResult PostContact([FromBody] Contact c)
         {
+            // x-www-form-urlencoded
             // TODO: login/auth check with token
             if (ReferenceEquals(c, null) || !ModelState.IsValid) return BadRequest();
             using (var transaction = _database.Database.BeginTransaction())
@@ -96,8 +100,9 @@
                 try
                 {
                     _database.Contacts.Add(c);
-                    _database.SaveChangesAsync();
+                    _database.SaveChanges();
                     transaction.Commit();
+                    return Ok();
                 }
                 catch (Exception ex)
                 {
@@ -105,7 +110,6 @@
                     return BadRequest(ex.Message);
                 }
             }
-            return NotFound();
         }
 
         public IHttpActionResult DeleteContactById(int? id)
@@ -137,7 +141,7 @@
                 return database.Contacts.CountAsync(p => p.ContactId == id).Result > 0;
         }
 
-        public dynamic CreateObject(List<Contact> list)
+        private dynamic CreateObject(List<Contact> list)
         {
             var dt = list.Select(c => new
             {
