@@ -1,53 +1,56 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Mail;
-using System.Net.Mime;
-using System.Web.Http;
-
-namespace CRM.WebApi.Controllers
+﻿namespace CRM.WebApi.Controllers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Net.Mail;
+    using System.Net.Mime;
+    using System.Web.Http;
+    using Entities;
+    using System.Linq;
+
     public class SendEmailController : ApiController
     {
-        public IHttpActionResult PostSendTo([FromUri] string address)
+        private readonly CRMContext _database = new CRMContext();
+        private Template template = new Template();
+        public IHttpActionResult PostSendTo(int templateid, [FromBody] Contact contact)
         {
-            SendMail(address);
+            if (SendMail(contact.Email, templateid))
+                return Ok(templateid);
+            else
+                return BadRequest();
+        }
+        public IHttpActionResult PostSendToList(int templateid, [FromBody] List<Contact> contacts)
+        {
+            foreach (var m in contacts)
+                SendMail(m.Email, templateid);
             return Ok();
         }
-        public IHttpActionResult PostSendToList(List<string> addresses)
+        private bool SendMail(string sendto, int templateid)
         {
-            foreach (var m in addresses)
-                SendMail(m);
-            return Ok();
-        }
-        private void SendMail(string sendto)
-        {
+            bool t = true;
             try
             {
-                MailMessage mailMsg = new MailMessage();
-
-                // To
-                mailMsg.To.Add(new MailAddress(sendto));
-
-                // From
-                mailMsg.From = new MailAddress("forproj@ms.com");
-
-                // Subject and multipart/alternative Body
-                mailMsg.Subject = "subject";
-                string text = "text body";
-                mailMsg.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(text, null, MediaTypeNames.Text.Plain));
-
-                // Init SmtpClient and send
-                SmtpClient smtpClient = new SmtpClient("smtp.sendgrid.net", Convert.ToInt32(587));
-                System.Net.NetworkCredential credentials = new System.Net.NetworkCredential("sahakyan_meri", "p42Zmx39");
-                smtpClient.Credentials = credentials;
-
-                smtpClient.Send(mailMsg);
+                template = _database.Templates.FirstOrDefault(p => p.TemplateId == templateid);
+                if (!ReferenceEquals(template, null))
+                {
+                    t = true;
+                    MailMessage mailMsg = new MailMessage();
+                    mailMsg.To.Add(new MailAddress(sendto));
+                    mailMsg.From = new MailAddress("forproj@ms.com");
+                    mailMsg.Subject = "subject";
+                    mailMsg.AlternateViews.Add(AlternateView.CreateAlternateViewFromString("", null, MediaTypeNames.Text.Plain));
+                    mailMsg.AlternateViews.Add(AlternateView.CreateAlternateViewFromString("", null, MediaTypeNames.Text.Html));
+                    SmtpClient smtpClient = new SmtpClient("smtp.sendgrid.net", Convert.ToInt32(587));
+                    System.Net.NetworkCredential credentials = new System.Net.NetworkCredential("sahakyan_meri", "p42Zmx39");
+                    smtpClient.Credentials = credentials;
+                    smtpClient.Send(mailMsg);
+                }
             }
             catch
             {
-
+                t = false;
             }
-
+            return t;
         }
     }
 }
