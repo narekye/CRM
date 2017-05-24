@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CRM.Entities;
-
-namespace CRM.HelperLibrary
+﻿namespace CRM.HelperLibrary
 {
+    using System;
+    using System.Collections.Generic;
+    using Entities;
     public class Parsing
     {
         public List<Contact> GetContactsFromFile(byte[] bytes, string path)
