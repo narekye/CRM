@@ -8,6 +8,6 @@ namespace CRM.Parsing
 {
     public class Parser
     {
-        
+        public string Name { get; set; }
     }
 }

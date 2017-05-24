@@ -27,6 +27,8 @@ namespace CRM.WebApi.Controllers
             return Ok(data);
         }
 
+
+
         [Route("api/EmailLists/count")]
         public int GetEmailListsPageCount()
         {

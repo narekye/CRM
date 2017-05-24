@@ -3,9 +3,8 @@
     using System;
     using System.Data.Entity;
     using System.Web.Http;
-    using System.Collections.Generic;
     using System.Linq;
-    using Entities;
+    using Entities; 
     /// <summary>
     /// Api Logic for CRM system
     /// </summary>
