@@ -55,6 +55,12 @@
             }
         }
 
+        [Route("api/contacts/count")]
+        public int GetContactsPageCount()
+        {
+            return _database.Contacts.Count() > 10 ? _database.Contacts.Count() / 10 : 1;
+        }
+
         public IHttpActionResult PutContact([FromBody] Contact c)
         {
             // TODO: login/auth check with token
@@ -123,7 +129,8 @@
                 }
             }
         }
-        // Helper
+
+        #region Helpers
         private bool ContactExsists(int id)
         {
             using (CRMContext database = new CRMContext())
@@ -145,5 +152,6 @@
             });
             return dt;
         }
+        #endregion
     }
 }
