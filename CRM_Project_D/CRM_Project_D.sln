@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRM.Entities", "src\CRM.Ent
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "CRM.Database_Project", "..\..\..\..\Documents\Visual Studio 2015\Projects\src\CRM.Database_Project\CRM.Database_Project.sqlproj", "{E1E0BB27-C353-4B66-A4B6-B166D7CD589C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRM.Parsing", "CRM.Parsing\CRM.Parsing.csproj", "{A8316615-3E17-46AA-A57C-DE235EE5E6B3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{E1E0BB27-C353-4B66-A4B6-B166D7CD589C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E1E0BB27-C353-4B66-A4B6-B166D7CD589C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E1E0BB27-C353-4B66-A4B6-B166D7CD589C}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{A8316615-3E17-46AA-A57C-DE235EE5E6B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8316615-3E17-46AA-A57C-DE235EE5E6B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8316615-3E17-46AA-A57C-DE235EE5E6B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8316615-3E17-46AA-A57C-DE235EE5E6B3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -41,5 +47,6 @@ Global
 		{12344345-40EA-4DCA-A3B7-5606FE1ED243} = {FFDCE1C3-1A00-4952-B0D1-7B57184139B3}
 		{FB128658-832D-4D72-8A44-8196E4CB5EC8} = {FFDCE1C3-1A00-4952-B0D1-7B57184139B3}
 		{E1E0BB27-C353-4B66-A4B6-B166D7CD589C} = {FFDCE1C3-1A00-4952-B0D1-7B57184139B3}
+		{A8316615-3E17-46AA-A57C-DE235EE5E6B3} = {FFDCE1C3-1A00-4952-B0D1-7B57184139B3}
 	EndGlobalSection
 EndGlobal
