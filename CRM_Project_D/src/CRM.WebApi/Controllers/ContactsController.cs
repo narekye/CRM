@@ -3,7 +3,6 @@
     using System;
     using System.Data.Entity;
     using System.Web.Http;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using Entities;
@@ -18,10 +17,9 @@
             // TODO: login/auth check with token
             try
             {
-                var data = _database.Contacts.Include(p => p.EmailLists).ToListAsync().Result;
-                var dt = CreateObject(data) as IEnumerable;
-                if (ReferenceEquals(dt, null)) return NotFound();
-                return Ok(dt);
+                var data = this.CreateListObjectFromContacts();
+                if (ReferenceEquals(data, null)) return NotFound();
+                return Ok(data);
             }
             catch
             {
@@ -55,6 +53,42 @@
             }
         }
 
+        public IHttpActionResult GetContactByGuid([FromUri] Guid? guid)
+        {
+            if (ReferenceEquals(guid, null)) return NotFound();
+            var data = CreateObjectFromModel(_database.Contacts.FirstOrDefault(p => p.GuID == guid.Value));
+            return Ok(data);
+        }
+
+        public IHttpActionResult GetContactByPagination(int start, int numberOfRows, bool ascending)
+        {
+            var contacts = ascending ?
+                _database.Contacts.OrderBy(x => x.ContactId).Skip(start - 1).Take(numberOfRows).Select(c => new
+                {
+                    c.FullName,
+                    c.CompanyName,
+                    c.Position,
+                    c.Country,
+                    c.Email,
+                    c.GuID,
+                    c.DateInserted,
+                    EmailLists = c.EmailLists.Select(k => k.EmailListName).ToList()
+                }).ToList() :
+                _database.Contacts.OrderByDescending(x => x.ContactId).Skip(start - 1).Take(numberOfRows).Select(c => new
+                {
+                    c.FullName,
+                    c.CompanyName,
+                    c.Position,
+                    c.Country,
+                    c.Email,
+                    c.GuID,
+                    c.DateInserted,
+                    EmailLists = c.EmailLists.Select(k => k.EmailListName).ToList()
+                }).ToList();
+            if (ReferenceEquals(contacts, null)) return NotFound();
+            return Ok(contacts);
+        }
+
         [Route("api/contacts/count")]
         public int GetContactsPageCount()
         {
@@ -67,14 +101,13 @@
             // TODO: login/auth check with token
             if (ReferenceEquals(c, null) || !ModelState.IsValid) return BadRequest();
 
-            Contact contact = _database.Contacts.FirstOrDefaultAsync(p => p.ContactId == c.ContactId).Result;
+            Contact contact = _database.Contacts.FirstOrDefault(p => p.GuID == c.GuID);
             if (ReferenceEquals(contact, null)) return NotFound();
+            c.ContactId = contact.ContactId;
             using (var transaction = _database.Database.BeginTransaction())
             {
                 try
                 {
-                    c.GuID = Guid.NewGuid();
-                    c.DateInserted = contact.DateInserted;
                     _database.Entry(contact).CurrentValues.SetValues(c);
                     _database.SaveChanges();
                     transaction.Commit();
@@ -112,13 +145,13 @@
             }
         }
 
-        public IHttpActionResult DeleteContactById(int? id)
+        public IHttpActionResult DeleteContactById(Guid? guid)
         {
             // TODO: login/auth check with token
-            if (!id.HasValue) return BadRequest();
+            if (!guid.HasValue) return BadRequest();
             using (var transaction = _database.Database.BeginTransaction())
             {
-                var contact = _database.Contacts.FirstOrDefaultAsync(p => p.ContactId == id.Value).Result;
+                var contact = _database.Contacts.FirstOrDefault(p => p.GuID == guid.Value);
                 if (ReferenceEquals(contact, null)) return NotFound();
                 try
                 {
@@ -141,9 +174,9 @@
                 return database.Contacts.CountAsync(p => p.ContactId == id).Result > 0;
         }
 
-        private dynamic CreateObject(List<Contact> list)
+        private dynamic CreateListObjectFromContacts()
         {
-            var dt = list.Select(c => new
+            var dt = _database.Contacts.Select(c => new
             {
                 c.FullName,
                 c.CompanyName,
@@ -154,6 +187,26 @@
                 c.DateInserted,
                 EmailLists = c.EmailLists.Select(k => k.EmailListName).ToList()
             });
+            return dt;
+        }
+        
+        private dynamic CreateObjectFromModel(Contact c)
+        {
+            var dt = new
+            {
+                c.FullName,
+                c.CompanyName,
+                c.Position,
+                c.Country,
+                c.Email,
+                c.GuID,
+                c.DateInserted,
+                EmailLists = c.EmailLists.Select(k => new
+                {
+                    k.EmailListID,
+                    k.EmailListName
+                }).ToList()
+            };
             return dt;
         }
         #endregion
