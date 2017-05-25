@@ -40,9 +40,9 @@
                     mailMsg.Subject = "subject";
                     mailMsg.AlternateViews.Add(AlternateView.CreateAlternateViewFromString("put template's text", null, MediaTypeNames.Text.Plain));
                     mailMsg.AlternateViews.Add(AlternateView.CreateAlternateViewFromString("put template's text", null, MediaTypeNames.Text.Html));
-                    SmtpClient smtpClient = new SmtpClient("smtp.sendgrid.net", Convert.ToInt32(587));
-                    System.Net.NetworkCredential credentials = new System.Net.NetworkCredential("sahakyan_meri", "p42Zmx39");
-                    smtpClient.Credentials = credentials;
+                    SmtpClient smtpClient = new SmtpClient();
+                    //System.Net.NetworkCredential credentials = new System.Net.NetworkCredential("sahakyan_meri", "p42Zmx39");
+                    //smtpClient.Credentials = credentials;
                     smtpClient.Send(mailMsg);
                 }
             }
