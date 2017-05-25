@@ -4,19 +4,21 @@
     using System.Data.Entity;
     using System.Web.Http;
     using System.Linq;
-    using Entities; 
+    using Models;
+    using Entities;
     /// <summary>
     /// Api Logic for CRM system
     /// </summary>
     public class ContactsController : ApiController
     {
         private readonly CRMContext _database = new CRMContext();
+
         public IHttpActionResult GetAllContacts()
         {
             // TODO: login/auth check with token
             try
             {
-                var data = this.CreateListObjectFromContacts();
+                var data = ContactModel.GetContactModelList(_database.Contacts.ToList());
                 if (ReferenceEquals(data, null)) return NotFound();
                 return Ok(data);
             }
@@ -55,7 +57,7 @@
         public IHttpActionResult GetContactByGuid([FromUri] Guid? guid)
         {
             if (ReferenceEquals(guid, null)) return NotFound();
-            var data = CreateObjectFromModel(_database.Contacts.FirstOrDefault(p => p.GuID == guid.Value));
+            var data = ContactModel.GetContactModel(_database.Contacts.FirstOrDefault(p => p.GuID == guid.Value));
             return Ok(data);
         }
 
@@ -94,15 +96,15 @@
             return _database.Contacts.Count() > 10 ? _database.Contacts.Count() / 10 : 1;
         }
 
-        public IHttpActionResult PutContact([FromBody] Contact c)
+        // working
+        public IHttpActionResult PutContact([FromBody] ContactModel c)
         {
             // x-www-form-urlencoded
             // TODO: login/auth check with token
             if (ReferenceEquals(c, null) || !ModelState.IsValid) return BadRequest();
 
-            Contact contact = _database.Contacts.FirstOrDefault(p => p.GuID == c.GuID);
+            Contact contact = _database.Contacts.FirstOrDefault(p => p.GuID == c.GuId);
             if (ReferenceEquals(contact, null)) return NotFound();
-            c.ContactId = contact.ContactId;
             using (var transaction = _database.Database.BeginTransaction())
             {
                 try
@@ -119,7 +121,7 @@
                 }
             }
         }
-
+        // working
         public IHttpActionResult PostContact([FromBody] Contact c)
         {
             // x-www-form-urlencoded
@@ -143,7 +145,7 @@
                 }
             }
         }
-
+        // working
         public IHttpActionResult DeleteContactById(Guid? guid)
         {
             // TODO: login/auth check with token
@@ -188,7 +190,7 @@
             });
             return dt;
         }
-        
+
         private dynamic CreateObjectFromModel(Contact c)
         {
             var dt = new
@@ -209,5 +211,12 @@
             return dt;
         }
         #endregion
+
+        protected override void Dispose(bool disposing)
+        {
+            if(disposing) _database.Dispose();
+            base.Dispose(disposing);    
+        }
+        
     }
 }
