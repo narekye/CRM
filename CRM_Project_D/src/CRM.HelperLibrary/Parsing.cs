@@ -3,12 +3,12 @@
     using System;
     using System.Collections.Generic;
     using Entities;
+
     public static class Parsing
     {
         public static List<Contact> GetContactsFromFile(byte[] bytes, string path)
         {
             List<Contact> contactslist = new List<Contact>();
-
             System.IO.File.WriteAllBytes(path, bytes);
             Microsoft.Office.Interop.Excel.Application xlApp = new Microsoft.Office.Interop.Excel.Application();
             Microsoft.Office.Interop.Excel.Workbook xlWorkbook = xlApp.Workbooks.Open(path);

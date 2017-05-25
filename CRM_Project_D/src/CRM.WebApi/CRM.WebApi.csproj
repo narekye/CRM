@@ -55,6 +55,10 @@
       <HintPath>..\..\packages\EntityFramework.6.2.0-beta1\lib\net45\EntityFramework.SqlServer.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="LinqToExcel, Version=1.11.0.0, Culture=neutral, PublicKeyToken=9c8ea65a58f03f1f, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\LinqToExcel.1.11.0\lib\LinqToExcel.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.AI.Agent.Intercept, Version=2.0.6.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.ApplicationInsights.Agent.Intercept.2.0.6\lib\net45\Microsoft.AI.Agent.Intercept.dll</HintPath>
       <Private>True</Private>
@@ -98,6 +102,18 @@
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Remotion, Version=1.13.52.2, Culture=neutral, PublicKeyToken=0669cf0452175907, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\LinqToExcel.1.11.0\lib\Remotion.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Remotion.Data.Linq, Version=1.13.52.2, Culture=neutral, PublicKeyToken=0669cf0452175907, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\LinqToExcel.1.11.0\lib\Remotion.Data.Linq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Remotion.Interfaces, Version=1.13.52.2, Culture=neutral, PublicKeyToken=0669cf0452175907, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\LinqToExcel.1.11.0\lib\Remotion.Interfaces.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Data.Entity" />
@@ -148,6 +164,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="InfrastructureModel\ApplicationManager.cs" />
     <Compile Include="Models\ContactModel.cs" />
     <Compile Include="Models\EmailListsModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -176,9 +193,6 @@
       <Project>{1e053ec6-b451-4229-a61a-c246007eabc2}</Project>
       <Name>CRM.HelperLibrary</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

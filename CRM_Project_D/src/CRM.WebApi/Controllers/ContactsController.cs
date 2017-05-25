@@ -9,7 +9,7 @@
     using Models;
     using Entities;
     using HelperLibrary;
-
+    
     /// <summary>
     /// Api RESTful logic for CRM system
     /// </summary>
@@ -177,7 +177,7 @@
                 }
             }
         }
-        
+
         // not tested yet
         [Route("api/contacts/upload")]
         public async Task<IHttpActionResult> PostContactByteArrayAsync([FromBody] byte[] array)
