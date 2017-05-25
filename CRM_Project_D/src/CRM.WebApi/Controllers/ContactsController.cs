@@ -4,9 +4,10 @@
     using System.Data.Entity;
     using System.Web.Http;
     using System.Linq;
+    using System.Collections.Generic;
     using Models;
     using Entities;
-    using CRM.HelperLibrary;
+    using HelperLibrary;
 
     /// <summary>
     /// Api Logic for CRM system
@@ -65,34 +66,17 @@
 
         public IHttpActionResult GetContactByPagination(int start, int numberOfRows, bool ascending)
         {
-            var contacts = ascending
-                ? _database.Contacts.OrderBy(x => x.ContactId).Skip(start - 1).Take(numberOfRows).Select(c => new
-                {
-                    c.FullName,
-                    c.CompanyName,
-                    c.Position,
-                    c.Country,
-                    c.Email,
-                    c.GuID,
-                    c.DateInserted,
-                    EmailLists = c.EmailLists.Select(k => k.EmailListName).ToList()
-                }).ToList()
-                : _database.Contacts.OrderByDescending(x => x.ContactId)
+            List<Contact> contacts = ascending
+                ? _database.Contacts.OrderBy(x => x.ContactId)
                     .Skip(start - 1)
                     .Take(numberOfRows)
-                    .Select(c => new
-                    {
-                        c.FullName,
-                        c.CompanyName,
-                        c.Position,
-                        c.Country,
-                        c.Email,
-                        c.GuID,
-                        c.DateInserted,
-                        EmailLists = c.EmailLists.Select(k => k.EmailListName).ToList()
-                    }).ToList();
-            if (ReferenceEquals(contacts, null)) return NotFound();
-            return Ok(contacts);
+                    .ToList()
+                : _database.Contacts.OrderByDescending(x => x.ContactId)
+                    .Skip(start - 1)
+                    .Take(numberOfRows).ToList();
+            var result = ContactModel.GetContactModelList(contacts);
+            if (ReferenceEquals(result, null)) return NotFound();
+            return Ok(result);
         }
 
         [Route("api/contacts/count")]
@@ -153,7 +137,7 @@
         }
 
         // working
-        public IHttpActionResult DeleteContactById(Guid? guid)
+        public IHttpActionResult DeleteContactByGuId(Guid? guid)
         {
             // TODO: login/auth check with token
             if (!guid.HasValue) return BadRequest();
@@ -175,6 +159,26 @@
             }
         }
 
+        // not tested
+        public IHttpActionResult PostContactByteArray([FromBody] byte[] array)
+        {
+            string pathtowork = ""; // path to work with file, on the end of function it will be deleted.
+            try
+            {
+                var contacts = Parsing.GetContactsFromFile(array, pathtowork);
+                using (var transaction = _database.Database.BeginTransaction())
+                {
+                    _database.Contacts.AddRange(contacts);
+                    _database.SaveChanges();
+                    transaction.Commit();
+                    return Ok();
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         #region Helpers
 
         private bool ContactExsists(int id)
@@ -220,25 +224,10 @@
         }
 
         #endregion
-
-        public IHttpActionResult PostContactByteArray([FromBody] byte[] array)
-        {
-            string pathtowork = "";
-            try
-            {
-                Parsing.GetContactsFromFile(array, pathtowork);
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
         protected override void Dispose(bool disposing)
         {
             if (disposing) _database.Dispose();
             base.Dispose(disposing);
         }
-
     }
 }
