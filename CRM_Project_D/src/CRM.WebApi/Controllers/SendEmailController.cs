@@ -8,6 +8,9 @@
     using Entities;
     using System.Data.Entity;
     using System.Threading.Tasks;
+    using System.Configuration;
+    using System.Net.Configuration;
+    using System.Net;
 
     public class SendEmailController : ApiController
     {
@@ -15,8 +18,8 @@
         {
             var email = await GetContactEmail(guid);
             if (ReferenceEquals(email, null)) return NotFound();
-            if (await SendMail(email, templateid)) return Ok();
-            return BadRequest();
+            await SendMail(email, templateid);
+            return Ok();
         }
         [Route("api/sendemail/list")]
         public async Task<IHttpActionResult> PostSendToList([FromUri] int templateid, [FromBody] List<Guid> guids)
@@ -27,32 +30,45 @@
             SendEmailToList(list, templateid);
             return Ok();
         }
-        private async Task<bool> SendMail(string sendto, int templateid)
+        private async Task SendMail(string sendto, int templateid)
         {
-            bool t = true;
-            try
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            var mailSettings = config.GetSectionGroup("system.net/mailSettings") as MailSettingsSectionGroup;
+
+            if (mailSettings != null)
             {
-                using (var database = new CRMContext())
+                int port = mailSettings.Smtp.Network.Port;
+                string from = mailSettings.Smtp.From;
+                string host = mailSettings.Smtp.Network.Host;
+                string pwd = mailSettings.Smtp.Network.Password;
+                string uid = mailSettings.Smtp.Network.UserName;
+
+                var message = new MailMessage
                 {
-                    Template template = await database.Templates.FirstOrDefaultAsync(p => p.TemplateId == templateid);
-                    if (ReferenceEquals(template, null)) return false;
-                    MailMessage mailMsg = new MailMessage();
-                    mailMsg.To.Add(new MailAddress(sendto));
-                    mailMsg.From = new MailAddress("forproj@ms.com");
-                    mailMsg.Subject = "subject";
-                    mailMsg.AlternateViews.Add(AlternateView.CreateAlternateViewFromString("put template's text", null, MediaTypeNames.Text.Plain));
-                    mailMsg.AlternateViews.Add(AlternateView.CreateAlternateViewFromString("put template's text", null, MediaTypeNames.Text.Html));
-                    SmtpClient smtpClient = new SmtpClient();
-                    //System.Net.NetworkCredential credentials = new System.Net.NetworkCredential("sahakyan_meri", "p42Zmx39");
-                    //smtpClient.Credentials = credentials;
-                    smtpClient.Send(mailMsg);
+                    From = new MailAddress(@from)
+                };
+                message.To.Add(new MailAddress(sendto));
+                message.CC.Add(new MailAddress(from));
+                message.Subject = "subject";
+                message.IsBodyHtml = true;
+                message.Body = "Hello!";
+
+                var client = new SmtpClient
+                {
+                    Host = host,
+                    Port = port,
+                    Credentials = new NetworkCredential(uid, pwd),
+                    EnableSsl = true
+                };
+
+                try
+                {
+                    client.Send(message);
+                }
+                catch (Exception ex)
+                {
                 }
             }
-            catch
-            {
-                t = false;
-            }
-            return t;
         }
         // helper
         private async Task<string> GetContactEmail(Guid guid)
