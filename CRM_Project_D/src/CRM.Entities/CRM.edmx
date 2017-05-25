@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="CRM.Database_D.Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="CRM.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Contacts">
           <Key>
             <PropertyRef Name="ContactId" />
@@ -68,12 +68,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Function Name="GetByPageProc" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-          <Parameter Name="startFrom" Type="int" Mode="In" />
-          <Parameter Name="numberOfRows" Type="int" Mode="In" />
-          <Parameter Name="flag" Type="bit" Mode="In" />
-        </Function>
-        <EntityContainer Name="CRMDatabase_DModelStoreContainer">
+        <EntityContainer Name="CRMStoreContainer">
           <EntitySet Name="Contacts" EntityType="Self.Contacts" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="EmailListContacts" EntityType="Self.EmailListContacts" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="EmailLists" EntityType="Self.EmailLists" Schema="dbo" store:Type="Tables" />
@@ -87,10 +82,11 @@
             <End Role="EmailListContacts" EntitySet="EmailListContacts" />
           </AssociationSet>
         </EntityContainer>
-      </Schema></edmx:StorageModels>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
-      <Schema Namespace="CRM.Database_D.Model" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+      <Schema Namespace="CRM" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityType Name="Contact">
           <Key>
             <PropertyRef Name="ContactId" />
@@ -132,30 +128,15 @@
             <End Role="Contacts" EntitySet="Contacts" />
             <End Role="EmailLists" EntitySet="EmailLists" />
           </AssociationSet>
-          <FunctionImport Name="GetByPageProc" ReturnType="Collection(CRM.Database_D.Model.GetByPageProc_Result)">
-            <Parameter Name="startFrom" Mode="In" Type="Int32" />
-            <Parameter Name="numberOfRows" Mode="In" Type="Int32" />
-            <Parameter Name="flag" Mode="In" Type="Boolean" />
-          </FunctionImport>
         </EntityContainer>
-        <ComplexType Name="GetByPageProc_Result">
-          <Property Type="Int32" Name="ContactId" Nullable="false" />
-          <Property Type="String" Name="FullName" Nullable="false" MaxLength="250" />
-          <Property Type="String" Name="CompanyName" Nullable="true" MaxLength="250" />
-          <Property Type="String" Name="Position" Nullable="true" MaxLength="250" />
-          <Property Type="String" Name="Country" Nullable="true" MaxLength="150" />
-          <Property Type="String" Name="Email" Nullable="false" MaxLength="250" />
-          <Property Type="Guid" Name="GuID" Nullable="false" />
-          <Property Type="DateTime" Name="DateInserted" Nullable="false" />
-        </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="CRMDatabase_DModelStoreContainer" CdmEntityContainer="CRMContext">
+        <EntityContainerMapping StorageEntityContainer="CRMStoreContainer" CdmEntityContainer="CRMContext">
           <EntitySetMapping Name="Contacts">
-            <EntityTypeMapping TypeName="CRM.Database_D.Model.Contact">
+            <EntityTypeMapping TypeName="CRM.Contact">
               <MappingFragment StoreEntitySet="Contacts">
                 <ScalarProperty Name="ContactId" ColumnName="ContactId" />
                 <ScalarProperty Name="FullName" ColumnName="FullName" />
@@ -169,7 +150,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="EmailLists">
-            <EntityTypeMapping TypeName="CRM.Database_D.Model.EmailList">
+            <EntityTypeMapping TypeName="CRM.EmailList">
               <MappingFragment StoreEntitySet="EmailLists">
                 <ScalarProperty Name="EmailListID" ColumnName="EmailListID" />
                 <ScalarProperty Name="EmailListName" ColumnName="EmailListName" />
@@ -177,14 +158,14 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Templates">
-            <EntityTypeMapping TypeName="CRM.Database_D.Model.Template">
+            <EntityTypeMapping TypeName="CRM.Template">
               <MappingFragment StoreEntitySet="Templates">
                 <ScalarProperty Name="TemplateId" ColumnName="TemplateId" />
                 <ScalarProperty Name="TemplateName" ColumnName="TemplateName" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <AssociationSetMapping Name="EmailListContacts" TypeName="CRM.Database_D.Model.EmailListContacts" StoreEntitySet="EmailListContacts">
+          <AssociationSetMapping Name="EmailListContacts" TypeName="CRM.EmailListContacts" StoreEntitySet="EmailListContacts">
             <EndProperty Name="Contacts">
               <ScalarProperty Name="ContactId" ColumnName="ContactID" />
             </EndProperty>
@@ -192,20 +173,6 @@
               <ScalarProperty Name="EmailListID" ColumnName="EmailListID" />
             </EndProperty>
           </AssociationSetMapping>
-          <FunctionImportMapping FunctionImportName="GetByPageProc" FunctionName="CRM.Database_D.Model.Store.GetByPageProc">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="CRM.Database_D.Model.GetByPageProc_Result">
-                <ScalarProperty Name="ContactId" ColumnName="ContactId" />
-                <ScalarProperty Name="FullName" ColumnName="FullName" />
-                <ScalarProperty Name="CompanyName" ColumnName="CompanyName" />
-                <ScalarProperty Name="Position" ColumnName="Position" />
-                <ScalarProperty Name="Country" ColumnName="Country" />
-                <ScalarProperty Name="Email" ColumnName="Email" />
-                <ScalarProperty Name="GuID" ColumnName="GuID" />
-                <ScalarProperty Name="DateInserted" ColumnName="DateInserted" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

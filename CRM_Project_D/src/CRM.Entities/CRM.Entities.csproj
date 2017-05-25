@@ -64,15 +64,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>CRM.tt</DependentUpon>
     </Compile>
-    <Compile Include="CRM.Entities.Designer.cs">
+    <Compile Include="CRM.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>CRM.Entities.edmx</DependentUpon>
+      <DependentUpon>CRM.edmx</DependentUpon>
     </Compile>
     <Compile Include="EmailList.cs">
-      <DependentUpon>CRM.tt</DependentUpon>
-    </Compile>
-    <Compile Include="GetByPageProc_Result.cs">
       <DependentUpon>CRM.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -81,32 +78,30 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EntityDeploy Include="CRM.Entities.edmx">
-      <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>CRM.Entities.Designer.cs</LastGenOutput>
-    </EntityDeploy>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="App.Config" />
-    <None Include="CRM.Entities.edmx.diagram">
-      <DependentUpon>CRM.Entities.edmx</DependentUpon>
+    <EntityDeploy Include="CRM.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>CRM.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="CRM.edmx.diagram">
+      <DependentUpon>CRM.edmx</DependentUpon>
     </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="CRM.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>CRM.Entities.edmx</DependentUpon>
+      <DependentUpon>CRM.edmx</DependentUpon>
       <LastGenOutput>CRM.Context.cs</LastGenOutput>
     </Content>
     <Content Include="CRM.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>CRM.Entities.edmx</DependentUpon>
+      <DependentUpon>CRM.edmx</DependentUpon>
       <LastGenOutput>CRM.cs</LastGenOutput>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -12,45 +12,21 @@ namespace CRM.Entities
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
-    using System.Data.Entity.Core.Objects;
-    using System.Linq;
-
+    
     public partial class CRMContext : DbContext
     {
         public CRMContext()
             : base("name=CRMContext")
         {
         }
-
+    
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Contact>().HasMany(x => x.EmailLists).WithMany(y => y.Contacts).Map(z =>
-            {
-                z.MapLeftKey("ContactId");
-                z.MapRightKey("EmailListID");
-                z.ToTable("EmailLists_Contacts");
-            });
+            throw new UnintentionalCodeFirstException();
         }
-
+    
         public virtual DbSet<Contact> Contacts { get; set; }
         public virtual DbSet<EmailList> EmailLists { get; set; }
         public virtual DbSet<Template> Templates { get; set; }
-
-        public virtual ObjectResult<GetByPageProc_Result> GetByPageProc(Nullable<int> startFrom, Nullable<int> numberOfRows, Nullable<bool> flag)
-        {
-            var startFromParameter = startFrom.HasValue ?
-                new ObjectParameter("startFrom", startFrom) :
-                new ObjectParameter("startFrom", typeof(int));
-
-            var numberOfRowsParameter = numberOfRows.HasValue ?
-                new ObjectParameter("numberOfRows", numberOfRows) :
-                new ObjectParameter("numberOfRows", typeof(int));
-
-            var flagParameter = flag.HasValue ?
-                new ObjectParameter("flag", flag) :
-                new ObjectParameter("flag", typeof(bool));
-
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetByPageProc_Result>("GetByPageProc", startFromParameter, numberOfRowsParameter, flagParameter);
-        }
     }
 }
