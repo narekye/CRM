@@ -6,6 +6,8 @@
     using System.Linq;
     using Models;
     using Entities;
+    using CRM.HelperLibrary;
+
     /// <summary>
     /// Api Logic for CRM system
     /// </summary>
@@ -63,8 +65,8 @@
 
         public IHttpActionResult GetContactByPagination(int start, int numberOfRows, bool ascending)
         {
-            var contacts = ascending ?
-                _database.Contacts.OrderBy(x => x.ContactId).Skip(start - 1).Take(numberOfRows).Select(c => new
+            var contacts = ascending
+                ? _database.Contacts.OrderBy(x => x.ContactId).Skip(start - 1).Take(numberOfRows).Select(c => new
                 {
                     c.FullName,
                     c.CompanyName,
@@ -74,18 +76,21 @@
                     c.GuID,
                     c.DateInserted,
                     EmailLists = c.EmailLists.Select(k => k.EmailListName).ToList()
-                }).ToList() :
-                _database.Contacts.OrderByDescending(x => x.ContactId).Skip(start - 1).Take(numberOfRows).Select(c => new
-                {
-                    c.FullName,
-                    c.CompanyName,
-                    c.Position,
-                    c.Country,
-                    c.Email,
-                    c.GuID,
-                    c.DateInserted,
-                    EmailLists = c.EmailLists.Select(k => k.EmailListName).ToList()
-                }).ToList();
+                }).ToList()
+                : _database.Contacts.OrderByDescending(x => x.ContactId)
+                    .Skip(start - 1)
+                    .Take(numberOfRows)
+                    .Select(c => new
+                    {
+                        c.FullName,
+                        c.CompanyName,
+                        c.Position,
+                        c.Country,
+                        c.Email,
+                        c.GuID,
+                        c.DateInserted,
+                        EmailLists = c.EmailLists.Select(k => k.EmailListName).ToList()
+                    }).ToList();
             if (ReferenceEquals(contacts, null)) return NotFound();
             return Ok(contacts);
         }
@@ -121,6 +126,7 @@
                 }
             }
         }
+
         // working
         public IHttpActionResult PostContact([FromBody] Contact c)
         {
@@ -145,6 +151,7 @@
                 }
             }
         }
+
         // working
         public IHttpActionResult DeleteContactById(Guid? guid)
         {
@@ -169,6 +176,7 @@
         }
 
         #region Helpers
+
         private bool ContactExsists(int id)
         {
             using (CRMContext database = new CRMContext())
@@ -210,13 +218,27 @@
             };
             return dt;
         }
+
         #endregion
 
+        public IHttpActionResult PostContactByteArray([FromBody] byte[] array)
+        {
+            string pathtowork = "";
+            try
+            {
+                Parsing.GetContactsFromFile(array, pathtowork);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
         protected override void Dispose(bool disposing)
         {
-            if(disposing) _database.Dispose();
-            base.Dispose(disposing);    
+            if (disposing) _database.Dispose();
+            base.Dispose(disposing);
         }
-        
+
     }
 }

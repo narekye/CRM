@@ -27,7 +27,6 @@
         public string Email { get; set; }
         public Guid GuId { get; set; }
         public DateTime DateInserted { get; set; }
-
         public List<string> EmailLists { get; set; }
         public static ContactModel GetContactModel(Contact contact)
         {

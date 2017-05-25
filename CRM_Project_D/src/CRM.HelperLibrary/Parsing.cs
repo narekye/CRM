@@ -3,9 +3,9 @@
     using System;
     using System.Collections.Generic;
     using Entities;
-    public class Parsing
+    public static class Parsing
     {
-        public List<Contact> GetContactsFromFile(byte[] bytes, string path)
+        public static List<Contact> GetContactsFromFile(byte[] bytes, string path)
         {
             List<Contact> contactslist = new List<Contact>();
 
@@ -50,7 +50,6 @@
                             }
                             else
                                 break;
-
                         }
                         contact.GuID = Guid.NewGuid();
                         contactslist.Add(contact);
@@ -58,9 +57,14 @@
                     else
                         break;
                 }
-                catch
+                catch (Exception ex)
                 {
-
+                    System.IO.File.Delete(path);
+                    throw new Exception(ex.Message);
+                }
+                finally
+                {
+                    System.IO.File.Delete(path);
                 }
             }
             return contactslist;

@@ -160,6 +160,13 @@
       <Project>{fb128658-832d-4d72-8a44-8196e4cb5ec8}</Project>
       <Name>CRM.Entities</Name>
     </ProjectReference>
+    <ProjectReference Include="..\CRM.HelperLibrary\CRM.HelperLibrary.csproj">
+      <Project>{1e053ec6-b451-4229-a61a-c246007eabc2}</Project>
+      <Name>CRM.HelperLibrary</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
