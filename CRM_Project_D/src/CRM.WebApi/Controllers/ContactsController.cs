@@ -27,9 +27,9 @@
                     return Ok(data);
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                return BadRequest();
+                return BadRequest($"{ex.Message}\n{ex.InnerException?.Message}");
             }
         }
 
@@ -207,10 +207,11 @@
         [Route("api/contacts/count")]
         public int GetContactsPageCount()
         {
-            using (var database = new CRMContext())
-            {
-                return database.Contacts.Count() > 10 ? database.Contacts.Count() / 10 : 1;
-            }
+            //using (var database = new CRMContext())
+            //{
+            //    return database.Contacts.Count() > 10 ? database.Contacts.Count() / 10 : 1;
+            //}
+            return 10;
         }
         #region Helpers
 
@@ -257,5 +258,6 @@
             return result;
         }
         #endregion
+
     }
 }
