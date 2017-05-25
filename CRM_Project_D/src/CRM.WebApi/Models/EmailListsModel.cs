@@ -16,7 +16,7 @@ namespace CRM.WebApi.Models
             {
                 FullName = o.FullName,
                 Email = o.Email,
-                CompanyName = o.CompanyName,
+                CompanyName = o.CompanyName, 
                 Country = o.Country,
                 DateInserted = o.DateInserted,
                 GuId = o.GuID,

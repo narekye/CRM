@@ -13,7 +13,7 @@ namespace CRM.WebApi.Controllers
         public IHttpActionResult GetEmailList()
         {
             var data = _database.EmailLists.ToList();
-
+            return this.Unauthorized();
         }
     }
 }

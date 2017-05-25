@@ -1,6 +1,9 @@
 ﻿namespace CRM.WebApi
 {
     using System.Web.Http;
+    using System.Linq;
+    using System.Net.Http.Formatting;
+    using Newtonsoft.Json.Serialization;
 
     public static class WebApiConfig
     {
@@ -13,6 +16,9 @@
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
+
+            var jsonFormatter = config.Formatters.OfType<JsonMediaTypeFormatter>().First();
+            jsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
         }
     }
 }
