@@ -15,7 +15,7 @@
     /// </summary>
     public class ContactsController : ApiController
     {
-        public async Task<IHttpActionResult> GetAllContacts()
+        public async Task<IHttpActionResult> GetAllContactsAsync()
         {
             // TODO: login/auth check with token
             try
@@ -34,7 +34,7 @@
         }
 
         /* Will not used */
-        public async Task<IHttpActionResult> GetContactById(int? id)
+        public async Task<IHttpActionResult> GetContactByIdAsync(int? id)
         {
             // TODO: login/auth check with token
             if (!id.HasValue) return BadRequest("Set parameter.");
@@ -56,7 +56,7 @@
             }
         }
 
-        public async Task<IHttpActionResult> GetContactByGuid([FromUri] Guid? guid)
+        public async Task<IHttpActionResult> GetContactByGuidAsync([FromUri] Guid? guid)
         {
             if (ReferenceEquals(guid, null)) return NotFound();
             try
@@ -71,7 +71,7 @@
             }
         }
 
-        public async Task<IHttpActionResult> GetContactByPagination(int start, int numberOfRows, bool ascending)
+        public async Task<IHttpActionResult> GetContactByPaginationAsync(int start, int numberOfRows, bool ascending)
         {
             using (var database = new CRMContext())
             {
@@ -96,7 +96,7 @@
         }
 
         // working
-        public async Task<IHttpActionResult> PutContact([FromBody] ContactModel c)
+        public async Task<IHttpActionResult> PutContactAsync([FromBody] ContactModel c)
         {
             // x-www-form-urlencoded
             // TODO: login/auth check with token
@@ -125,7 +125,7 @@
         }
 
         // working
-        public async Task<IHttpActionResult> PostContact([FromBody] ContactModel c)
+        public async Task<IHttpActionResult> PostContactAsync([FromBody] ContactModel c)
         {
             // x-www-form-urlencoded
             // TODO: login/auth check with token
@@ -152,7 +152,7 @@
         }
 
         // working
-        public async Task<IHttpActionResult> DeleteContactByGuId(Guid? guid)
+        public async Task<IHttpActionResult> DeleteContactByGuIdAsync(Guid? guid)
         {
             // TODO: login/auth check with token
             if (!guid.HasValue) return BadRequest();
@@ -177,9 +177,10 @@
                 }
             }
         }
-        [Route("api/contacts/upload")]
+        
         // not tested yet
-        public async Task<IHttpActionResult> PostContactByteArray([FromBody] byte[] array)
+        [Route("api/contacts/upload")]
+        public async Task<IHttpActionResult> PostContactByteArrayAsync([FromBody] byte[] array)
         {
             string pathtowork = ""; // path to work with file, on the end of function it will be deleted.
             using (var database = new CRMContext())

@@ -42,8 +42,10 @@
             return result;
         }
 
-        #region testing remap
 
+        #region testing remap
+        // didn't use remap.
+        [Obsolete("Didn't use this method", true)]
         public static Contact ReMap(ContactModel model)
         {
             // CRMContext datacontext = new CRMContext();

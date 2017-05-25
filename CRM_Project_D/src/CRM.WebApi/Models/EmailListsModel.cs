@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using CRM.Entities;
-
-namespace CRM.WebApi.Models
+﻿namespace CRM.WebApi.Models
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using Entities;
+
     using AutoMapper;
     public class EmailListsModel
     {
@@ -12,22 +12,12 @@ namespace CRM.WebApi.Models
             Mapper.Initialize(f => f.CreateMap<EmailList, EmailListsModel>()
             .ForMember("EmailListId", p => p.MapFrom(z => z.EmailListID))
             .ForMember("EmailListName", p => p.MapFrom(z => z.EmailListName))
-            .ForMember("Contacts", p => p.MapFrom(z => z.Contacts.Select(o => new ContactModel()
-            {
-                FullName = o.FullName,
-                Email = o.Email,
-                CompanyName = o.CompanyName, 
-                Country = o.Country,
-                DateInserted = o.DateInserted,
-                GuId = o.GuID,
-                Position = o.Position
-            }))
-            ));
+            .ForMember("Contacts", p => p.MapFrom(z => z.Contacts.Select(t => t.FullName))));
         }
         public int EmailListId { get; set; }
         public string EmailListName { get; set; }
 
-        public List<ContactModel> Contacts { get; set; }
+        public List<string> Contacts { get; set; }
 
         public static EmailListsModel GetEmailListsModel(EmailList emailList)
         {
