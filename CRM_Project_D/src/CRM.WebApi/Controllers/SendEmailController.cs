@@ -30,12 +30,7 @@
             SendEmailToList(list, templateid);
             return Ok();
         }
-        [Route("/api/sendplz")]
-        public async Task<IHttpActionResult> GetSending()
-        {
-            await SendMail("merisahakyan1@gmail.com", 1);
-            return Ok();
-        }
+        
         private async Task SendMail(string sendto, int templateid)
         {
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
