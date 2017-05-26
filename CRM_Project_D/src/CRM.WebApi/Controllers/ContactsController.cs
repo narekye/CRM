@@ -9,7 +9,7 @@
     using Models;
     using Entities;
     using HelperLibrary;
-    
+
     /// <summary>
     /// Api RESTful logic for CRM system
     /// </summary>
@@ -208,7 +208,7 @@
         {
             using (var database = new CRMContext())
             {
-                return database.Contacts.Count() > 10 ? database.Contacts.Count() / 10 : 1;
+                return database.Contacts.Count() / 10 + 1;
             }
         }
         #region Helpers

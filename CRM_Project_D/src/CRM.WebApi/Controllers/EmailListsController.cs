@@ -31,7 +31,13 @@ namespace CRM.WebApi.Controllers
 
         public async Task<IHttpActionResult> GetEmailListByIdAsync(int? id)
         {
-            return Ok();
+            if (!id.HasValue) return BadRequest();
+            using (var database = new CRMContext())
+            {
+                var emaillist = await database.EmailLists.FirstOrDefaultAsync(p => p.EmailListID == id.Value);
+                if (ReferenceEquals(emaillist, null)) return NotFound();
+                return this.Ok(emaillist);
+            }
         }
 
         public async Task<IHttpActionResult> PostEmailListAsync([FromBody] EmailListsModel model)
