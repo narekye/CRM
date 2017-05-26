@@ -22,7 +22,8 @@
             {
                 using (var database = new CRMContext())
                 {
-                    var data = ContactModel.GetContactModelList(await database.Contacts.ToListAsync());
+                    var list = await database.Contacts.ToListAsync();
+                    var data = ContactModel.GetContactModelList(list);
                     if (ReferenceEquals(data, null)) return NotFound();
                     return Ok(data);
                 }
@@ -42,11 +43,9 @@
             {
                 using (var database = new CRMContext())
                 {
-                    var data = await
-                                database.Contacts.Where(p => p.ContactId == id.Value)
-                                .Select(c => ContactModel.GetContactModel(c))
-                                .ToListAsync();
-                    if (!(data.Count > 0)) return NotFound();
+                    var contact = await database.Contacts.FirstOrDefaultAsync(p => p.ContactId == id.Value);
+                    var data = ContactModel.GetContactModel(contact);
+                    if (ReferenceEquals(data, null)) return NotFound();
                     return Ok(data);
                 }
             }
@@ -207,11 +206,10 @@
         [Route("api/contacts/count")]
         public int GetContactsPageCount()
         {
-            //using (var database = new CRMContext())
-            //{
-            //    return database.Contacts.Count() > 10 ? database.Contacts.Count() / 10 : 1;
-            //}
-            return 10;
+            using (var database = new CRMContext())
+            {
+                return database.Contacts.Count() > 10 ? database.Contacts.Count() / 10 : 1;
+            }
         }
         #region Helpers
 

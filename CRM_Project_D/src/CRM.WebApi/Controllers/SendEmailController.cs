@@ -6,34 +6,36 @@
     using System.Net.Mime;
     using System.Web.Http;
     using Entities;
-    using System.Linq;
+    using System.Data.Entity;
+    using System.Threading.Tasks;
 
     public class SendEmailController : ApiController
     {
-        private readonly CRMContext _database = new CRMContext();
-        private Template template = new Template();
-        public IHttpActionResult PostSendTo(int templateid, [FromBody] Contact contact)
+        public async Task<IHttpActionResult> PostSendTo([FromUri] int templateid, [FromBody] Guid guid)
         {
-            if (SendMail(contact.Email, templateid))
-                return Ok(templateid);
-            else
-                return BadRequest();
+            var email = await GetContactEmail(guid);
+            if (ReferenceEquals(email, null)) return NotFound();
+            if (await SendMail(email, templateid)) return Ok();
+            return BadRequest();
         }
-        public IHttpActionResult PostSendToList(int templateid, [FromBody] List<Contact> contacts)
+        [Route("api/sendemail/list")]
+        public async Task<IHttpActionResult> PostSendToList([FromUri] int templateid, [FromBody] List<Guid> guids)
         {
-            foreach (var m in contacts)
-                SendMail(m.Email, templateid);
+            var list = new List<string>();
+            foreach (Guid guid in guids)
+                list.Add(await GetContactEmail(guid));
+            SendEmailToList(list, templateid);
             return Ok();
         }
-        private bool SendMail(string sendto, int templateid)
+        private async Task<bool> SendMail(string sendto, int templateid)
         {
             bool t = true;
             try
             {
-                template = _database.Templates.FirstOrDefault(p => p.TemplateId == templateid);
-                if (!ReferenceEquals(template, null))
+                using (var database = new CRMContext())
                 {
-                    t = true;
+                    Template template = await database.Templates.FirstOrDefaultAsync(p => p.TemplateId == templateid);
+                    if (ReferenceEquals(template, null)) return false;
                     MailMessage mailMsg = new MailMessage();
                     mailMsg.To.Add(new MailAddress(sendto));
                     mailMsg.From = new MailAddress("forproj@ms.com");
@@ -51,6 +53,21 @@
                 t = false;
             }
             return t;
+        }
+        // helper
+        private async Task<string> GetContactEmail(Guid guid)
+        {
+            using (var database = new CRMContext())
+            {
+                var data = await database.Contacts.FirstOrDefaultAsync(p => p.GuID == guid);
+                if (ReferenceEquals(data, null)) return null;
+                return data.Email;
+            }
+        }
+
+        private void SendEmailToList(List<string> list, int t)
+        {
+            list.ForEach(async i => await SendMail(i, t));
         }
     }
 }
