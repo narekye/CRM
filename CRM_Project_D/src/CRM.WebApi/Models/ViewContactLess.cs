@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.UI.WebControls;
-using AutoMapper;
-using CRM.Entities;
-
-namespace CRM.WebApi.Models
+﻿namespace CRM.WebApi.Models
 {
+    using System;
     public class ViewContactLess
     {
         public string FullName { get; set; }
@@ -17,25 +10,5 @@ namespace CRM.WebApi.Models
         public string Email { get; set; }
         public Guid GuId { get; set; }
         public DateTime DateInserted { get; set; }
-
-
-        public static List<ViewContactLess> CreateViewModelLess(List<Contact> contacts)
-        {
-            var data = new List<ViewContactLess>();
-            contacts.ForEach(p =>
-            {
-                data.Add(new ViewContactLess()
-                {
-                    CompanyName = p.CompanyName,
-                    FullName = p.FullName,
-                    DateInserted = p.DateInserted,
-                    Email = p.Email,
-                    Position = p.Position,
-                    GuId = p.GuID,
-                    Country = p.Country
-                });
-            });
-            return data;
-        }
     }
 }

@@ -1,24 +1,20 @@
-﻿using System.Linq;
-using CRM.Entities;
-
-namespace CRM.WebApi.InfrastructureModel
+﻿namespace CRM.WebApi.InfrastructureModel
 {
     using System;
     using System.Collections.Generic;
     using System.Data.Entity;
     using System.Threading.Tasks;
     using Models;
-
+    using Entities;
     public partial class ApplicationManager
     {
-        // working
         public async Task<List<ViewEmailListLess>> GetAllEmailListsAsync()
         {
             try
             {
                 var list = await _database.EmailLists.ToListAsync();
                 if (ReferenceEquals(list, null)) return null;
-                var result = ViewEmailListLess.GetEmailListsLessList(list);
+                var result = _factory.GetEmailListsLessList(list);
                 if (ReferenceEquals(result, null)) return null;
                 return result;
             }
@@ -27,8 +23,6 @@ namespace CRM.WebApi.InfrastructureModel
                 throw new Exception(ex.Message);
             }
         }
-
-        // working
         public async Task<ViewEmailList> GetEmailListById(int? id)
         {
             if (!id.HasValue) return null;
@@ -37,7 +31,7 @@ namespace CRM.WebApi.InfrastructureModel
                 var data = await _database.EmailLists.Include(p => p.Contacts)
                     .FirstOrDefaultAsync(p => p.EmailListID == id.Value);
                 if (ReferenceEquals(data, null)) return null;
-                var result = ViewEmailList.GetEmailListsModel(data);
+                var result = _factory.GetEmailListsModel(data);
                 return result;
             }
             catch (Exception ex)
@@ -53,7 +47,7 @@ namespace CRM.WebApi.InfrastructureModel
             {
                 try
                 {
-                    var data = await ViewEmailList.CreateEmailList(emailList, true);
+                    var data = await _factory.CreateEmailList(emailList, true);
                     _database.EmailLists.Add(data);
                     await _database.SaveChangesAsync();
                     transaction.Commit();

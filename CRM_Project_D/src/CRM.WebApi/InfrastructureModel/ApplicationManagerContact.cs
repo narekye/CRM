@@ -17,9 +17,12 @@
     }
     public partial class ApplicationManager : IDisposable
     {
-        private readonly CRMContext _database = new CRMContext();
+        private readonly CRMContext _database;
+        private readonly ModelFactory _factory;
         public ApplicationManager()
         {
+            _factory = new ModelFactory();
+            _database = new CRMContext();
             _database.Configuration.LazyLoadingEnabled = false;
         }
         // working, almost change the mapping
@@ -28,7 +31,7 @@
             try
             {
                 var list = await _database.Contacts.ToListAsync();
-                var data = ViewContactLess.CreateViewModelLess(list);
+                var data = _factory.CreateViewModelLess(list);
                 return data;
             }
             catch (Exception ex)
@@ -44,7 +47,7 @@
                 var contact =
                     await _database.Contacts.Include(p => p.EmailLists).FirstOrDefaultAsync(p => p.ContactId == id.Value);
                 if (ReferenceEquals(contact, null)) return null;
-                var data = ViewContact.CreateViewModel(contact);
+                var data = _factory.CreateViewModel(contact);
                 return data;
             }
             catch (Exception ex)
@@ -59,7 +62,7 @@
                 var contact =
                     await _database.Contacts.Include(p => p.EmailLists).FirstOrDefaultAsync(p => p.GuID == guid.Value);
                 if (ReferenceEquals(contact, null)) return null;
-                var data = ViewContact.CreateViewModel(contact);
+                var data = _factory.CreateViewModel(contact);
                 return data;
             }
             catch (Exception ex)
@@ -78,7 +81,7 @@
                         await
                             _database.Contacts.Include(p => p.EmailLists)
                                 .FirstOrDefaultAsync(p => p.GuID == contact.GuId);
-                    var replace = await ViewContact.GetContactFromContactModel(contact, false);
+                    var replace = await _factory.GetContactFromContactModel(contact, false);
                     replace.ContactId = original.ContactId;
                     _database.Entry(original).CurrentValues.SetValues(replace);
                     await _database.SaveChangesAsync();
@@ -94,7 +97,7 @@
         }
         public async Task<bool> AddContactAsync(ViewContact contact)
         {
-            var cont = await ViewContact.GetContactFromContactModel(contact, true);
+            var cont = await _factory.GetContactFromContactModel(contact, true);
             using (var transaction = _database.Database.BeginTransaction())
             {
                 try

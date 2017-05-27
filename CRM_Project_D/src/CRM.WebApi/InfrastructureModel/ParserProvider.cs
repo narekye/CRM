@@ -6,8 +6,6 @@
     using System.IO;
     using System.Linq;
     using LinqToExcel;
-
-
     public class ParserProvider
     {
         public static List<Contact> GetContactsFromFile(byte[] bytes, string path)
