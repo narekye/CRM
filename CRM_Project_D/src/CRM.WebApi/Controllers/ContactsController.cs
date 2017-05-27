@@ -9,6 +9,7 @@
     public class ContactsController : ApiController
     {
         private readonly ApplicationManager _manager = new ApplicationManager();
+        private readonly ParserProvider _parser = new ParserProvider();
         public async Task<IHttpActionResult> GetAllContactsAsync()
         {
             // TODO: login/auth check with token
@@ -123,21 +124,20 @@
             }
         }
         [Route("api/contacts/upload")]
+        // please change to application manager class
         public async Task<IHttpActionResult> PostContactByteArrayAsync([FromBody] byte[] array)
         {
-            string pathtowork = ""; // path to work with file, on the end of function it will be deleted.
             using (var database = new CRMContext())
             using (var transaction = database.Database.BeginTransaction())
             {
                 try
                 {
-                    var contacts = ParserProvider.GetContactsFromFile(array, pathtowork);
-                    {
-                        database.Contacts.AddRange(contacts);
-                        await database.SaveChangesAsync();
-                        transaction.Commit();
-                        return Ok();
-                    }
+                    var contacts = _parser.GetContactsFromBytes(array);
+                    database.Contacts.AddRange(contacts);
+                    await database.SaveChangesAsync();
+                    transaction.Commit();
+                    return Ok();
+
                 }
                 catch (Exception ex)
                 {
