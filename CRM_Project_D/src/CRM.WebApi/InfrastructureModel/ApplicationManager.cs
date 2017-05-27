@@ -14,7 +14,6 @@
     public class ApplicationManager : IDisposable
     {
         private static readonly CRMContext Database = new CRMContext();
-        // private static readonly DbContextTransaction Transaction = Database.Database.BeginTransaction();
 
         static ApplicationManager()
         {
@@ -190,6 +189,7 @@
 
         }
 
+        // working
         public async Task<List<ViewEmailListsLess>> GetAllEmailListsAsync()
         {
             try
@@ -204,7 +204,23 @@
             {
                 throw new Exception(ex.Message);
             }
+        }
 
+        public async Task<ViewEmailLists> GetEmailListById(int? id)
+        {
+            if (!id.HasValue) return null;
+            try
+            {
+                var data = await Database.EmailLists.Include(p => p.Contacts)
+                    .FirstOrDefaultAsync(p => p.EmailListID == id.Value);
+                if (ReferenceEquals(data, null)) return null;
+                var result = ViewEmailLists.GetEmailListsModel(data);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
         public void Dispose()
         {

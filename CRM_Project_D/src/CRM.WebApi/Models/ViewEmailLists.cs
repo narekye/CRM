@@ -9,14 +9,14 @@
         public int EmailListId { get; set; }
         public string EmailListName { get; set; }
 
-        public List<ViewContact> Contacts { get; set; }
+        public List<ViewContactLess> Contacts { get; set; }
 
         public static ViewEmailLists GetEmailListsModel(EmailList emailList)
         {
             return new ViewEmailLists
             {
                 Contacts = (from d in emailList.Contacts
-                            select new ViewContact
+                            select new ViewContactLess
                             {
                                 CompanyName = d.CompanyName,
                                 Country = d.Country,

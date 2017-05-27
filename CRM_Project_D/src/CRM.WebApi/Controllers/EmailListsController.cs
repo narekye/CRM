@@ -12,12 +12,12 @@ namespace CRM.WebApi.Controllers
 
     public class EmailListsController : ApiController
     {
-        private readonly ApplicationManager manager = new ApplicationManager();
+        private static readonly ApplicationManager Manager = new ApplicationManager();
         public async Task<IHttpActionResult> GetAllEmailListsAsync()
         {
             try
             {
-                var data = await manager.GetAllEmailListsAsync();
+                var data = await Manager.GetAllEmailListsAsync();
                 if (ReferenceEquals(data, null)) return NotFound();
                 return Ok(data);
             }
@@ -27,15 +27,17 @@ namespace CRM.WebApi.Controllers
             }
         }
 
-
         public async Task<IHttpActionResult> GetEmailListByIdAsync(int? id)
         {
-            if (!id.HasValue) return BadRequest();
-            using (var database = new CRMContext())
+            try
             {
-                var emaillist = await database.EmailLists.FirstOrDefaultAsync(p => p.EmailListID == id.Value);
-                if (ReferenceEquals(emaillist, null)) return NotFound();
-                return this.Ok(emaillist);
+                var result = await Manager.GetEmailListById(id);
+                if (ReferenceEquals(result, null)) return NotFound();
+                return Ok(result);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
 
@@ -52,5 +54,11 @@ namespace CRM.WebApi.Controllers
         //{
         //    return this.Ok();
         //}
+        /// <inheritdoc />
+        protected override void Dispose(bool disposing)
+        {
+            Manager.Dispose();
+            base.Dispose(disposing);
+        }
     }
 }
