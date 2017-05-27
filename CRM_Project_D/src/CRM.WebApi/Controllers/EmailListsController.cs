@@ -12,7 +12,7 @@ namespace CRM.WebApi.Controllers
 
     public class EmailListsController : ApiController
     {
-        private static readonly ApplicationManager Manager = new ApplicationManager();
+        private readonly ApplicationManager Manager = new ApplicationManager();
         public async Task<IHttpActionResult> GetAllEmailListsAsync()
         {
             try

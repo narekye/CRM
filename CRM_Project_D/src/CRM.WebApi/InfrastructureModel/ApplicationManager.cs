@@ -13,9 +13,9 @@
 
     public class ApplicationManager : IDisposable
     {
-        private static readonly CRMContext Database = new CRMContext();
+        private readonly CRMContext Database = new CRMContext();
 
-        static ApplicationManager()
+        public ApplicationManager()
         {
             Database.Configuration.LazyLoadingEnabled = false;
         }
@@ -60,7 +60,7 @@
         #endregion
 
         // working, almost change the mapping
-        // TODO: change to view model second without emaillists
+        // TODO: change to view model second without emaillists: completed
         public async Task<List<ViewContactLess>> GetAllContactsAsync()
         {
             try
@@ -174,7 +174,6 @@
             }
         }
 
-        // public async Task<List<Contact>> 
         public async Task<int> PageCountAsync()
         {
             try

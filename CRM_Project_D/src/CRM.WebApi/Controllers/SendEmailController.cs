@@ -2,86 +2,31 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Net.Mail;
     using System.Web.Http;
-    using Entities;
-    using System.Data.Entity;
     using System.Threading.Tasks;
-    using System.Configuration;
-    using System.Net.Configuration;
-    using System.Net;
+    using InfrastructureModel;
 
     public class SendEmailController : ApiController
     {
-        public async Task<IHttpActionResult> PostSendTo([FromUri] int templateid, [FromBody] Guid guid)
-        {
-            var email = await GetContactEmail(guid);
-            if (ReferenceEquals(email, null)) return NotFound();
-            SendMail(email, templateid);
-            return Ok();
-        }
-        [Route("api/sendemail/list")]
+        private readonly MailManager _manager = new MailManager();
+
         public async Task<IHttpActionResult> PostSendToList([FromUri] int templateid, [FromBody] List<Guid> guids)
         {
-            var list = new List<string>();
-            foreach (Guid guid in guids)
-                list.Add(await GetContactEmail(guid));
-            SendEmailToList(list, templateid);
-            return Ok();
-        }
-
-        private void SendMail(string sendto, int templateid)
-        {
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            var mailSettings = config.GetSectionGroup("system.net/mailSettings") as MailSettingsSectionGroup;
-
-            if (ReferenceEquals(mailSettings, null)) return;
-            int port = mailSettings.Smtp.Network.Port;
-            string from = mailSettings.Smtp.From;
-            string host = mailSettings.Smtp.Network.Host;
-            string pwd = mailSettings.Smtp.Network.Password;
-            string uid = mailSettings.Smtp.Network.UserName;
-            var message = new MailMessage
-            {
-                From = new MailAddress(@from)
-            };
-            message.To.Add(new MailAddress(sendto));
-            message.CC.Add(new MailAddress(from));
-            message.Subject = "Test CRM";
-            message.IsBodyHtml = true;
-            message.Body = "Hello!";
-
-            var client = new SmtpClient
-            {
-                Host = host,
-                Port = port,
-                Credentials = new NetworkCredential(uid, pwd),
-                EnableSsl = true
-            };
-
             try
             {
-                client.Send(message);
+                var list = await _manager.GetListOfEmails(guids);
+                _manager.SendEmailToList(list, templateid);
+                return Ok();
             }
             catch (Exception ex)
             {
-            }
-
-        }
-        // helper
-        private async Task<string> GetContactEmail(Guid guid)
-        {
-            using (var database = new CRMContext())
-            {
-                var data = await database.Contacts.FirstOrDefaultAsync(p => p.GuID == guid);
-                if (ReferenceEquals(data, null)) return null;
-                return data.Email;
+                return BadRequest(ex.Message);
             }
         }
-
-        private void SendEmailToList(List<string> list, int t)
+        protected override void Dispose(bool disposing)
         {
-            list.ForEach(i => SendMail(i, t));
+            _manager.Dispose();
+            base.Dispose(disposing);
         }
     }
 }

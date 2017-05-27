@@ -3,46 +3,87 @@
     using System;
     using System.Data.Entity;
     using System.Net.Mail;
-    using System.Net.Mime;
     using System.Threading.Tasks;
     using System.Collections.Generic;
+    using System.Configuration;
+    using System.Net;
+    using System.Net.Configuration;
     using Entities;
-
     public class MailManager : IDisposable
     {
-        private static readonly CRMContext Database = new CRMContext();
-        public async Task<bool> SendMail(string sendto, int templateid)
+        private readonly CRMContext _database = new CRMContext();
+
+        public bool SendMail(string sendto, int templateid)
         {
-            bool t = true;
+            // TODO: get the template and put to mail body.
+            Configuration config;
+            if (System.Web.HttpContext.Current != null)
+                config =
+                    System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration("~");
+            else
+                config =
+                    ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+            var mailSettings = config.GetSectionGroup("system.net/mailSettings") as MailSettingsSectionGroup;
+
+            if (mailSettings == null) return false;
             try
             {
-                Template template = await Database.Templates.FirstOrDefaultAsync(p => p.TemplateId == templateid);
-                if (ReferenceEquals(template, null)) return false;
-                MailMessage mailMsg = new MailMessage();
-                mailMsg.To.Add(new MailAddress(sendto));
-                mailMsg.From = new MailAddress("forproj@ms.com");
-                mailMsg.Subject = "subject";
-                mailMsg.AlternateViews.Add(AlternateView.CreateAlternateViewFromString("put template's text", null, MediaTypeNames.Text.Plain));
-                mailMsg.AlternateViews.Add(AlternateView.CreateAlternateViewFromString("put template's text", null, MediaTypeNames.Text.Html));
-                SmtpClient smtpClient = new SmtpClient();
-                //System.Net.NetworkCredential credentials = new System.Net.NetworkCredential("sahakyan_meri", "p42Zmx39");
-                //smtpClient.Credentials = credentials;
-                smtpClient.Send(mailMsg);
+                int port = mailSettings.Smtp.Network.Port;
+                string from = mailSettings.Smtp.From;
+                string host = mailSettings.Smtp.Network.Host;
+                string pwd = mailSettings.Smtp.Network.Password;
+                string uid = mailSettings.Smtp.Network.UserName;
+
+                var message = new MailMessage
+                {
+                    From = new MailAddress(@from)
+                };
+                message.To.Add(new MailAddress(sendto));
+                message.CC.Add(new MailAddress(from));
+                message.Subject = "CRM Project Group-D";
+                message.IsBodyHtml = true;
+                message.Body = "Hello!";
+                var client = new SmtpClient
+                {
+                    Host = host,
+                    Port = port,
+                    Credentials = new NetworkCredential(uid, pwd),
+                    EnableSsl = true
+                };
+
+                client.Send(message);
+                return true;
             }
-            catch
+            catch (Exception ex)
             {
-                t = false;
+                throw new Exception(ex.Message);
             }
-            return t;
-        }
-        public void SendEmailToList(List<Contact> list, int t)
-        {
-            list.ForEach(async i => await SendMail(i.Email, t));
         }
 
+        public void SendEmailToList(List<string> list, int t)
+        {
+            list.ForEach(i => SendMail(i, t));
+        }
+        public async Task<List<string>> GetListOfEmails(List<Guid> guids)
+        {
+            var list = new List<string>();
+            foreach (Guid guid in guids)
+            {
+                try
+                {
+                    list.Add((await _database.Contacts.FirstOrDefaultAsync(p => p.GuID == guid)).Email);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message);
+                }
+            }
+            return list;
+        }
         public void Dispose()
         {
-            Database.Dispose();
+            _database.Dispose();
         }
     }
 }
