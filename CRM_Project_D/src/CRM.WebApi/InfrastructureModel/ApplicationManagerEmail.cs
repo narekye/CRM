@@ -12,9 +12,9 @@
         {
             try
             {
-                var list = await _database.EmailLists.ToListAsync();
+                List<EmailList> list = await _database.EmailLists.ToListAsync();
                 if (ReferenceEquals(list, null)) return null;
-                var result = _factory.GetEmailListsLessList(list);
+                List<ViewEmailListLess> result = _factory.GetEmailListsLessList(list);
                 if (ReferenceEquals(result, null)) return null;
                 return result;
             }
@@ -28,10 +28,10 @@
             if (!id.HasValue) return null;
             try
             {
-                var data = await _database.EmailLists.Include(p => p.Contacts)
+                EmailList data = await _database.EmailLists.Include(p => p.Contacts)
                     .FirstOrDefaultAsync(p => p.EmailListID == id.Value);
                 if (ReferenceEquals(data, null)) return null;
-                var result = _factory.GetEmailListsModel(data);
+                var result = _factory.GetViewEmailList(data);
                 return result;
             }
             catch (Exception ex)
@@ -40,20 +40,21 @@
             }
         }
 
-        // test not completed yet.
         public async Task<bool> AddEmailList(ViewEmailList emailList)
         {
-            using (var transaction = _database.Database.BeginTransaction())
+            using (DbContextTransaction transaction = _database.Database.BeginTransaction())
             {
                 try
                 {
-                    var data = await _factory.CreateEmailList(emailList, true);
-                    _database.EmailLists.Add(data);
+                    EmailList entity = await _factory.EntityCreateEmailList(emailList, true);
+                    List<ViewContact> viewcontacts = _factory.GetViewContactListFromLessList(emailList.Contacts);
+                    List<Contact> entitycontacts = _factory.EntityGetContactListFromViewContactList(viewcontacts, true);
+                    entity.Contacts = entitycontacts;
+                    _database.EmailLists.Add(entity);
                     await _database.SaveChangesAsync();
                     transaction.Commit();
                     return true;
                 }
-
                 catch (Exception ex)
                 {
                     transaction.Rollback();
@@ -65,18 +66,23 @@
         // update emallist
         public async Task<EmailList> UpdateEmailList(ViewEmailList emaillists)
         {
-            var emaillist = await _database.EmailLists.Include(z => z.Contacts).FirstOrDefaultAsync(p => p.EmailListID == emaillists.EmailListId);
-            return emaillist;
+            EmailList original = await _database.EmailLists.Include(z => z.Contacts).FirstOrDefaultAsync(p => p.EmailListID == emaillists.EmailListId);
+            List<ViewContact> newlist = new List<ViewContact>();
+            foreach (ViewContactLess emaillistsContact in emaillists.Contacts)
+            {
+                newlist.Add(_factory.ViewContactGet(emaillistsContact));
+            }
+            return new EmailList();
         }
         // test
         public async Task<bool> DeleteEmailListById(int? id)
         {
             if (!id.HasValue) return false;
-            using (var transaction = _database.Database.BeginTransaction())
+            using (DbContextTransaction transaction = _database.Database.BeginTransaction())
             {
                 try
                 {
-                    var emaillist = await _database.EmailLists.FirstOrDefaultAsync(p => p.EmailListID == id.Value);
+                    EmailList emaillist = await _database.EmailLists.FirstOrDefaultAsync(p => p.EmailListID == id.Value);
                     _database.EmailLists.Remove(emaillist);
                     await _database.SaveChangesAsync();
                     transaction.Commit();
