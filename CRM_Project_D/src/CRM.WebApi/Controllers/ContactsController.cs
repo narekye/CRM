@@ -1,4 +1,6 @@
-﻿namespace CRM.WebApi.Controllers
+﻿using System.Web.Http.Results;
+
+namespace CRM.WebApi.Controllers
 {
     using System;
     using System.Data.Entity;
@@ -9,59 +11,23 @@
     using Models;
     using Entities;
     using HelperLibrary;
+    using InfrastructureModel;
+
 
     /// <summary>
     /// Api RESTful logic for CRM system
     /// </summary>
     public class ContactsController : ApiController
     {
+        private readonly ApplicationManager manager = new ApplicationManager();
+        // get completed, tested successful
         public async Task<IHttpActionResult> GetAllContactsAsync()
         {
             // TODO: login/auth check with token
             try
             {
-                using (var database = new CRMContext())
-                {
-                    var list = await database.Contacts.ToListAsync();
-                    var data = ContactModel.GetContactModelList(list);
-                    if (ReferenceEquals(data, null)) return NotFound();
-                    return Ok(data);
-                }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest($"{ex.Message}\n{ex.InnerException?.Message}");
-            }
-        }
-
-        /* Will not used */
-        public async Task<IHttpActionResult> GetContactByIdAsync(int? id)
-        {
-            // TODO: login/auth check with token
-            if (!id.HasValue) return BadRequest("Set parameter.");
-            try
-            {
-                using (var database = new CRMContext())
-                {
-                    var contact = await database.Contacts.FirstOrDefaultAsync(p => p.ContactId == id.Value);
-                    var data = ContactModel.GetContactModel(contact);
-                    if (ReferenceEquals(data, null)) return NotFound();
-                    return Ok(data);
-                }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        public async Task<IHttpActionResult> GetContactByGuidAsync([FromUri] Guid? guid)
-        {
-            if (ReferenceEquals(guid, null)) return NotFound();
-            try
-            {
-                var data = ContactModel.GetContactModel(await GetContactFromContext(guid.Value));
-                if (ReferenceEquals(null, data)) return BadRequest();
+                var data = await manager.GetAllContactsAsync();
+                if (ReferenceEquals(data, null)) return NotFound();
                 return Ok(data);
             }
             catch (Exception ex)
@@ -70,110 +36,110 @@
             }
         }
 
-        public async Task<IHttpActionResult> GetContactByPaginationAsync(int start, int numberOfRows, bool ascending)
-        {
-            using (var database = new CRMContext())
-            {
-                try
-                {
-                    var contacts = ascending
-                                    ? database.Contacts.OrderBy(x => x.ContactId)
-                                        .Skip(start - 1)
-                                        .Take(numberOfRows)
-                                    : database.Contacts.OrderByDescending(x => x.ContactId)
-                                        .Skip(start - 1)
-                                        .Take(numberOfRows);
-                    var result = ContactModel.GetContactModelList(await contacts.ToListAsync());
-                    if (ReferenceEquals(result, null)) return NotFound();
-                    return Ok(result);
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest(ex.Message);
-                }
-            }
-        }
-
         // working
-        public async Task<IHttpActionResult> PutContactAsync([FromBody] ContactModel c)
+        public async Task<IHttpActionResult> GetContactByIdAsync(int? id)
         {
-            // x-www-form-urlencoded
             // TODO: login/auth check with token
-            if (ReferenceEquals(c, null) || !ModelState.IsValid) return BadRequest();
-            Contact replace = await GetContactFromContactModel(c, false);
-            using (var database = new CRMContext())
+            if (!id.HasValue) return BadRequest("Set parameter.");
+            try
             {
-                Contact contact = await GetContactFromContext(c.GuId);
+                var contact = await manager.GetContactByIdAsync(id);
                 if (ReferenceEquals(contact, null)) return NotFound();
-                using (var transaction = database.Database.BeginTransaction())
-                {
-                    try
-                    {
-                        database.Entry(contact).CurrentValues.SetValues(replace);
-                        await database.SaveChangesAsync();
-                        transaction.Commit();
-                        return Ok();
-                    }
-                    catch (Exception ex)
-                    {
-                        transaction.Rollback();
-                        return BadRequest(ex.Message);
-                    }
-                }
+                return Ok(contact);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
 
         // working
-        public async Task<IHttpActionResult> PostContactAsync([FromBody] ContactModel c)
+        public async Task<IHttpActionResult> GetContactByGuidAsync([FromUri] Guid? guid)
+        {
+            try
+            {
+                var contact = await manager.GetContactByGuidAsync(guid);
+                if (ReferenceEquals(contact, null)) return NotFound();
+                return Ok(contact);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        //public async Task<IHttpActionResult> GetContactByPaginationAsync(int start, int numberOfRows, bool ascending)
+        //{
+        //    using (var database = new CRMContext())
+        //    {
+        //        try
+        //        {
+        //            var contacts = ascending
+        //                            ? database.Contacts.OrderBy(x => x.ContactId)
+        //                                .Skip(start - 1)
+        //                                .Take(numberOfRows)
+        //                            : database.Contacts.OrderByDescending(x => x.ContactId)
+        //                                .Skip(start - 1)
+        //                                .Take(numberOfRows);
+        //            var result = ViewContact.GetContactModelList(await contacts.ToListAsync());
+        //            if (ReferenceEquals(result, null)) return NotFound();
+        //            return Ok(result);
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            return BadRequest(ex.Message);
+        //        }
+        //    }
+        //}
+
+        // working
+
+        // working
+        public async Task<IHttpActionResult> PutContactAsync([FromBody] ViewContact c)
         {
             // x-www-form-urlencoded
             // TODO: login/auth check with token
             if (ReferenceEquals(c, null) || !ModelState.IsValid) return BadRequest();
-            using (var database = new CRMContext())
+            try
             {
-                var contact = await GetContactFromContactModel(c, true);
-                using (var transaction = database.Database.BeginTransaction())
-                {
-                    try
-                    {
-                        database.Contacts.Add(contact);
-                        await database.SaveChangesAsync();
-                        transaction.Commit();
-                        return Ok();
-                    }
-                    catch (Exception ex)
-                    {
-                        transaction.Rollback();
-                        return BadRequest(ex.Message);
-                    }
-                }
+                if (await manager.UpdateConactAsync(c)) return Ok();
+                return BadRequest();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+        // working
+        public async Task<IHttpActionResult> PostContactAsync([FromBody] ViewContact c)
+        {
+            // TODO: login/auth check with token
+            if (ReferenceEquals(c, null) || !ModelState.IsValid) return BadRequest();
+            try
+            {
+                if (await manager.AddContactAsync(c)) return Ok();
+                return BadRequest();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
-
         // working
         public async Task<IHttpActionResult> DeleteContactByGuIdAsync(Guid? guid)
         {
             // TODO: login/auth check with token
             if (!guid.HasValue) return BadRequest();
-            using (var database = new CRMContext())
+            try
             {
-                using (var transaction = database.Database.BeginTransaction())
-                {
-                    var contact = await GetContactFromContext(guid.Value);
-                    if (ReferenceEquals(contact, null)) return NotFound();
-                    try
-                    {
-                        database.Contacts.Remove(contact);
-                        await database.SaveChangesAsync();
-                        transaction.Commit();
-                        return Ok();
-                    }
-                    catch (Exception ex)
-                    {
-                        transaction.Rollback();
-                        return BadRequest(ex.Message);
-                    }
-                }
+                if (await manager.DeleteContactAsync(guid.Value)) return Ok();
+                return BadRequest();
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
 
@@ -204,58 +170,15 @@
         }
 
         [Route("api/contacts/count")]
-        public int GetContactsPageCount()
+        public async Task<int> GetContactsPageCount()
         {
-            using (var database = new CRMContext())
-            {
-                return database.Contacts.Count() / 10 + 1;
-            }
-        }
-        #region Helpers
-
-        private async Task<Contact> GetContactFromContactModel(ContactModel model, bool flag, List<EmailList> emailList = null)
-        {
-            Contact contact;
-            if (flag) // true returns new object with new Guid from model without contactId
-            {
-                contact = new Contact()
-                {
-                    GuID = Guid.NewGuid(),
-                    DateInserted = DateTime.UtcNow,
-                    FullName = model.FullName,
-                    CompanyName = model.CompanyName,
-                    Country = model.Country,
-                    Email = model.Email,
-                    Position = model.Position,
-                    EmailLists = emailList
-                };
-            }
-            else // false returns object from database 
-            {
-                using (var database = new CRMContext())
-                {
-                    contact = await database.Contacts.FirstOrDefaultAsync(p => p.GuID == model.GuId);
-                    contact.FullName = model.FullName;
-                    contact.CompanyName = model.CompanyName;
-                    contact.Country = model.Country;
-                    contact.Email = model.Email;
-                    contact.Position = model.Position;
-                    contact.EmailLists = emailList;
-                }
-            }
-            return contact;
+            return await manager.PageCountAsync();
         }
 
-        private async Task<Contact> GetContactFromContext(Guid guid)
+        protected override void Dispose(bool disposing)
         {
-            Contact result;
-            using (var database = new CRMContext())
-            {
-                result = await database.Contacts.FirstOrDefaultAsync(p => p.GuID == guid);
-            }
-            return result;
+            manager.Dispose();
+            base.Dispose(disposing);
         }
-        #endregion
-
     }
 }

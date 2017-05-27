@@ -7,22 +7,25 @@
     using AutoMapper;
     public class EmailListsModel
     {
-        static EmailListsModel()
-        {
-            Mapper.Initialize(f => f.CreateMap<EmailList, EmailListsModel>()
-            .ForMember("EmailListId", p => p.MapFrom(z => z.EmailListID))
-            .ForMember("EmailListName", p => p.MapFrom(z => z.EmailListName))
-            .ForMember("Contacts", p => p.MapFrom(z => z.Contacts.Select(t => t.FullName))));
-        }
         public int EmailListId { get; set; }
         public string EmailListName { get; set; }
 
-        public List<string> Contacts { get; set; }
+        public Dictionary<string, string> Contacts { get; set; }
 
         public static EmailListsModel GetEmailListsModel(EmailList emailList)
         {
-            var result = Mapper.Map<EmailList, EmailListsModel>(emailList);
-            return result;
+            int i = 0;
+            return new EmailListsModel
+            {
+                Contacts = (from d in emailList.Contacts
+                            select new ViewContact()
+                            {
+                                FullName = d.GuID.ToString(),
+                                Email = d.Email
+                            }).ToDictionary(item => item.FullName, item => item.Email),
+                EmailListName = emailList.EmailListName,
+                EmailListId = emailList.EmailListID
+            };
         }
 
         public static List<EmailListsModel> GetEmailListsModels(List<EmailList> list)

@@ -40,18 +40,18 @@ namespace CRM.WebApi.Controllers
             }
         }
 
-        public async Task<IHttpActionResult> PostEmailListAsync([FromBody] EmailListsModel model)
-        {
-            return this.Ok();
-        }
-        public async Task<IHttpActionResult> PostEmailListsAsync([FromBody] List<EmailListsModel> model)
-        {
-            return this.Ok();
-        }
+        //public async Task<IHttpActionResult> PostEmailListAsync([FromBody] EmailListsModel model)
+        //{
+        //    return this.Ok();
+        //}
+        //public async Task<IHttpActionResult> PostEmailListsAsync([FromBody] List<EmailListsModel> model)
+        //{
+        //    return this.Ok();
+        //}
 
-        public async Task<IHttpActionResult> DeleteEmailListById([FromUri] int? id)
-        {
-            return this.Ok();
-        }
+        //public async Task<IHttpActionResult> DeleteEmailListById([FromUri] int? id)
+        //{
+        //    return this.Ok();
+        //}
     }
 }

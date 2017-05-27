@@ -173,8 +173,12 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="InfrastructureModel\ApplicationManager.cs" />
-    <Compile Include="Models\ContactModel.cs" />
+    <Compile Include="InfrastructureModel\MailManager.cs" />
+    <Compile Include="InfrastructureModel\ModelFactory.cs" />
+    <Compile Include="InfrastructureModel\ParserProvider.cs" />
+    <Compile Include="Models\ViewContact.cs" />
     <Compile Include="Models\EmailListsModel.cs" />
+    <Compile Include="Models\ViewContactLess.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
