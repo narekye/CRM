@@ -6,106 +6,152 @@
     using System.IO;
     using System.Linq;
     using LinqToExcel;
+    using System.Runtime.InteropServices;
+
     public class ParserProvider
     {
-        public static List<Contact> GetContactsFromFile(byte[] bytes, string path)
+        private static int MimeSampleSize = 256;
+
+        private static string DefaultMimeType = "application/octet-stream";
+
+        [DllImport(@"urlmon.dll", CharSet = CharSet.Auto)]
+        private extern static uint FindMimeFromData(
+            uint pBC,
+            [MarshalAs(UnmanagedType.LPStr)] string pwzUrl,
+            [MarshalAs(UnmanagedType.LPArray)] byte[] pBuffer,
+            uint cbSize,
+            [MarshalAs(UnmanagedType.LPStr)] string pwzMimeProposed,
+            uint dwMimeFlags,
+            out uint ppwzMimeOut,
+            uint dwReserverd
+        );
+        private  string GetMimeFromBytes(byte[] data)
+        {
+            try
+            {
+                uint mimeType;
+                FindMimeFromData(0, null, data, (uint)MimeSampleSize, null, 0, out mimeType, 0);
+
+                var mimePointer = new IntPtr(mimeType);
+                var mime = Marshal.PtrToStringUni(mimePointer);
+                Marshal.FreeCoTaskMem(mimePointer);
+
+                return mime ?? DefaultMimeType;
+            }
+            catch
+            {
+                return DefaultMimeType;
+            }
+        }
+        private  List<Contact> ReadFromExcel(byte[] bytes)
         {
             List<Contact> contactslist = new List<Contact>();
-            System.IO.File.WriteAllBytes(path, bytes);
-            Microsoft.Office.Interop.Excel.Application xlApp = new Microsoft.Office.Interop.Excel.Application();
-            Microsoft.Office.Interop.Excel.Workbook xlWorkbook = xlApp.Workbooks.Open(path);
-            Microsoft.Office.Interop.Excel._Worksheet xlWorksheet = xlWorkbook.Sheets[1];
-            Microsoft.Office.Interop.Excel.Range xlRange = xlWorksheet.UsedRange;
-
-            for (int i = 1; i <= xlWorksheet.Rows.Count; i++)
-            {
-                Contact contact = new Contact();
-                try
-                {
-                    if (xlRange.Cells[i, 1].Value2 != null && xlRange.Cells[i, 1] != null)
-                    {
-                        for (int j = 1; j <= xlWorksheet.Columns.Count; j++)
-                        {
-                            if (xlRange.Cells[i, j] != null && xlRange.Cells[i, j].Value2 != null)
-                            {
-                                switch (j)
-                                {
-                                    case 1:
-                                        contact.FullName = xlRange.Cells[i, j].Value2.ToString();
-                                        break;
-                                    case 2:
-                                        contact.CompanyName = xlRange.Cells[i, j].Value2.ToString();
-                                        break;
-                                    case 3:
-                                        contact.Position = xlRange.Cells[i, j].Value2.ToString();
-                                        break;
-                                    case 4:
-                                        contact.Country = xlRange.Cells[i, j].Value2.ToString();
-                                        break;
-                                    case 5:
-                                        contact.Email = xlRange.Cells[i, j].Value2.ToString();
-                                        break;
-                                    case 6:
-                                        contact.DateInserted = (DateTime)xlRange.Cells[i, j].Value2.ToString();
-                                        break;
-                                }
-                            }
-                            else
-                                break;
-                        }
-                        contact.GuID = Guid.NewGuid();
-                        contactslist.Add(contact);
-                    }
-                    else
-                        break;
-                }
-                catch (Exception ex)
-                {
-                    System.IO.File.Delete(path);
-                    throw new Exception(ex.Message);
-                }
-                finally
-                {
-                    System.IO.File.Delete(path);
-                }
-            }
-            return contactslist;
-        }
-        public static List<Contact> GetContactsFromFile(byte[] bytes)
-        {
-            var contact = new Contact();
-            List<Contact> contactsList = new List<Contact>();
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + @"\newfile.xlsx";
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "file.xlsx";
             try
             {
                 File.WriteAllBytes(path, bytes);
-                var excel = new ExcelQueryFactory(path);
-                var contacts = from c in excel.Worksheet<Row>("Sheet1")
-                               select c;
+                ExcelQueryFactory excel = new ExcelQueryFactory(path);
+                var sheets = excel.GetWorksheetNames();
+                var contacts = (from c in excel.Worksheet<Row>(sheets.First())
+                                select c).ToList();
 
                 foreach (var m in contacts)
                 {
-                    contact = new Contact
-                    {
-                        FullName = m["fullname"],
-                        CompanyName = m["company"],
-                        Country = m["country"],
-                        Position = m["position"],
-                        Email = m["email"]
-                    };
-                    contactsList.Add(contact);
+                    Contact c = new Contact();
+                    c.FullName = m["fullname"];
+                    c.CompanyName = m["company"];
+                    c.Country = m["country"];
+                    c.Position = m["position"];
+                    c.Email = m["email"];
+                    c.DateInserted = Convert.ToDateTime(m["datainserted"]);
+                    c.GuID = Guid.NewGuid();
+                    contactslist.Add(c);
                 }
-            }
-            catch (Exception ex)
-            {
                 File.Delete(path);
-                throw new Exception(ex.Message);
             }
-            finally
+            catch
             {
                 File.Delete(path);
             }
-            return contactsList;
+            return contactslist;
+        }
+
+        private List<Contact> ReadFromCsv(byte[] bytes)
+        {
+            List<Contact> contactslist = new List<Contact>();
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "file.csv";
+            try
+            {
+                File.WriteAllBytes(path, bytes);
+                string[] lines = File.ReadAllLines(path);
+                string[] columns = lines[0].Split(',');
+                Dictionary<string, int> d = new Dictionary<string, int>();
+                d.Add("FullName", 0);
+                d.Add("Company", 1);
+                d.Add("Position", 2);
+                d.Add("Country", 3);
+                d.Add("Email", 4);
+                d.Add("DataInserted", 5);
+
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    Contact contact = new Contact();
+                    string[] values = lines[i].Split(',');
+                    for (int j = 0; j < values.Length; j++)
+                    {
+                        switch (j)
+                        {
+                            case 0:
+                                contact.FullName = values[d["FullName"]];
+                                break;
+                            case 1:
+                                contact.CompanyName = values[d["Company"]];
+                                break;
+                            case 2:
+                                contact.Position = values[d["Position"]];
+                                break;
+                            case 3:
+                                contact.Country = values[d["Country"]];
+                                break;
+                            case 4:
+                                contact.Email = values[d["Email"]];
+                                break;
+                            case 5:
+                                contact.DateInserted = Convert.ToDateTime(values[d["DataInserted"]]);
+                                break;
+                        }
+                    }
+                    contact.GuID = new Guid();
+                    contactslist.Add(contact);
+                }
+                File.Delete(path);
+            }
+            catch
+            {
+                File.Delete(path);
+            }
+            return contactslist;
+        }
+
+        public  List<Contact> GetContactsFromBytes(byte[] bytes)
+        {
+            List<Contact> list = new List<Contact>();
+            string p = GetMimeFromBytes(bytes);
+            switch (p)
+            {
+                case "text/csv":
+                case "text/plain":
+                    list = ReadFromCsv(bytes);
+                    break;
+                case "application/vnd.ms-excel":
+                case "application/x-zip-compressed":
+                    list = ReadFromExcel(bytes);
+                    break;
+                default:
+                    list = null;
+                    break;
+            }
+            return list;
         }
     }
 }
