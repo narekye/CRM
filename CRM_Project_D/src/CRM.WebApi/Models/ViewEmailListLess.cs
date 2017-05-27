@@ -6,26 +6,26 @@ using CRM.Entities;
 
 namespace CRM.WebApi.Models
 {
-    public class ViewEmailListsLess
+    public class ViewEmailListLess
     {
         public int EmailListId { get; set; }
         public string EmailListName { get; set; }
 
-        public static ViewEmailListsLess GetEmailListsLess(EmailList emailList)
+        public static ViewEmailListLess GetEmailListsLess(EmailList emailList)
         {
-            return new ViewEmailListsLess
+            return new ViewEmailListLess
             {
                 EmailListName = emailList.EmailListName,
                 EmailListId = emailList.EmailListID
             };
         }
 
-        public static List<ViewEmailListsLess> GetEmailListsLessList(List<EmailList> list)
+        public static List<ViewEmailListLess> GetEmailListsLessList(List<EmailList> list)
         {
-            var result = new List<ViewEmailListsLess>();
+            var result = new List<ViewEmailListLess>();
             foreach (EmailList emailList in list)
             {
-                result.Add(new ViewEmailListsLess()
+                result.Add(new ViewEmailListLess()
                 {
                     EmailListName = emailList.EmailListName,
                     EmailListId = emailList.EmailListID

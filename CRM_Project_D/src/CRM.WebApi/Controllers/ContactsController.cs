@@ -5,22 +5,16 @@
     using System.Threading.Tasks;
     using Models;
     using Entities;
-    using HelperLibrary;
     using InfrastructureModel;
-
-    /// <summary>
-    /// Api RESTful logic for CRM system
-    /// </summary>
     public class ContactsController : ApiController
     {
-        private readonly ApplicationManager manager = new ApplicationManager();
-        // get completed, tested successful
+        private readonly ApplicationManager _manager = new ApplicationManager();
         public async Task<IHttpActionResult> GetAllContactsAsync()
         {
             // TODO: login/auth check with token
             try
             {
-                var data = await manager.GetAllContactsAsync();
+                var data = await _manager.GetAllContactsAsync();
                 if (ReferenceEquals(data, null)) return NotFound();
                 return Ok(data);
             }
@@ -29,15 +23,13 @@
                 return BadRequest(ex.Message);
             }
         }
-
-        // working
         public async Task<IHttpActionResult> GetContactByIdAsync(int? id)
         {
             // TODO: login/auth check with token
             if (!id.HasValue) return BadRequest("Set parameter.");
             try
             {
-                var contact = await manager.GetContactByIdAsync(id);
+                var contact = await _manager.GetContactByIdAsync(id);
                 if (ReferenceEquals(contact, null)) return NotFound();
                 return Ok(contact);
             }
@@ -46,13 +38,11 @@
                 return BadRequest(ex.Message);
             }
         }
-
-        // working
         public async Task<IHttpActionResult> GetContactByGuidAsync([FromUri] Guid? guid)
         {
             try
             {
-                var contact = await manager.GetContactByGuidAsync(guid);
+                var contact = await _manager.GetContactByGuidAsync(guid);
                 if (ReferenceEquals(contact, null)) return NotFound();
                 return Ok(contact);
             }
@@ -61,7 +51,6 @@
                 return BadRequest(ex.Message);
             }
         }
-
         //public async Task<IHttpActionResult> GetContactByPaginationAsync(int start, int numberOfRows, bool ascending)
         //{
         //    using (var database = new CRMContext())
@@ -91,12 +80,11 @@
         // working
         public async Task<IHttpActionResult> PutContactAsync([FromBody] ViewContact c)
         {
-            // x-www-form-urlencoded
             // TODO: login/auth check with token
             if (ReferenceEquals(c, null) || !ModelState.IsValid) return BadRequest();
             try
             {
-                if (await manager.UpdateConactAsync(c)) return Ok();
+                if (await _manager.UpdateConactAsync(c)) return Ok();
                 return BadRequest();
             }
             catch (Exception ex)
@@ -105,14 +93,13 @@
             }
 
         }
-        // working
         public async Task<IHttpActionResult> PostContactAsync([FromBody] ViewContact c)
         {
             // TODO: login/auth check with token
             if (ReferenceEquals(c, null) || !ModelState.IsValid) return BadRequest();
             try
             {
-                if (await manager.AddContactAsync(c)) return Ok();
+                if (await _manager.AddContactAsync(c)) return Ok();
                 return BadRequest();
             }
             catch (Exception ex)
@@ -120,14 +107,13 @@
                 return BadRequest(ex.Message);
             }
         }
-        // working
         public async Task<IHttpActionResult> DeleteContactByGuIdAsync(Guid? guid)
         {
             // TODO: login/auth check with token
             if (!guid.HasValue) return BadRequest();
             try
             {
-                if (await manager.DeleteContactAsync(guid.Value)) return Ok();
+                if (await _manager.DeleteContactAsync(guid.Value)) return Ok();
                 return BadRequest();
 
             }
@@ -136,8 +122,6 @@
                 return BadRequest(ex.Message);
             }
         }
-
-        // not tested yet
         [Route("api/contacts/upload")]
         public async Task<IHttpActionResult> PostContactByteArrayAsync([FromBody] byte[] array)
         {
@@ -147,7 +131,7 @@
             {
                 try
                 {
-                    var contacts = Parsing.GetContactsFromFile(array, pathtowork);
+                    var contacts = ParserProvider.GetContactsFromFile(array, pathtowork);
                     {
                         database.Contacts.AddRange(contacts);
                         await database.SaveChangesAsync();
@@ -162,17 +146,10 @@
                 }
             }
         }
-
         [Route("api/contacts/count")]
         public async Task<int> GetContactsPageCount()
         {
-            return await manager.PageCountAsync();
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            manager.Dispose();
-            base.Dispose(disposing);
+            return await _manager.PageCountAsync();
         }
     }
 }

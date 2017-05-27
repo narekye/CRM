@@ -1,23 +1,20 @@
-﻿using System.Collections.Generic;
-using CRM.WebApi.InfrastructureModel;
-
-namespace CRM.WebApi.Controllers
+﻿namespace CRM.WebApi.Controllers
 {
-    using System.Linq;
+    using System;
     using System.Web.Http;
-    using System.Data.Entity;
     using System.Threading.Tasks;
+    using InfrastructureModel;
     using Models;
-    using Entities;
 
     public class EmailListsController : ApiController
     {
-        private readonly ApplicationManager Manager = new ApplicationManager();
+        private readonly ApplicationManager _manager = new ApplicationManager();
+
         public async Task<IHttpActionResult> GetAllEmailListsAsync()
         {
             try
             {
-                var data = await Manager.GetAllEmailListsAsync();
+                var data = await _manager.GetAllEmailListsAsync();
                 if (ReferenceEquals(data, null)) return NotFound();
                 return Ok(data);
             }
@@ -31,33 +28,50 @@ namespace CRM.WebApi.Controllers
         {
             try
             {
-                var result = await Manager.GetEmailListById(id);
+                var result = await _manager.GetEmailListById(id);
                 if (ReferenceEquals(result, null)) return NotFound();
                 return Ok(result);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
-
-        //public async Task<IHttpActionResult> PostEmailListAsync([FromBody] EmailListsModel model)
-        //{
-        //    return this.Ok();
-        //}
-        //public async Task<IHttpActionResult> PostEmailListsAsync([FromBody] List<EmailListsModel> model)
-        //{
-        //    return this.Ok();
-        //}
-
-        //public async Task<IHttpActionResult> DeleteEmailListById([FromUri] int? id)
-        //{
-        //    return this.Ok();
-        //}
-        /// <inheritdoc />
+        // not completed
+        public async Task<IHttpActionResult> PostEmailListAsync([FromBody] ViewEmailList model)
+        {
+            try
+            {
+                if (await _manager.AddEmailList(model)) return Ok();
+                return BadRequest();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        // not completed...
+        public async Task<IHttpActionResult> PutEmailListAsync([FromBody] ViewEmailList emaillist)
+        {
+            var data = await _manager.UpdateEmailList(emaillist);
+            return Ok(data);
+        }
+        // working
+        public async Task<IHttpActionResult> DeleteEmailListById([FromUri] int? id)
+        {
+            try
+            {
+                if (await _manager.DeleteEmailListById(id)) return Ok();
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         protected override void Dispose(bool disposing)
         {
-            Manager.Dispose();
+            _manager.Dispose();
             base.Dispose(disposing);
         }
     }

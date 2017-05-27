@@ -18,6 +18,7 @@ namespace CRM.WebApi.Models
         public Guid GuId { get; set; }
         public DateTime DateInserted { get; set; }
 
+
         public static List<ViewContactLess> CreateViewModelLess(List<Contact> contacts)
         {
             var data = new List<ViewContactLess>();

@@ -1,11 +1,10 @@
-﻿using System.Data.Entity;
-using System.Threading.Tasks;
-
-namespace CRM.WebApi.Models
+﻿namespace CRM.WebApi.Models
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Data.Entity;
+    using System.Threading.Tasks;
     using Entities;
     using AutoMapper;
     public class ViewContact
@@ -31,6 +30,7 @@ namespace CRM.WebApi.Models
         public Guid GuId { get; set; }
         public DateTime DateInserted { get; set; }
         public List<string> EmailLists { get; set; }
+
         public static ViewContact CreateViewModel(Contact contact)
         {
             var result = Mapper.Map<Contact, ViewContact>(contact);

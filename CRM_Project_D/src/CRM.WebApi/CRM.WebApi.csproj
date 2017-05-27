@@ -172,14 +172,15 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="InfrastructureModel\ApplicationManager.cs" />
+    <Compile Include="InfrastructureModel\ApplicationManagerContact.cs" />
+    <Compile Include="InfrastructureModel\ApplicationManagerEmail.cs" />
     <Compile Include="InfrastructureModel\MailManager.cs" />
     <Compile Include="InfrastructureModel\ModelFactory.cs" />
     <Compile Include="InfrastructureModel\ParserProvider.cs" />
     <Compile Include="Models\ViewContact.cs" />
-    <Compile Include="Models\ViewEmailLists.cs" />
+    <Compile Include="Models\ViewEmailList.cs" />
     <Compile Include="Models\ViewContactLess.cs" />
-    <Compile Include="Models\ViewEmailListsLess.cs" />
+    <Compile Include="Models\ViewEmailListLess.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -206,13 +207,38 @@
       <Project>{fb128658-832d-4d72-8a44-8196e4cb5ec8}</Project>
       <Name>CRM.Entities</Name>
     </ProjectReference>
-    <ProjectReference Include="..\CRM.HelperLibrary\CRM.HelperLibrary.csproj">
-      <Project>{1e053ec6-b451-4229-a61a-c246007eabc2}</Project>
-      <Name>CRM.HelperLibrary</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="Microsoft.Office.Core">
+      <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>5</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="Microsoft.Office.Interop.Excel">
+      <Guid>{00020813-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>7</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="VBIDE">
+      <Guid>{0002E157-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>5</VersionMajor>
+      <VersionMinor>3</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
