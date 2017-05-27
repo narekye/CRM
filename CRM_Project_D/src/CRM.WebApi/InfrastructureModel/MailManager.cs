@@ -15,6 +15,7 @@
 
     public class MailManager : IDisposable
     {
+        //Decrypting start
         static readonly string PasswordHash = "P@@Sw0rd";
         static readonly string SaltKey = "S@LT&KEY";
         static readonly string VIKey = "@1B2c3D4e5F6g7H8";
@@ -34,6 +35,8 @@
             cryptoStream.Close();
             return Encoding.UTF8.GetString(plainTextBytes, 0, decryptedByteCount).TrimEnd("\0".ToCharArray());
         }
+        //Decrypting end
+
         private readonly CRMContext _database = new CRMContext();
 
         public bool SendMail(string sendto, int templateid)
