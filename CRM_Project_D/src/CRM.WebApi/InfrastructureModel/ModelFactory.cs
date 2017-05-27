@@ -34,10 +34,37 @@
             return result;
         }
 
+        // =======================================================================================
+        // new added working
+        public ViewContact ViewContactGet(ViewContactLess less)
+        {
+            var contacts = new ViewContact()
+            {
+                CompanyName = less.CompanyName,
+                Country = less.Country,
+                DateInserted = less.DateInserted,
+                Email = less.Email,
+                FullName = less.FullName,
+                GuId = less.GuId,
+                Position = less.Position
+            };
+            return contacts;
+        }
+
+        public List<ViewContact> GetViewContactListFromLessList(List<ViewContactLess> less)
+        {
+            var list = new List<ViewContact>();
+            less.ForEach(i => list.Add(ViewContactGet(i)));
+            return list;
+        }
+        // =======================================================================================
+
+        #region RETURNS contact
+
         public async Task<Contact> GetContactFromContactModel(ViewContact model, bool flag, List<EmailList> emailList = null)
         {
             Contact contact;
-            if (flag) // true returns new object with new Guid from model without contactId
+            if (flag) // true returns new object with new Guid from model without contactId and emaillist |
             {
                 contact = new Contact()
                 {
@@ -64,6 +91,14 @@
             return contact;
         }
 
+        public List<Contact> EntityGetContactListFromViewContactList(List<ViewContact> list, bool flag, List<EmailList> emailLists = null)
+        {
+            var result = new List<Contact>();
+            if (flag) list.ForEach(async i => result.Add(await GetContactFromContactModel(i, true, emailLists)));
+            list.ForEach(async z => result.Add(await GetContactFromContactModel(z, false)));
+            return result;
+        }
+        #endregion
         #region VIEWemailMODELLESS
         public ViewEmailListLess GetEmailListsLess(EmailList emailList)
         {
@@ -116,7 +151,7 @@
 
         #region VIEWEMAILLIST
 
-        public ViewEmailList GetEmailListsModel(EmailList emailList)
+        public ViewEmailList GetViewEmailList(EmailList emailList)
         {
             return new ViewEmailList
             {
@@ -141,12 +176,12 @@
             var result = new List<ViewEmailList>();
             foreach (EmailList emailList in list)
             {
-                result.Add(GetEmailListsModel(emailList));
+                result.Add(this.GetViewEmailList(emailList));
             }
             return result;
         }
 
-        public async Task<EmailList> CreateEmailList(ViewEmailList viewEmailList, bool flag, List<Contact> contacts = null)
+        public async Task<EmailList> EntityCreateEmailList(ViewEmailList viewEmailList, bool flag, List<Contact> contacts = null)
         {
             EmailList obj;
             if (flag) // returns new object 
