@@ -15,8 +15,8 @@
         private static string DefaultMimeType = "application/octet-stream";
 
         [DllImport(@"urlmon.dll", CharSet = CharSet.Auto)]
-        private extern static uint FindMimeFromData(
-            uint pBC,
+        private static extern uint FindMimeFromData(
+            uint pBc,
             [MarshalAs(UnmanagedType.LPStr)] string pwzUrl,
             [MarshalAs(UnmanagedType.LPArray)] byte[] pBuffer,
             uint cbSize,
@@ -25,7 +25,7 @@
             out uint ppwzMimeOut,
             uint dwReserverd
         );
-        private  string GetMimeFromBytes(byte[] data)
+        private string GetMimeFromBytes(byte[] data)
         {
             try
             {
@@ -43,7 +43,7 @@
                 return DefaultMimeType;
             }
         }
-        private  List<Contact> ReadFromExcel(byte[] bytes)
+        private List<Contact> ReadFromExcel(byte[] bytes)
         {
             List<Contact> contactslist = new List<Contact>();
             string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "file.xlsx";
@@ -63,13 +63,16 @@
                     c.Country = m["country"];
                     c.Position = m["position"];
                     c.Email = m["email"];
-                    c.DateInserted = Convert.ToDateTime(m["datainserted"]);
-                    c.GuID = Guid.NewGuid();
                     contactslist.Add(c);
                 }
                 File.Delete(path);
             }
-            catch
+            catch (Exception ex)
+            {
+                File.Delete(path);
+                throw new Exception(ex.Message);
+            }
+            finally
             {
                 File.Delete(path);
             }
@@ -133,7 +136,7 @@
             return contactslist;
         }
 
-        public  List<Contact> GetContactsFromBytes(byte[] bytes)
+        public List<Contact> GetContactsFromBytes(byte[] bytes)
         {
             List<Contact> list = new List<Contact>();
             string p = GetMimeFromBytes(bytes);
