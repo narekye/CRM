@@ -177,8 +177,9 @@
     <Compile Include="InfrastructureModel\ModelFactory.cs" />
     <Compile Include="InfrastructureModel\ParserProvider.cs" />
     <Compile Include="Models\ViewContact.cs" />
-    <Compile Include="Models\EmailListsModel.cs" />
+    <Compile Include="Models\ViewEmailLists.cs" />
     <Compile Include="Models\ViewContactLess.cs" />
+    <Compile Include="Models\ViewEmailListsLess.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -209,6 +210,9 @@
       <Project>{1e053ec6-b451-4229-a61a-c246007eabc2}</Project>
       <Name>CRM.HelperLibrary</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -1,18 +1,12 @@
-﻿using System.Web.Http.Results;
-
-namespace CRM.WebApi.Controllers
+﻿namespace CRM.WebApi.Controllers
 {
     using System;
-    using System.Data.Entity;
     using System.Web.Http;
-    using System.Linq;
-    using System.Collections.Generic;
     using System.Threading.Tasks;
     using Models;
     using Entities;
     using HelperLibrary;
     using InfrastructureModel;
-
 
     /// <summary>
     /// Api RESTful logic for CRM system

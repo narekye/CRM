@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CRM.WebApi.InfrastructureModel;
 
 namespace CRM.WebApi.Controllers
 {
@@ -11,23 +12,21 @@ namespace CRM.WebApi.Controllers
 
     public class EmailListsController : ApiController
     {
-        private readonly CRMContext _database = new CRMContext();
+        private readonly ApplicationManager manager = new ApplicationManager();
         public async Task<IHttpActionResult> GetAllEmailListsAsync()
         {
-            using (var database = new CRMContext())
+            try
             {
-                try
-                {
-                    var data = EmailListsModel.GetEmailListsModels(await database.EmailLists.ToListAsync());
-                    if (ReferenceEquals(data, null)) return NotFound();
-                    return Ok(data);
-                }
-                catch (System.Exception ex)
-                {
-                    return BadRequest(ex.Message);
-                }
+                var data = await manager.GetAllEmailListsAsync();
+                if (ReferenceEquals(data, null)) return NotFound();
+                return Ok(data);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
+
 
         public async Task<IHttpActionResult> GetEmailListByIdAsync(int? id)
         {

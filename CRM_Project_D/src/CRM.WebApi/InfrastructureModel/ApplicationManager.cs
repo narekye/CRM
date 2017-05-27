@@ -75,6 +75,7 @@
                 throw new EntityException(ex.Message);
             }
         }
+
         // working
         public async Task<ViewContact> GetContactByIdAsync(int? id)
         {
@@ -92,6 +93,7 @@
                 throw new Exception(ex.Message);
             }
         }
+
         // working
         public async Task<ViewContact> GetContactByGuidAsync(Guid? guid)
         {
@@ -108,6 +110,7 @@
                 throw new Exception(ex.Message);
             }
         }
+
         // working
         public async Task<bool> UpdateConactAsync(ViewContact contact)
         {
@@ -134,6 +137,7 @@
                 }
             }
         }
+
         // working
         public async Task<bool> AddContactAsync(ViewContact contact)
         {
@@ -154,6 +158,7 @@
                 }
             }
         }
+
         // working
         public async Task<bool> DeleteContactAsync(Guid guid)
         {
@@ -177,6 +182,23 @@
             {
                 var count = await Database.Contacts.CountAsync();
                 return count / 10 + 1;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+        }
+
+        public async Task<List<ViewEmailListsLess>> GetAllEmailListsAsync()
+        {
+            try
+            {
+                var list = await Database.EmailLists.ToListAsync();
+                if (ReferenceEquals(list, null)) return null;
+                var result = ViewEmailListsLess.GetEmailListsLessList(list);
+                if (ReferenceEquals(result, null)) return null;
+                return result;
             }
             catch (Exception ex)
             {
