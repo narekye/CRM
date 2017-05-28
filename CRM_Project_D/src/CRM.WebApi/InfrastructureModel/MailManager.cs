@@ -36,9 +36,11 @@
             return Encoding.UTF8.GetString(plainTextBytes, 0, decryptedByteCount).TrimEnd("\0".ToCharArray());
         }
 
-        public bool SendMail(string sendto, int templateid)
+        public async Task<bool> SendMail(Contact sendto, int templateid)
         {
             // TODO: get the template and put to mail body. {templateid}
+            var template = await _database.Templates.FirstOrDefaultAsync(p => p.TemplateId == templateid);
+            var getpath = template.TemplatePath;
             Configuration config = System.Web.HttpContext.Current != null ?
                 System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration("~") :
                 ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
@@ -58,11 +60,16 @@
                 {
                     From = new MailAddress(@from)
                 };
-                message.To.Add(new MailAddress(sendto));
+
+                string path = System.Web.HttpContext.Current?.Request.MapPath(getpath);
+                if (ReferenceEquals(path, null)) throw new ArgumentNullException(nameof(path));
+                var html = File.ReadAllText(path);
+                var send = html.Replace("{yourname}", sendto.FullName);
+                message.To.Add(new MailAddress(sendto.Email));
                 message.CC.Add(new MailAddress(from));
-                message.Subject = "CRM Project Group-D";
+                message.Subject = "BetConstruct CRM project team D";
                 message.IsBodyHtml = true;
-                message.Body = "Hello!";
+                message.Body = send;
                 var client = new SmtpClient
                 {
                     Host = host,
@@ -80,18 +87,19 @@
             }
         }
 
-        public void SendEmailToList(List<string> list, int t)
+        public async Task SendEmailToList(List<Contact> list, int t)
         {
-            list.ForEach(i => SendMail(i, t));
+            foreach (Contact contact in list)
+               await SendMail(contact, t);
         }
-        public async Task<List<string>> GetListOfEmailsByGuids(List<Guid> guids)
+        public async Task<List<Contact>> GetListOfEmailsByGuids(List<Guid> guids)
         {
-            var list = new List<string>();
+            var list = new List<Contact>();
             foreach (Guid guid in guids)
             {
                 try
                 {
-                    list.Add((await _database.Contacts.FirstOrDefaultAsync(p => p.GuID == guid)).Email);
+                    list.Add((await _database.Contacts.FirstOrDefaultAsync(p => p.GuID == guid)));
                 }
                 catch (Exception ex)
                 {

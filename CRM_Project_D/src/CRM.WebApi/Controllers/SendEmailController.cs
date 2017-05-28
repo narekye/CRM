@@ -13,7 +13,7 @@
             try
             {
                 var list = await _manager.GetListOfEmailsByGuids(guids);
-                _manager.SendEmailToList(list, templateid);
+                await _manager.SendEmailToList(list, templateid);
                 return Ok();
             }
             catch (Exception ex)

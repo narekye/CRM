@@ -108,7 +108,7 @@
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest($"{ex.Message}\n{ex.InnerException?.Message}");
             }
         }
         public async Task<IHttpActionResult> DeleteContactByGuIdAsync([FromUri] Guid? guid)
