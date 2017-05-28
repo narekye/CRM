@@ -1,4 +1,6 @@
-﻿namespace CRM.WebApi.Controllers
+﻿using System.Collections.Generic;
+
+namespace CRM.WebApi.Controllers
 {
     using System;
     using System.Web.Http;
@@ -78,10 +80,6 @@
         //        }
         //    }
         //}
-
-        // working
-
-        // working
         public async Task<IHttpActionResult> PutContactAsync([FromBody] ViewContact c)
         {
             // TODO: login/auth check with token
@@ -109,6 +107,20 @@
             catch (Exception ex)
             {
                 return BadRequest($"{ex.Message}\n{ex.InnerException?.Message}");
+            }
+        }
+        [Route("api/contacts/filter")]
+        public async Task<IHttpActionResult> PostFilterOrderBy([FromBody] RequestQuery request)
+        {
+            try
+            {
+                var data = await _manager.FilterOrderByRequestAsync(request);
+                if (ReferenceEquals(data, null)) return BadRequest();
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
         public async Task<IHttpActionResult> DeleteContactByGuIdAsync([FromUri] Guid? guid)
@@ -144,13 +156,6 @@
         {
             return await _manager.PageCountAsync();
         }
-        [Route("api/contacts/big")]
-        public async Task<IHttpActionResult> PostBigTask([FromBody] RequestQuery request)
-        {
-            var data = await _manager.PostBigRequestAsync(request);
-            return Ok(data);
-        }
-
         protected override void Dispose(bool disposing)
         {
             if (disposing) _manager.Dispose();

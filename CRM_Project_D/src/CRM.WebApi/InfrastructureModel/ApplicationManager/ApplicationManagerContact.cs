@@ -9,14 +9,12 @@
     using Entities;
     using Models.Request;
     using Models.Response;
-
-    // TODO: Sort and pagination
+    // TODO: pagination
     public partial class ApplicationManager : IDisposable
     {
         private readonly CRMContext _database;
         private readonly ModelFactory _factory;
         private readonly ParserProvider _parser;
-
         public ApplicationManager()
         {
             _parser = new ParserProvider();
@@ -24,13 +22,12 @@
             _database = new CRMContext();
             _database.Configuration.LazyLoadingEnabled = false;
         }
-
         public async Task<List<ViewContactLess>> GetAllContactsAsync()
         {
             try
             {
-                var list = await _database.Contacts.ToListAsync();
-                var data = _factory.CreateViewContactLessList(list);
+                List<Contact> list = await _database.Contacts.ToListAsync();
+                List<ViewContactLess> data = _factory.CreateViewContactLessList(list);
                 return data;
             }
             catch (Exception ex)
@@ -38,17 +35,16 @@
                 throw new EntityException(ex.Message);
             }
         }
-
         public async Task<ViewContact> GetContactByIdAsync(int? id)
         {
             if (!id.HasValue) return null;
             try
             {
-                var contact =
+                Contact contact =
                     await
                         _database.Contacts.Include(p => p.EmailLists).FirstOrDefaultAsync(p => p.ContactId == id.Value);
                 if (ReferenceEquals(contact, null)) return null;
-                var data = _factory.CreateViewModel(contact);
+                ViewContact data = _factory.CreateViewModel(contact);
                 return data;
             }
             catch (Exception ex)
@@ -56,15 +52,14 @@
                 throw new Exception(ex.Message);
             }
         }
-
         public async Task<ViewContact> GetContactByGuidAsync(Guid? guid)
         {
             try
             {
-                var contact =
+                Contact contact =
                     await _database.Contacts.Include(p => p.EmailLists).FirstOrDefaultAsync(p => p.GuID == guid.Value);
                 if (ReferenceEquals(contact, null)) return null;
-                var data = _factory.CreateViewModel(contact);
+                ViewContact data = _factory.CreateViewModel(contact);
                 return data;
             }
             catch (Exception ex)
@@ -72,19 +67,18 @@
                 throw new Exception(ex.Message);
             }
         }
-
         public async Task<bool> UpdateConactAsync(ViewContact contact)
         {
             if (ReferenceEquals(contact, null)) return false;
-            using (var transaction = _database.Database.BeginTransaction())
+            using (DbContextTransaction transaction = _database.Database.BeginTransaction())
             {
                 try
                 {
-                    var original =
+                    Contact original =
                         await
                             _database.Contacts.Include(p => p.EmailLists)
                                 .FirstOrDefaultAsync(p => p.GuID == contact.GuId);
-                    var replace = await _factory.GetContactFromContactModel(contact, false);
+                    Contact replace = await _factory.GetContactFromContactModel(contact, false);
                     replace.ContactId = original.ContactId;
                     _database.Entry(original).CurrentValues.SetValues(replace);
                     await _database.SaveChangesAsync();
@@ -98,11 +92,10 @@
                 }
             }
         }
-
         public async Task<bool> AddContactAsync(ViewContact contact)
         {
-            var cont = await _factory.GetContactFromContactModel(contact, true);
-            using (var transaction = _database.Database.BeginTransaction())
+            Contact cont = await _factory.GetContactFromContactModel(contact, true);
+            using (DbContextTransaction transaction = _database.Database.BeginTransaction())
             {
                 try
                 {
@@ -118,10 +111,9 @@
                 }
             }
         }
-
         public async Task<bool> DeleteContactAsync(Guid guid)
         {
-            var cont = await _database.Contacts.FirstOrDefaultAsync(p => p.GuID == guid);
+            Contact cont = await _database.Contacts.FirstOrDefaultAsync(p => p.GuID == guid);
             try
             {
                 _database.Contacts.Remove(cont);
@@ -133,12 +125,11 @@
                 throw new Exception(ex.Message);
             }
         }
-
         public async Task<int> PageCountAsync()
         {
             try
             {
-                var count = await _database.Contacts.CountAsync();
+                int count = await _database.Contacts.CountAsync();
                 return count / 10 + 1;
             }
             catch (Exception ex)
@@ -146,41 +137,40 @@
                 throw new Exception(ex.Message);
             }
         }
-
-        public async Task<List<ViewContactLess>> PostBigRequestAsync(RequestQuery request)
+        public async Task<List<ViewContactLess>> FilterOrderByRequestAsync(RequestQuery request)
         {
             if (ReferenceEquals(request, null)) return null;
-            var filter = request.FilterBy;
-            var result = new List<ViewContactLess>();
+            ViewContactLess filter = request.FilterBy;
+            List<ViewContactLess> result = new List<ViewContactLess>();
             try
             {
                 if (filter.FullName != null)
-                    result = await Filter(request, FilterBy.Name);
+                    result = await FilterSortAsync(request, FilterBy.Name);
                 if (filter.CompanyName != null)
                 {
-                    result = await Filter(request, FilterBy.Company);
+                    result = await FilterSortAsync(request, FilterBy.Company);
                     if (filter.FullName != null)
-                        result = await Filter(request, FilterBy.NameCompany);
+                        result = await FilterSortAsync(request, FilterBy.NameCompany);
                 }
                 if (filter.Position != null)
                 {
-                    result = await Filter(request, FilterBy.Position);
+                    result = await FilterSortAsync(request, FilterBy.Position);
                     if (filter.FullName != null)
-                        result = await Filter(request, FilterBy.NamePosition);
+                        result = await FilterSortAsync(request, FilterBy.NamePosition);
                     if (filter.CompanyName != null)
-                        result = await Filter(request, FilterBy.CompanyPosition);
+                        result = await FilterSortAsync(request, FilterBy.CompanyPosition);
                     if (filter.FullName != null && filter.CompanyName != null)
-                        result = await Filter(request, FilterBy.NameCompanyPosition);
+                        result = await FilterSortAsync(request, FilterBy.NameCompanyPosition);
                 }
                 if (filter.Country != null)
                 {
-                    result = await Filter(request, FilterBy.Country);
+                    result = await FilterSortAsync(request, FilterBy.Country);
                     if (filter.FullName != null)
-                        result = await Filter(request, FilterBy.NameCountry);
+                        result = await FilterSortAsync(request, FilterBy.NameCountry);
                     if (filter.Position != null)
-                        result = await Filter(request, FilterBy.CompanyPosition);
+                        result = await FilterSortAsync(request, FilterBy.CompanyPosition);
                     if (filter.FullName != null && filter.Position != null)
-                        result = await Filter(request, FilterBy.NamePositionCountry);
+                        result = await FilterSortAsync(request, FilterBy.NamePositionCountry);
                 }
                 return result;
             }
@@ -189,12 +179,11 @@
                 throw new Exception(ex.Message);
             }
         }
-
-        public async Task<List<ViewContactLess>> Filter(RequestQuery model, FilterBy filter)
+        public async Task<List<ViewContactLess>> FilterSortAsync(RequestQuery model, FilterBy filter)
         {
-            var data = new List<Contact>();
-            var filterby = model.FilterBy;
-
+            List<Contact> data = new List<Contact>();
+            Dictionary<string, string> sortby = model.SortBy;
+            ViewContactLess filterby = model.FilterBy;
             #region SWITCH
 
             switch (filter)
@@ -271,18 +260,39 @@
             }
 
             #endregion
-
-            var result = _factory.CreateViewContactLessList(data);
+            if (sortby.ContainsKey("OrderBy"))
+            {
+                string orderby = sortby["OrderBy"];
+                if (orderby == "Ascending" || orderby == "0")
+                    data = Sort(OrderBy.Ascending, data);
+                if (orderby == "Descending" || orderby == "1")
+                    data = Sort(OrderBy.Descending, data);
+            }
+            List<ViewContactLess> result = _factory.CreateViewContactLessList(data);
             return result;
         }
-
+        public List<Contact> Sort(OrderBy sortby, List<Contact> contacts)
+        {
+            List<Contact> result = new List<Contact>();
+            if (ReferenceEquals(contacts, null)) return null;
+            switch (sortby)
+            {
+                case OrderBy.Ascending:
+                    result = contacts.OrderBy(p => p.ContactId).ToList();
+                    break;
+                case OrderBy.Descending:
+                    result = contacts.OrderByDescending(p => p.ContactId).ToList();
+                    break;
+            }
+            return result;
+        }
         public async Task<bool> AddToDatabaseFromBytes(byte[] bytes)
         {
-            using (var transaction = _database.Database.BeginTransaction())
+            using (DbContextTransaction transaction = _database.Database.BeginTransaction())
             {
                 try
                 {
-                    var contacts = _parser.GetContactsFromBytes(bytes);
+                    List<Contact> contacts = _parser.GetContactsFromBytes(bytes);
                     _database.Contacts.AddRange(contacts);
                     await _database.SaveChangesAsync();
                     transaction.Commit();
@@ -295,13 +305,11 @@
                 }
             }
         }
-
         public void Dispose()
         {
             _database.Dispose();
         }
     }
-
     public enum FilterBy
     {
         Name,
@@ -318,8 +326,7 @@
         NameCompanyPositionCountry,
         DateInserted
     }
-
-    public enum SortBy
+    public enum OrderBy
     {
         NoSort,
         Ascending,
