@@ -3,10 +3,9 @@
     using System;
     using System.Web.Http;
     using System.Threading.Tasks;
-    using InfrastructureModel;
     using Models.Request;
     using Models.Response;
-
+    using InfrastructureModel.ApplicationManager;
     public class ContactsController : ApiController
     {
         private readonly ApplicationManager _manager;
@@ -141,15 +140,21 @@
             }
         }
         [Route("api/contacts/count")]
-        public async Task<int> GetContactsPageCount()
+        public async Task<int> GetContactsPageCountAsync()
         {
             return await _manager.PageCountAsync();
         }
         [Route("api/contacts/big")]
         public async Task<IHttpActionResult> PostBigTask([FromBody] RequestQuery request)
         {
-            var data = await _manager.PostBigRequest(request);
+            var data = await _manager.PostBigRequestAsync(request);
             return Ok(data);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing) _manager.Dispose();
+            base.Dispose(disposing);
         }
     }
 }

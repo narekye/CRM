@@ -169,11 +169,13 @@
     <Compile Include="Controllers\ContactsController.cs" />
     <Compile Include="Controllers\EmailListsController.cs" />
     <Compile Include="Controllers\SendEmailController.cs" />
+    <Compile Include="Controllers\TemplateController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="InfrastructureModel\ApplicationManagerContact.cs" />
-    <Compile Include="InfrastructureModel\ApplicationManagerEmail.cs" />
+    <Compile Include="InfrastructureModel\ApplicationManager\ApplicationManagerContact.cs" />
+    <Compile Include="InfrastructureModel\ApplicationManager\ApplicationManagerEmail.cs" />
+    <Compile Include="InfrastructureModel\ApplicationManager\ApplicationManagerTemplate.cs" />
     <Compile Include="InfrastructureModel\MailManager.cs" />
     <Compile Include="InfrastructureModel\ModelFactory.cs" />
     <Compile Include="InfrastructureModel\ParserProvider.cs" />

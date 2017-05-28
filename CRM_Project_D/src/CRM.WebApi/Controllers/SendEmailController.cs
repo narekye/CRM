@@ -5,11 +5,9 @@
     using System.Web.Http;
     using System.Threading.Tasks;
     using InfrastructureModel;
-
     public class SendEmailController : ApiController
     {
         private readonly MailManager _manager = new MailManager();
-
         public async Task<IHttpActionResult> PostSendToList([FromUri] int templateid, [FromBody] List<Guid> guids)
         {
             try

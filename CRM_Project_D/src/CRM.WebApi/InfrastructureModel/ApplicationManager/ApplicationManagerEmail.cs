@@ -1,4 +1,4 @@
-﻿namespace CRM.WebApi.InfrastructureModel
+﻿namespace CRM.WebApi.InfrastructureModel.ApplicationManager
 {
     using System;
     using System.Collections.Generic;
@@ -6,6 +6,7 @@
     using System.Threading.Tasks;
     using Entities;
     using Models.Response;
+
     public partial class ApplicationManager
     {
         public async Task<List<ViewEmailListLess>> GetAllEmailListsAsync()
@@ -62,14 +63,14 @@
             }
         }
         // update emallist, petqa dzel hamarya datarka
-        public async Task<EmailList> UpdateEmailList(ViewEmailList emaillists)
+        public async Task<EmailList> UpdateEmailListAsync(ViewEmailList emaillists)
         {
             EmailList original = await _database.EmailLists.Include(z => z.Contacts).FirstOrDefaultAsync(p => p.EmailListID == emaillists.EmailListId);
             List<ViewContact> newlist = new List<ViewContact>();
 
             return new EmailList();
         }
-        public async Task<bool> DeleteEmailListById(int? id)
+        public async Task<bool> DeleteEmailListByIdAsync(int? id)
         {
             if (!id.HasValue) return false;
             using (DbContextTransaction transaction = _database.Database.BeginTransaction())

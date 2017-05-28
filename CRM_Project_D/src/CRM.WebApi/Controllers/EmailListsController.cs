@@ -3,7 +3,7 @@
     using System;
     using System.Web.Http;
     using System.Threading.Tasks;
-    using InfrastructureModel;
+    using InfrastructureModel.ApplicationManager;
     using Models.Response;
     public class EmailListsController : ApiController
     {
@@ -17,7 +17,7 @@
                 if (ReferenceEquals(data, null)) return NotFound();
                 return Ok(data);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -49,18 +49,17 @@
                 return BadRequest(ex.Message);
             }
         }
-        // not completed...
+        // TODO: CHANGE
         public async Task<IHttpActionResult> PutEmailListAsync([FromBody] ViewEmailList emaillist)
         {
-            var data = await _manager.UpdateEmailList(emaillist);
+            var data = await _manager.UpdateEmailListAsync(emaillist);
             return Ok(data);
         }
-        // working
         public async Task<IHttpActionResult> DeleteEmailListById([FromUri] int? id)
         {
             try
             {
-                if (await _manager.DeleteEmailListById(id)) return Ok();
+                if (await _manager.DeleteEmailListByIdAsync(id)) return Ok();
                 return NotFound();
             }
             catch (Exception ex)

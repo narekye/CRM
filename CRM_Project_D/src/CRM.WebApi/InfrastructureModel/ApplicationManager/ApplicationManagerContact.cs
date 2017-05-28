@@ -1,14 +1,14 @@
-﻿namespace CRM.WebApi.InfrastructureModel
+﻿namespace CRM.WebApi.InfrastructureModel.ApplicationManager
 {
     using System;
     using System.Collections.Generic;
     using System.Data;
     using System.Data.Entity;
-    using System.Threading.Tasks;
     using System.Linq;
+    using System.Threading.Tasks;
     using Entities;
-    using Models.Response;
     using Models.Request;
+    using Models.Response;
 
     // TODO: Sort and pagination
     public partial class ApplicationManager : IDisposable
@@ -16,6 +16,7 @@
         private readonly CRMContext _database;
         private readonly ModelFactory _factory;
         private readonly ParserProvider _parser;
+
         public ApplicationManager()
         {
             _parser = new ParserProvider();
@@ -23,6 +24,7 @@
             _database = new CRMContext();
             _database.Configuration.LazyLoadingEnabled = false;
         }
+
         public async Task<List<ViewContactLess>> GetAllContactsAsync()
         {
             try
@@ -36,13 +38,15 @@
                 throw new EntityException(ex.Message);
             }
         }
+
         public async Task<ViewContact> GetContactByIdAsync(int? id)
         {
             if (!id.HasValue) return null;
             try
             {
                 var contact =
-                    await _database.Contacts.Include(p => p.EmailLists).FirstOrDefaultAsync(p => p.ContactId == id.Value);
+                    await
+                        _database.Contacts.Include(p => p.EmailLists).FirstOrDefaultAsync(p => p.ContactId == id.Value);
                 if (ReferenceEquals(contact, null)) return null;
                 var data = _factory.CreateViewModel(contact);
                 return data;
@@ -52,6 +56,7 @@
                 throw new Exception(ex.Message);
             }
         }
+
         public async Task<ViewContact> GetContactByGuidAsync(Guid? guid)
         {
             try
@@ -67,6 +72,7 @@
                 throw new Exception(ex.Message);
             }
         }
+
         public async Task<bool> UpdateConactAsync(ViewContact contact)
         {
             if (ReferenceEquals(contact, null)) return false;
@@ -92,6 +98,7 @@
                 }
             }
         }
+
         public async Task<bool> AddContactAsync(ViewContact contact)
         {
             var cont = await _factory.GetContactFromContactModel(contact, true);
@@ -111,6 +118,7 @@
                 }
             }
         }
+
         public async Task<bool> DeleteContactAsync(Guid guid)
         {
             var cont = await _database.Contacts.FirstOrDefaultAsync(p => p.GuID == guid);
@@ -125,6 +133,7 @@
                 throw new Exception(ex.Message);
             }
         }
+
         public async Task<int> PageCountAsync()
         {
             try
@@ -136,9 +145,9 @@
             {
                 throw new Exception(ex.Message);
             }
-
         }
-        public async Task<List<ViewContactLess>> PostBigRequest(RequestQuery request)
+
+        public async Task<List<ViewContactLess>> PostBigRequestAsync(RequestQuery request)
         {
             if (ReferenceEquals(request, null)) return null;
             var filter = request.FilterBy;
@@ -180,24 +189,27 @@
                 throw new Exception(ex.Message);
             }
         }
+
         public async Task<List<ViewContactLess>> Filter(RequestQuery model, FilterBy filter)
         {
             var data = new List<Contact>();
             var filterby = model.FilterBy;
+
             #region SWITCH
+
             switch (filter)
             {
                 case FilterBy.Name:
                     data = await
-                       _database.Contacts
-                       .Where(p => p.FullName == filterby.FullName)
-                       .ToListAsync();
+                        _database.Contacts
+                            .Where(p => p.FullName == filterby.FullName)
+                            .ToListAsync();
                     break;
                 case FilterBy.Company:
                     data = await
-                       _database.Contacts
-                       .Where(p => p.CompanyName == filterby.CompanyName)
-                       .ToListAsync();
+                        _database.Contacts
+                            .Where(p => p.CompanyName == filterby.CompanyName)
+                            .ToListAsync();
                     break;
                 case FilterBy.NameCompany:
                     data =
@@ -257,10 +269,13 @@
                                     p.Country == filterby.Country).ToListAsync();
                     break;
             }
+
             #endregion
+
             var result = _factory.CreateViewContactLessList(data);
             return result;
         }
+
         public async Task<bool> AddToDatabaseFromBytes(byte[] bytes)
         {
             using (var transaction = _database.Database.BeginTransaction())
@@ -272,7 +287,6 @@
                     await _database.SaveChangesAsync();
                     transaction.Commit();
                     return true;
-
                 }
                 catch (Exception ex)
                 {
@@ -281,11 +295,13 @@
                 }
             }
         }
+
         public void Dispose()
         {
             _database.Dispose();
         }
     }
+
     public enum FilterBy
     {
         Name,
@@ -302,6 +318,7 @@
         NameCompanyPositionCountry,
         DateInserted
     }
+
     public enum SortBy
     {
         NoSort,
