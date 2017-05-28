@@ -15,11 +15,11 @@
 
     public class MailManager : IDisposable
     {
-        //Decrypting start
-        static readonly string PasswordHash = "P@@Sw0rd";
-        static readonly string SaltKey = "S@LT&KEY";
-        static readonly string VIKey = "@1B2c3D4e5F6g7H8";
-        string Decrypt(string encryptedText)
+        private readonly CRMContext _database = new CRMContext();
+        private static readonly string PasswordHash = "P@@Sw0rd";
+        private static readonly string SaltKey = "S@LT&KEY";
+        private static readonly string VIKey = "@1B2c3D4e5F6g7H8";
+        private string Decrypt(string encryptedText)
         {
             byte[] cipherTextBytes = Convert.FromBase64String(encryptedText);
             byte[] keyBytes = new Rfc2898DeriveBytes(PasswordHash, Encoding.ASCII.GetBytes(SaltKey)).GetBytes(256 / 8);
@@ -35,20 +35,13 @@
             cryptoStream.Close();
             return Encoding.UTF8.GetString(plainTextBytes, 0, decryptedByteCount).TrimEnd("\0".ToCharArray());
         }
-        //Decrypting end
-
-        private readonly CRMContext _database = new CRMContext();
 
         public bool SendMail(string sendto, int templateid)
         {
-            // TODO: get the template and put to mail body.
-            Configuration config;
-            if (System.Web.HttpContext.Current != null)
-                config =
-                    System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration("~");
-            else
-                config =
-                    ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            // TODO: get the template and put to mail body. {templateid}
+            Configuration config = System.Web.HttpContext.Current != null ?
+                System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration("~") :
+                ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
             var mailSettings = config.GetSectionGroup("system.net/mailSettings") as MailSettingsSectionGroup;
 
@@ -91,7 +84,7 @@
         {
             list.ForEach(i => SendMail(i, t));
         }
-        public async Task<List<string>> GetListOfEmails(List<Guid> guids)
+        public async Task<List<string>> GetListOfEmailsByGuids(List<Guid> guids)
         {
             var list = new List<string>();
             foreach (Guid guid in guids)

@@ -4,17 +4,13 @@
     using System.Collections.Generic;
     using System.Data;
     using System.Data.Entity;
-    using System.Linq;
     using System.Threading.Tasks;
+    using System.Linq;
     using Entities;
-    using Models;
+    using Models.Response;
+    using Models.Request;
 
-    public enum SortBy
-    {
-        NoSort,
-        Ascending,
-        Descending,
-    }
+    // TODO: Sort and pagination
     public partial class ApplicationManager : IDisposable
     {
         private readonly CRMContext _database;
@@ -25,13 +21,12 @@
             _database = new CRMContext();
             _database.Configuration.LazyLoadingEnabled = false;
         }
-        // working, almost change the mapping
         public async Task<List<ViewContactLess>> GetAllContactsAsync()
         {
             try
             {
                 var list = await _database.Contacts.ToListAsync();
-                var data = _factory.CreateViewModelLess(list);
+                var data = _factory.CreateViewContactLessList(list);
                 return data;
             }
             catch (Exception ex)
@@ -141,38 +136,148 @@
             }
 
         }
-
-        public async Task<List<ViewContactLess>> BigPostRequest(List<string> values, SortBy select)
+        public async Task<List<ViewContactLess>> PostBigRequest(RequestQuery request)
         {
-            var data = new List<string>();
-            if (values.Contains("FullName"))
+            if (ReferenceEquals(request, null)) return null;
+            var filter = request.FilterBy;
+            var result = new List<ViewContactLess>();
+            try
             {
-                data = await _database.Contacts.Select(p => p.FullName).ToListAsync();
+                if (filter.FullName != null)
+                    result = await Filter(request, FilterBy.Name);
+                if (filter.CompanyName != null)
+                {
+                    result = await Filter(request, FilterBy.Company);
+                    if (filter.FullName != null)
+                        result = await Filter(request, FilterBy.NameCompany);
+                }
+                if (filter.Position != null)
+                {
+                    result = await Filter(request, FilterBy.Position);
+                    if (filter.FullName != null)
+                        result = await Filter(request, FilterBy.NamePosition);
+                    if (filter.CompanyName != null)
+                        result = await Filter(request, FilterBy.CompanyPosition);
+                    if (filter.FullName != null && filter.CompanyName != null)
+                        result = await Filter(request, FilterBy.NameCompanyPosition);
+                }
+                if (filter.Country != null)
+                {
+                    result = await Filter(request, FilterBy.Country);
+                    if (filter.FullName != null)
+                        result = await Filter(request, FilterBy.NameCountry);
+                    if (filter.Position != null)
+                        result = await Filter(request, FilterBy.CompanyPosition);
+                    if (filter.FullName != null && filter.Position != null)
+                        result = await Filter(request, FilterBy.NamePositionCountry);
+                }
+                return result;
             }
-            if (values.Contains("Position"))
+            catch (Exception ex)
             {
-                data = await _database.Contacts.Select(p => p.Position).ToListAsync();
-
+                throw new Exception(ex.Message);
             }
-
-            if (select == SortBy.Ascending)
+        }
+        public async Task<List<ViewContactLess>> Filter(RequestQuery model, FilterBy filter)
+        {
+            var data = new List<Contact>();
+            var filterby = model.FilterBy;
+            #region SWITCH
+            switch (filter)
             {
-                // sort by ascending
-                data.Sort();
+                case FilterBy.Name:
+                    data = await
+                       _database.Contacts
+                       .Where(p => p.FullName == filterby.FullName)
+                       .ToListAsync();
+                    break;
+                case FilterBy.Company:
+                    data = await
+                       _database.Contacts
+                       .Where(p => p.CompanyName == filterby.CompanyName)
+                       .ToListAsync();
+                    break;
+                case FilterBy.NameCompany:
+                    data =
+                        await
+                            _database.Contacts.Where(
+                                    p => p.FullName == filterby.FullName && p.CompanyName == filterby.CompanyName)
+                                .ToListAsync();
+                    break;
+                case FilterBy.Position:
+                    data = await _database.Contacts.Where(p => p.Position == filterby.Position).ToListAsync();
+                    break;
+                case FilterBy.NamePosition:
+                    data =
+                        await
+                            _database.Contacts.Where(
+                                p => p.FullName == filterby.FullName && p.Position == filterby.Position).ToListAsync();
+                    break;
+                case FilterBy.NameCompanyPosition:
+                    data =
+                        await
+                            _database.Contacts.Where(
+                                p =>
+                                    p.FullName == filterby.FullName && p.CompanyName == filterby.CompanyName &&
+                                    p.Position == filterby.Position).ToListAsync();
+                    break;
+                case FilterBy.Country:
+                    data = await _database.Contacts.Where(p => p.Country == filterby.Country).ToListAsync();
+                    break;
+                case FilterBy.NameCountry:
+                    data =
+                        await
+                            _database.Contacts.Where(
+                                p => p.FullName == filterby.FullName && p.Country == filterby.Country).ToListAsync();
+                    break;
+                case FilterBy.NameCompanyCountry:
+                    data =
+                        await
+                            _database.Contacts.Where(
+                                p =>
+                                    p.FullName == filterby.FullName && p.CompanyName == filterby.CompanyName &&
+                                    p.Country == filterby.Country).ToListAsync();
+                    break;
+                case FilterBy.NameCompanyPositionCountry:
+                    data =
+                        await
+                            _database.Contacts.Where(
+                                p =>
+                                    p.FullName == filterby.FullName && p.CompanyName == filterby.CompanyName &&
+                                    p.Position == filterby.Position && p.Country == filterby.Country).ToListAsync();
+                    break;
+                case FilterBy.NamePositionCountry:
+                    data =
+                        await
+                            _database.Contacts.Where(
+                                p =>
+                                    p.FullName == filterby.FullName && p.Position == filterby.Position &&
+                                    p.Country == filterby.Country).ToListAsync();
+                    break;
             }
-            if (select == SortBy.Descending)
-            {
-                // sort by descending
-            }
-            if (select == SortBy.NoSort)
-            {
-                // only return;
-            }
-            return null;
+            #endregion
+            var result = _factory.CreateViewContactLessList(data);
+            return result;
         }
         public void Dispose()
         {
             _database.Dispose();
         }
+    }
+    public enum FilterBy
+    {
+        Name,
+        Company,
+        NameCompany,
+        Position,
+        NamePosition,
+        CompanyPosition,
+        NameCompanyPosition,
+        Country,
+        NameCountry,
+        NamePositionCountry,
+        NameCompanyCountry,
+        NameCompanyPositionCountry,
+        DateInserted
     }
 }

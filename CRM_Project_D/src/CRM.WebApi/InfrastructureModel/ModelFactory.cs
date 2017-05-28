@@ -6,7 +6,7 @@
     using System.Linq;
     using System.Threading.Tasks;
     using Entities;
-    using Models;
+    using Models.Response;
 
     public class ModelFactory : IDisposable
     {
@@ -128,7 +128,7 @@
 
         #region VIEWcontactMODELLESS
 
-        public List<ViewContactLess> CreateViewModelLess(List<Contact> contacts)
+        public List<ViewContactLess> CreateViewContactLessList(List<Contact> contacts)
         {
             var data = new List<ViewContactLess>();
             contacts.ForEach(p =>

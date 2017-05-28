@@ -3,9 +3,10 @@
     using System;
     using System.Web.Http;
     using System.Threading.Tasks;
-    using Models;
     using Entities;
     using InfrastructureModel;
+    using Models.Request;
+    using Models.Response;
     public class ContactsController : ApiController
     {
         private readonly ApplicationManager _manager = new ApplicationManager();
@@ -108,7 +109,7 @@
                 return BadRequest(ex.Message);
             }
         }
-        public async Task<IHttpActionResult> DeleteContactByGuIdAsync(Guid? guid)
+        public async Task<IHttpActionResult> DeleteContactByGuIdAsync([FromUri]Guid? guid)
         {
             // TODO: login/auth check with token
             if (!guid.HasValue) return BadRequest();
@@ -124,7 +125,7 @@
             }
         }
         [Route("api/contacts/upload")]
-        // please change to application manager class
+        // please change to application manager class, TODO: change
         public async Task<IHttpActionResult> PostContactByteArrayAsync([FromBody] byte[] array)
         {
             using (var database = new CRMContext())
@@ -150,6 +151,12 @@
         public async Task<int> GetContactsPageCount()
         {
             return await _manager.PageCountAsync();
+        }
+        [Route("api/contacts/big")]
+        public async Task<IHttpActionResult> PostBigTask([FromBody] RequestQuery request)
+        {
+            var data = await _manager.PostBigRequest(request);
+            return Ok(data);
         }
     }
 }

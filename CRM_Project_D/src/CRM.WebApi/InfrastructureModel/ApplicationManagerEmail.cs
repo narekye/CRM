@@ -4,8 +4,8 @@
     using System.Collections.Generic;
     using System.Data.Entity;
     using System.Threading.Tasks;
-    using Models;
     using Entities;
+    using Models.Response;
     public partial class ApplicationManager
     {
         public async Task<List<ViewEmailListLess>> GetAllEmailListsAsync()
@@ -39,7 +39,6 @@
                 throw new Exception(ex.Message);
             }
         }
-
         public async Task<bool> AddEmailList(ViewEmailList emailList)
         {
             using (DbContextTransaction transaction = _database.Database.BeginTransaction())
@@ -62,19 +61,14 @@
                 }
             }
         }
-
-        // update emallist
+        // update emallist, petqa dzel hamarya datarka
         public async Task<EmailList> UpdateEmailList(ViewEmailList emaillists)
         {
             EmailList original = await _database.EmailLists.Include(z => z.Contacts).FirstOrDefaultAsync(p => p.EmailListID == emaillists.EmailListId);
             List<ViewContact> newlist = new List<ViewContact>();
-            foreach (ViewContactLess emaillistsContact in emaillists.Contacts)
-            {
-                newlist.Add(_factory.ViewContactGet(emaillistsContact));
-            }
+
             return new EmailList();
         }
-        // test
         public async Task<bool> DeleteEmailListById(int? id)
         {
             if (!id.HasValue) return false;

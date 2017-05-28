@@ -14,7 +14,7 @@
         {
             try
             {
-                var list = await _manager.GetListOfEmails(guids);
+                var list = await _manager.GetListOfEmailsByGuids(guids);
                 _manager.SendEmailToList(list, templateid);
                 return Ok();
             }
@@ -25,7 +25,8 @@
         }
         protected override void Dispose(bool disposing)
         {
-            _manager.Dispose();
+            if (disposing)
+                _manager.Dispose();
             base.Dispose(disposing);
         }
     }

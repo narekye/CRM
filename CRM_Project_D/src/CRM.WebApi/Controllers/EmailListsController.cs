@@ -4,8 +4,7 @@
     using System.Web.Http;
     using System.Threading.Tasks;
     using InfrastructureModel;
-    using Models;
-
+    using Models.Response;
     public class EmailListsController : ApiController
     {
         private readonly ApplicationManager _manager = new ApplicationManager();
@@ -37,7 +36,7 @@
                 return BadRequest(ex.Message);
             }
         }
-        // not completed
+        // working, can send a contact list if you want.
         public async Task<IHttpActionResult> PostEmailListAsync([FromBody] ViewEmailList model)
         {
             try
@@ -71,7 +70,8 @@
         }
         protected override void Dispose(bool disposing)
         {
-            _manager.Dispose();
+            if (disposing)
+                _manager.Dispose();
             base.Dispose(disposing);
         }
     }

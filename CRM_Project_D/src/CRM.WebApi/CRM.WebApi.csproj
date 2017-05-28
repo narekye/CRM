@@ -177,10 +177,11 @@
     <Compile Include="InfrastructureModel\MailManager.cs" />
     <Compile Include="InfrastructureModel\ModelFactory.cs" />
     <Compile Include="InfrastructureModel\ParserProvider.cs" />
-    <Compile Include="Models\ViewContact.cs" />
-    <Compile Include="Models\ViewEmailList.cs" />
-    <Compile Include="Models\ViewContactLess.cs" />
-    <Compile Include="Models\ViewEmailListLess.cs" />
+    <Compile Include="Models\Request\RequestQuery.cs" />
+    <Compile Include="Models\Response\ViewContact.cs" />
+    <Compile Include="Models\Response\ViewEmailList.cs" />
+    <Compile Include="Models\Response\ViewContactLess.cs" />
+    <Compile Include="Models\Response\ViewEmailListLess.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

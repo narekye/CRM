@@ -57,12 +57,14 @@
 
                 foreach (var m in contacts)
                 {
-                    Contact c = new Contact();
-                    c.FullName = m["fullname"];
-                    c.CompanyName = m["company"];
-                    c.Country = m["country"];
-                    c.Position = m["position"];
-                    c.Email = m["email"];
+                    Contact c = new Contact
+                    {
+                        FullName = m["fullname"],
+                        CompanyName = m["company"],
+                        Country = m["country"],
+                        Position = m["position"],
+                        Email = m["email"]
+                    };
                     contactslist.Add(c);
                 }
                 File.Delete(path);

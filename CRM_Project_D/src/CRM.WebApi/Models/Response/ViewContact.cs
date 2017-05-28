@@ -1,4 +1,4 @@
-﻿namespace CRM.WebApi.Models
+﻿namespace CRM.WebApi.Models.Response
 {
     using System;
     using System.Collections.Generic;

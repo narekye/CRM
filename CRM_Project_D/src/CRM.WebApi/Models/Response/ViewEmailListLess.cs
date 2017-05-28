@@ -1,4 +1,4 @@
-﻿namespace CRM.WebApi.Models
+namespace CRM.WebApi.Models.Response
 {
     public class ViewEmailListLess
     {
