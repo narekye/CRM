@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-
     public class ViewContact
     {
         public string FullName { get; set; }

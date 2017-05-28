@@ -15,8 +15,10 @@
     {
         private readonly CRMContext _database;
         private readonly ModelFactory _factory;
+        private readonly ParserProvider _parser;
         public ApplicationManager()
         {
+            _parser = new ParserProvider();
             _factory = new ModelFactory();
             _database = new CRMContext();
             _database.Configuration.LazyLoadingEnabled = false;
@@ -259,6 +261,26 @@
             var result = _factory.CreateViewContactLessList(data);
             return result;
         }
+        public async Task<bool> AddToDatabaseFromBytes(byte[] bytes)
+        {
+            using (var transaction = _database.Database.BeginTransaction())
+            {
+                try
+                {
+                    var contacts = _parser.GetContactsFromBytes(bytes);
+                    _database.Contacts.AddRange(contacts);
+                    await _database.SaveChangesAsync();
+                    transaction.Commit();
+                    return true;
+
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    throw new Exception(ex.Message);
+                }
+            }
+        }
         public void Dispose()
         {
             _database.Dispose();
@@ -279,5 +301,11 @@
         NameCompanyCountry,
         NameCompanyPositionCountry,
         DateInserted
+    }
+    public enum SortBy
+    {
+        NoSort,
+        Ascending,
+        Descending
     }
 }

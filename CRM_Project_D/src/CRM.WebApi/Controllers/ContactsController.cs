@@ -3,14 +3,17 @@
     using System;
     using System.Web.Http;
     using System.Threading.Tasks;
-    using Entities;
     using InfrastructureModel;
     using Models.Request;
     using Models.Response;
+
     public class ContactsController : ApiController
     {
-        private readonly ApplicationManager _manager = new ApplicationManager();
-        private readonly ParserProvider _parser = new ParserProvider();
+        private readonly ApplicationManager _manager;
+        public ContactsController()
+        {
+            _manager = new ApplicationManager();
+        }
         public async Task<IHttpActionResult> GetAllContactsAsync()
         {
             // TODO: login/auth check with token
@@ -109,7 +112,7 @@
                 return BadRequest(ex.Message);
             }
         }
-        public async Task<IHttpActionResult> DeleteContactByGuIdAsync([FromUri]Guid? guid)
+        public async Task<IHttpActionResult> DeleteContactByGuIdAsync([FromUri] Guid? guid)
         {
             // TODO: login/auth check with token
             if (!guid.HasValue) return BadRequest();
@@ -125,26 +128,16 @@
             }
         }
         [Route("api/contacts/upload")]
-        // please change to application manager class, TODO: change
         public async Task<IHttpActionResult> PostContactByteArrayAsync([FromBody] byte[] array)
         {
-            using (var database = new CRMContext())
-            using (var transaction = database.Database.BeginTransaction())
+            try
             {
-                try
-                {
-                    var contacts = _parser.GetContactsFromBytes(array);
-                    database.Contacts.AddRange(contacts);
-                    await database.SaveChangesAsync();
-                    transaction.Commit();
-                    return Ok();
-
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-                    return BadRequest(ex.Message);
-                }
+                if (await _manager.AddToDatabaseFromBytes(array)) return Ok();
+                return BadRequest();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
         [Route("api/contacts/count")]
