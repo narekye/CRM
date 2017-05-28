@@ -55,12 +55,10 @@
                 string host = mailSettings.Smtp.Network.Host;
                 string pwd = Decrypt(mailSettings.Smtp.Network.Password);
                 string uid = Decrypt(mailSettings.Smtp.Network.UserName);
-
                 var message = new MailMessage
                 {
                     From = new MailAddress(@from)
                 };
-
                 string path = System.Web.HttpContext.Current?.Request.MapPath(getpath);
                 if (ReferenceEquals(path, null)) throw new ArgumentNullException(nameof(path));
                 var html = File.ReadAllText(path);
@@ -77,7 +75,6 @@
                     Credentials = new NetworkCredential(uid, pwd),
                     EnableSsl = true
                 };
-
                 client.Send(message);
                 return true;
             }

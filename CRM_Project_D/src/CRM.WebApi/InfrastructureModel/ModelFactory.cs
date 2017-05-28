@@ -214,5 +214,21 @@
         {
             _database.Dispose();
         }
+
+        public ViewTemplate GetViewTemplate(Template template)
+        {
+            return new ViewTemplate()
+            {
+                TemplateId = template.TemplateId,
+                TemplateName = template.TemplateName
+            };
+        }
+        public List<ViewTemplate> GetViewTemplates(List<Template> templates)
+        {
+            if (ReferenceEquals(templates, null)) return null;
+            var list = new List<ViewTemplate>();
+            templates.ForEach(i => list.Add(GetViewTemplate(i)));
+            return list;
+        }
     }
 }
