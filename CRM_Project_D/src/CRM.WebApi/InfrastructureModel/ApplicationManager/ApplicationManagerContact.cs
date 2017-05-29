@@ -168,7 +168,7 @@
                     if (filter.FullName != null)
                         result = await FilterSortAsync(request, FilterBy.NameCountry);
                     if (filter.Position != null)
-                        result = await FilterSortAsync(request, FilterBy.CompanyPosition);
+                        result = await FilterSortAsync(request, FilterBy.CountryPosition);
                     if (filter.FullName != null && filter.Position != null)
                         result = await FilterSortAsync(request, FilterBy.NamePositionCountry);
                 }
@@ -181,9 +181,9 @@
         }
         public async Task<List<ViewContactLess>> FilterSortAsync(RequestQuery model, FilterBy filter)
         {
-            List<Contact> data = new List<Contact>();
-            Dictionary<string, string> sortby = model.SortBy;
-            ViewContactLess filterby = model.FilterBy;
+            var data = new List<Contact>();
+            var sortby = model.SortBy;
+            var filterby = model.FilterBy;
             #region SWITCH
 
             switch (filter)
@@ -257,19 +257,37 @@
                                     p.FullName == filterby.FullName && p.Position == filterby.Position &&
                                     p.Country == filterby.Country).ToListAsync();
                     break;
+                case FilterBy.CountryPosition:
+                    data =
+                        await
+                            _database.Contacts.Where(
+                                p => p.Country == filterby.Country && p.Position == filterby.Position).ToListAsync();
+                    break;
             }
 
             #endregion
+            #region ORDERBY
             if (sortby.ContainsKey("OrderBy"))
             {
                 string orderby = sortby["OrderBy"];
-                if (orderby == "Ascending" || orderby == "0")
+                if (orderby == "Ascending" || orderby == "0" || orderby == "Asc")
                     data = Sort(OrderBy.Ascending, data);
-                if (orderby == "Descending" || orderby == "1")
+                if (orderby == "Descending" || orderby == "1" || orderby == "Desc")
                     data = Sort(OrderBy.Descending, data);
             }
-            List<ViewContactLess> result = _factory.CreateViewContactLessList(data);
-            return result;
+            #endregion
+            #region PAGING
+            string first = "Start", second = "Count";
+            if (sortby.ContainsKey(first) && sortby.ContainsKey(second))
+            {
+                int start;
+                bool st = int.TryParse(sortby[first], out start);
+                int count;
+                bool end = int.TryParse(sortby[second], out count);
+                if (st && end) data = Paging(data, start, count);
+            }
+            #endregion
+            return _factory.CreateViewContactLessList(data);
         }
         public List<Contact> Sort(OrderBy sortby, List<Contact> contacts)
         {
@@ -285,6 +303,13 @@
                     break;
             }
             return result;
+        }
+
+        public List<Contact> Paging(List<Contact> contacts, int skip, int count)
+        {
+            if (skip == 0) skip = 1;
+            if (count < skip || count == 0) return null;
+            return contacts.Skip(skip).Take(count).ToList();
         }
         public async Task<bool> AddToDatabaseFromBytes(byte[] bytes)
         {
@@ -318,6 +343,7 @@
         Position,
         NamePosition,
         CompanyPosition,
+        CountryPosition,
         NameCompanyPosition,
         Country,
         NameCountry,
