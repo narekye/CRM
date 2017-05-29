@@ -9,7 +9,6 @@
     using Entities;
     using Models.Request;
     using Models.Response;
-    // TODO: pagination
     public partial class ApplicationManager : IDisposable
     {
         private readonly CRMContext _database;
@@ -304,7 +303,6 @@
             }
             return result;
         }
-
         public List<Contact> Paging(List<Contact> contacts, int skip, int count)
         {
             if (skip == 0) skip = 1;

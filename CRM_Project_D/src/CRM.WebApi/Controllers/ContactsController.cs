@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace CRM.WebApi.Controllers
+﻿namespace CRM.WebApi.Controllers
 {
     using System;
     using System.Web.Http;
@@ -57,29 +55,6 @@ namespace CRM.WebApi.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        //public async Task<IHttpActionResult> GetContactByPaginationAsync(int start, int numberOfRows, bool ascending)
-        //{
-        //    using (var database = new CRMContext())
-        //    {
-        //        try
-        //        {
-        //            var contacts = ascending
-        //                            ? database.Contacts.OrderBy(x => x.ContactId)
-        //                                .Skip(start - 1)
-        //                                .Take(numberOfRows)
-        //                            : database.Contacts.OrderByDescending(x => x.ContactId)
-        //                                .Skip(start - 1)
-        //                                .Take(numberOfRows);
-        //            var result = ViewContact.GetContactModelList(await contacts.ToListAsync());
-        //            if (ReferenceEquals(result, null)) return NotFound();
-        //            return Ok(result);
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            return BadRequest(ex.Message);
-        //        }
-        //    }
-        //}
         public async Task<IHttpActionResult> PutContactAsync([FromBody] ViewContact c)
         {
             // TODO: login/auth check with token
