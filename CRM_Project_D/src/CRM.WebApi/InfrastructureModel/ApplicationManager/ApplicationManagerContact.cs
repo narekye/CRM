@@ -265,16 +265,6 @@
             }
 
             #endregion
-            #region ORDERBY
-            if (sortby.ContainsKey("OrderBy"))
-            {
-                string orderby = sortby["OrderBy"];
-                if (orderby == "Ascending" || orderby == "0" || orderby == "Asc")
-                    data = Sort(OrderBy.Ascending, data);
-                if (orderby == "Descending" || orderby == "1" || orderby == "Desc")
-                    data = Sort(OrderBy.Descending, data);
-            }
-            #endregion
             #region PAGING
             string first = "Start", second = "Count";
             if (sortby.ContainsKey(first) && sortby.ContainsKey(second))
@@ -284,6 +274,16 @@
                 int count;
                 bool end = int.TryParse(sortby[second], out count);
                 if (st && end) data = Paging(data, start, count);
+            }
+            #endregion
+            #region ORDERBY
+            if (sortby.ContainsKey("OrderBy"))
+            {
+                string orderby = sortby["OrderBy"];
+                if (orderby == "Ascending" || orderby == "0" || orderby == "Asc")
+                    data = Sort(OrderBy.Ascending, data);
+                if (orderby == "Descending" || orderby == "1" || orderby == "Desc")
+                    data = Sort(OrderBy.Descending, data);
             }
             #endregion
             return _factory.CreateViewContactLessList(data);
@@ -305,13 +305,12 @@
         }
         public List<Contact> Paging(List<Contact> contacts, int skip, int count)
         {
-            if (skip == 0) skip = 1;
             if (count < skip || count == 0) return null;
             return contacts.Skip(skip).Take(count).ToList();
         }
         public async Task<bool> AddToDatabaseFromBytes(byte[] bytes)
         {
-            using (DbContextTransaction transaction = _database.Database.BeginTransaction())
+            using (var transaction = _database.Database.BeginTransaction())
             {
                 try
                 {
