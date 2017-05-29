@@ -7,8 +7,11 @@
     using Models.Response;
     public class EmailListsController : ApiController
     {
-        private readonly ApplicationManager _manager = new ApplicationManager();
-
+        private readonly ApplicationManager _manager;
+        public EmailListsController()
+        {
+            _manager = new ApplicationManager();
+        }
         public async Task<IHttpActionResult> GetAllEmailListsAsync()
         {
             try

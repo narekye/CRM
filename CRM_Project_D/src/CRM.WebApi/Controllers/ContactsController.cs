@@ -84,20 +84,6 @@
                 return BadRequest($"{ex.Message}\n{ex.InnerException?.Message}");
             }
         }
-        [Route("api/contacts/filter")]
-        public async Task<IHttpActionResult> PostFilterOrderBy([FromBody] RequestQuery request)
-        {
-            try
-            {
-                var data = await _manager.FilterOrderByRequestAsync(request);
-                if (ReferenceEquals(data, null)) return BadRequest();
-                return Ok(data);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
         public async Task<IHttpActionResult> DeleteContactByGuIdAsync([FromUri] Guid? guid)
         {
             // TODO: login/auth check with token
@@ -107,6 +93,20 @@
                 if (await _manager.DeleteContactAsync(guid.Value)) return Ok();
                 return BadRequest();
 
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [Route("api/contacts/filter")]
+        public async Task<IHttpActionResult> PostFilterOrderBy([FromBody] RequestQuery request)
+        {
+            try
+            {
+                var data = await _manager.FilterOrderByRequestAsync(request);
+                if (ReferenceEquals(data, null)) return BadRequest();
+                return Ok(data);
             }
             catch (Exception ex)
             {

@@ -1,4 +1,4 @@
-﻿namespace CRM.WebApi.InfrastructureModel.ApplicationManager
+namespace CRM.WebApi.InfrastructureModel.ApplicationManager
 {
     using System;
     using System.Collections.Generic;
@@ -43,7 +43,7 @@
                     await
                         _database.Contacts.Include(p => p.EmailLists).FirstOrDefaultAsync(p => p.ContactId == id.Value);
                 if (ReferenceEquals(contact, null)) return null;
-                ViewContact data = _factory.CreateViewModel(contact);
+                ViewContact data = _factory.CreateViewContact(contact);
                 return data;
             }
             catch (Exception ex)
@@ -58,7 +58,7 @@
                 Contact contact =
                     await _database.Contacts.Include(p => p.EmailLists).FirstOrDefaultAsync(p => p.GuID == guid.Value);
                 if (ReferenceEquals(contact, null)) return null;
-                ViewContact data = _factory.CreateViewModel(contact);
+                ViewContact data = _factory.CreateViewContact(contact);
                 return data;
             }
             catch (Exception ex)
@@ -77,7 +77,7 @@
                         await
                             _database.Contacts.Include(p => p.EmailLists)
                                 .FirstOrDefaultAsync(p => p.GuID == contact.GuId);
-                    Contact replace = await _factory.GetContactFromContactModel(contact, false);
+                    Contact replace = await _factory.GetContactFromViewContact(contact, false);
                     replace.ContactId = original.ContactId;
                     _database.Entry(original).CurrentValues.SetValues(replace);
                     await _database.SaveChangesAsync();
@@ -93,7 +93,7 @@
         }
         public async Task<bool> AddContactAsync(ViewContact contact)
         {
-            Contact cont = await _factory.GetContactFromContactModel(contact, true);
+            Contact cont = await _factory.GetContactFromViewContact(contact, true);
             using (DbContextTransaction transaction = _database.Database.BeginTransaction())
             {
                 try
@@ -281,14 +281,14 @@
             {
                 string orderby = sortby["OrderBy"];
                 if (orderby == "Ascending" || orderby == "0" || orderby == "Asc")
-                    data = Sort(OrderBy.Ascending, data);
+                    data = Sort(data, OrderBy.Ascending);
                 if (orderby == "Descending" || orderby == "1" || orderby == "Desc")
-                    data = Sort(OrderBy.Descending, data);
+                    data = Sort(data, OrderBy.Descending);
             }
             #endregion
             return _factory.CreateViewContactLessList(data);
         }
-        public List<Contact> Sort(OrderBy sortby, List<Contact> contacts)
+        public List<Contact> Sort(List<Contact> contacts, OrderBy sortby)
         {
             List<Contact> result = new List<Contact>();
             if (ReferenceEquals(contacts, null)) return null;
@@ -351,7 +351,6 @@
     }
     public enum OrderBy
     {
-        NoSort,
         Ascending,
         Descending
     }

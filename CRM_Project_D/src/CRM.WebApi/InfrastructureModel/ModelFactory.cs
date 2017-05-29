@@ -11,7 +11,7 @@
     public class ModelFactory : IDisposable
     {
         private readonly CRMContext _database = new CRMContext();
-        public ViewContact CreateViewModel(Contact contact)
+        public ViewContact CreateViewContact(Contact contact)
         {
             var result = new ViewContact()
             {
@@ -30,7 +30,7 @@
         {
             var result = new List<ViewContact>();
             foreach (Contact contact in list)
-                result.Add(CreateViewModel(contact));
+                result.Add(this.CreateViewContact(contact));
             return result;
         }
 
@@ -61,7 +61,7 @@
 
         #region RETURNS contact
 
-        public async Task<Contact> GetContactFromContactModel(ViewContact model, bool flag, List<EmailList> emailList = null)
+        public async Task<Contact> GetContactFromViewContact(ViewContact model, bool flag, List<EmailList> emailList = null)
         {
             Contact contact;
             if (flag) // true returns new object with new Guid from model without contactId and emaillist |
@@ -94,8 +94,8 @@
         public List<Contact> EntityGetContactListFromViewContactList(List<ViewContact> list, bool flag, List<EmailList> emailLists = null)
         {
             var result = new List<Contact>();
-            if (flag) list.ForEach(async i => result.Add(await GetContactFromContactModel(i, true, emailLists)));
-            list.ForEach(async z => result.Add(await GetContactFromContactModel(z, false)));
+            if (flag) list.ForEach(async i => result.Add(await this.GetContactFromViewContact(i, true, emailLists)));
+            list.ForEach(async z => result.Add(await this.GetContactFromViewContact(z, false)));
             return result;
         }
         #endregion
@@ -181,12 +181,11 @@
             return result;
         }
 
-        public async Task<EmailList> EntityCreateEmailList(ViewEmailList viewEmailList, bool flag, List<Contact> contacts = null)
+        public async Task<EmailList> EntityCreateEmailList(ViewEmailList viewEmailList, bool flag, ICollection<Contact> contacts = null)
         {
             EmailList obj;
             if (flag) // returns new object 
             {
-
                 obj = new EmailList
                 {
                     EmailListName = viewEmailList.EmailListName,

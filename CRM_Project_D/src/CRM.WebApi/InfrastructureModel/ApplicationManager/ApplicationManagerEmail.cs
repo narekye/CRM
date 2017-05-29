@@ -24,6 +24,7 @@
                 throw new Exception(ex.Message);
             }
         }
+
         public async Task<ViewEmailList> GetEmailListById(int? id)
         {
             if (!id.HasValue) return null;
@@ -40,6 +41,7 @@
                 throw new Exception(ex.Message);
             }
         }
+
         public async Task<bool> AddEmailList(ViewEmailList emailList)
         {
             using (DbContextTransaction transaction = _database.Database.BeginTransaction())
@@ -62,13 +64,30 @@
                 }
             }
         }
-        // update emallist, petqa dzel hamarya datarka
-        public async Task<EmailList> UpdateEmailListAsync(ViewEmailList emaillists)
-        {
-            EmailList original = await _database.EmailLists.Include(z => z.Contacts).FirstOrDefaultAsync(p => p.EmailListID == emaillists.EmailListId);
-            List<ViewContact> newlist = new List<ViewContact>();
 
-            return new EmailList();
+        // update emallist, need to be done...
+        public async Task<bool> UpdateEmailListAsync(ViewEmailList emaillists)
+        {
+            EmailList original = await _database.EmailLists.Include(z => z.Contacts)
+                .FirstOrDefaultAsync(p => p.EmailListID == emaillists.EmailListId);
+            var viewcontacts = _factory.GetViewContactListFromLessList(emaillists.Contacts);
+            var contacts = _factory.EntityGetContactListFromViewContactList(viewcontacts, true);
+            var replace = _factory.EntityCreateEmailList(emaillists, true, contacts);
+            using (var transaction = _database.Database.BeginTransaction())
+            {
+                try
+                {
+                    _database.Entry(original).CurrentValues.SetValues(replace);
+                    await _database.SaveChangesAsync();
+                    transaction.Commit();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    throw new Exception(ex.Message);
+                }
+            }
         }
         public async Task<bool> DeleteEmailListByIdAsync(int? id)
         {
