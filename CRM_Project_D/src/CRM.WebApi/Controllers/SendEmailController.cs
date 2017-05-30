@@ -7,7 +7,11 @@
     using InfrastructureModel;
     public class SendEmailController : ApiController
     {
-        private readonly MailManager _manager = new MailManager();
+        private readonly MailManager _manager;
+        public SendEmailController()
+        {
+            _manager = new MailManager();
+        }
         public async Task<IHttpActionResult> PostSendToList([FromUri] int templateid, [FromBody] List<Guid> guids)
         {
             try

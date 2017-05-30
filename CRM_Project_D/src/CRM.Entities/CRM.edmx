@@ -17,6 +17,7 @@
           <Property Name="Email" Type="varchar" MaxLength="250" Nullable="false" />
           <Property Name="GuID" Type="uniqueidentifier" Nullable="false" />
           <Property Name="DateInserted" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="DateModified" Type="datetime2" Precision="7" />
         </EntityType>
         <EntityType Name="EmailListContacts">
           <Key>
@@ -100,6 +101,7 @@
           <Property Name="GuID" Type="Guid" Nullable="false" />
           <Property Name="DateInserted" Type="DateTime" Nullable="false" Precision="7" />
           <NavigationProperty Name="EmailLists" Relationship="Self.EmailListContacts" FromRole="Contacts" ToRole="EmailLists" />
+          <Property Name="DateModified" Type="DateTime" Precision="7" />
         </EntityType>
         <EntityType Name="EmailList">
           <Key>
@@ -109,14 +111,6 @@
           <Property Name="EmailListName" Type="String" MaxLength="250" FixedLength="false" Unicode="false" Nullable="false" />
           <NavigationProperty Name="Contacts" Relationship="Self.EmailListContacts" FromRole="EmailLists" ToRole="Contacts" />
         </EntityType>
-        <EntityType Name="Template">
-          <Key>
-            <PropertyRef Name="TemplateId" />
-          </Key>
-          <Property Name="TemplateId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="TemplateName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="TemplatePath" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
-        </EntityType>
         <Association Name="EmailListContacts">
           <End Role="Contacts" Type="Self.Contact" Multiplicity="*" />
           <End Role="EmailLists" Type="Self.EmailList" Multiplicity="*" />
@@ -124,12 +118,20 @@
         <EntityContainer Name="CRMContext" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Contacts" EntityType="Self.Contact" />
           <EntitySet Name="EmailLists" EntityType="Self.EmailList" />
-          <EntitySet Name="Templates" EntityType="Self.Template" />
           <AssociationSet Name="EmailListContacts" Association="Self.EmailListContacts">
             <End Role="Contacts" EntitySet="Contacts" />
             <End Role="EmailLists" EntitySet="EmailLists" />
           </AssociationSet>
+          <EntitySet Name="Templates" EntityType="CRM.Template" />
         </EntityContainer>
+        <EntityType Name="Template">
+          <Key>
+            <PropertyRef Name="TemplateId" />
+          </Key>
+          <Property Name="TemplateId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TemplateName" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="TemplatePath" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -139,6 +141,7 @@
           <EntitySetMapping Name="Contacts">
             <EntityTypeMapping TypeName="CRM.Contact">
               <MappingFragment StoreEntitySet="Contacts">
+                <ScalarProperty Name="DateModified" ColumnName="DateModified" />
                 <ScalarProperty Name="ContactId" ColumnName="ContactId" />
                 <ScalarProperty Name="FullName" ColumnName="FullName" />
                 <ScalarProperty Name="CompanyName" ColumnName="CompanyName" />
@@ -158,15 +161,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Templates">
-            <EntityTypeMapping TypeName="CRM.Template">
-              <MappingFragment StoreEntitySet="Templates">
-                <ScalarProperty Name="TemplatePath" ColumnName="TemplatePath" />
-                <ScalarProperty Name="TemplateId" ColumnName="TemplateId" />
-                <ScalarProperty Name="TemplateName" ColumnName="TemplateName" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <AssociationSetMapping Name="EmailListContacts" TypeName="CRM.EmailListContacts" StoreEntitySet="EmailListContacts">
             <EndProperty Name="Contacts">
               <ScalarProperty Name="ContactId" ColumnName="ContactID" />
@@ -175,6 +169,15 @@
               <ScalarProperty Name="EmailListID" ColumnName="EmailListID" />
             </EndProperty>
           </AssociationSetMapping>
+          <EntitySetMapping Name="Templates">
+            <EntityTypeMapping TypeName="CRM.Template">
+              <MappingFragment StoreEntitySet="Templates">
+                <ScalarProperty Name="TemplatePath" ColumnName="TemplatePath" />
+                <ScalarProperty Name="TemplateName" ColumnName="TemplateName" />
+                <ScalarProperty Name="TemplateId" ColumnName="TemplateId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

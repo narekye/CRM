@@ -1,8 +1,9 @@
+using CRM.WebApi.Converter;
+
 namespace CRM.WebApi.InfrastructureModel.ApplicationManager
 {
     using System;
     using System.Collections.Generic;
-    using System.Data;
     using System.Data.Entity;
     using System.Linq;
     using System.Threading.Tasks;
@@ -31,7 +32,7 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
             }
             catch (Exception ex)
             {
-                throw new EntityException(ex.Message);
+                throw new Exception(ex.Message);
             }
         }
         public async Task<ViewContact> GetContactByIdAsync(int? id)
@@ -66,19 +67,17 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
                 throw new Exception(ex.Message);
             }
         }
-        public async Task<bool> UpdateConactAsync(ViewContact contact)
+        public async Task<bool> UpdateContactAsync(ViewContactLess contact)
         {
-            if (ReferenceEquals(contact, null)) return false;
-            using (DbContextTransaction transaction = _database.Database.BeginTransaction())
+            using (var transaction = _database.Database.BeginTransaction())
             {
                 try
                 {
-                    Contact original =
-                        await
-                            _database.Contacts.Include(p => p.EmailLists)
-                                .FirstOrDefaultAsync(p => p.GuID == contact.GuId);
-                    Contact replace = await _factory.GetContactFromViewContact(contact, false);
+                    var original = await _database.Contacts.FirstOrDefaultAsync(p => p.GuID == contact.GuID);
+                    var replace = new Contact();
+                    contact.ConvertTo(replace);
                     replace.ContactId = original.ContactId;
+                    replace.DateModified = DateTime.Now;
                     _database.Entry(original).CurrentValues.SetValues(replace);
                     await _database.SaveChangesAsync();
                     transaction.Commit();
@@ -91,10 +90,11 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
                 }
             }
         }
-        public async Task<bool> AddContactAsync(ViewContact contact)
+        public async Task<bool> AddContactAsync(ViewContactLess contact)
         {
-            Contact cont = await _factory.GetContactFromViewContact(contact, true);
-            using (DbContextTransaction transaction = _database.Database.BeginTransaction())
+            Contact cont = new Contact();
+            contact.ConvertTo(cont);
+            using (var transaction = _database.Database.BeginTransaction())
             {
                 try
                 {

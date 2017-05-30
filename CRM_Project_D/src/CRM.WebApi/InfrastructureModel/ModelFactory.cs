@@ -7,58 +7,40 @@
     using System.Threading.Tasks;
     using Entities;
     using Models.Response;
-
+    using Converter;
     public class ModelFactory : IDisposable
     {
-        private readonly CRMContext _database = new CRMContext();
+        private readonly CRMContext _database;
+        public ModelFactory()
+        {
+            _database = new CRMContext();
+        }
         public ViewContact CreateViewContact(Contact contact)
         {
-            var result = new ViewContact()
-            {
-                EmailLists = contact.EmailLists.Select(p => p.EmailListName).ToList(),
-                FullName = contact.FullName,
-                Email = contact.Email,
-                DateInserted = contact.DateInserted,
-                CompanyName = contact.CompanyName,
-                Country = contact.Country,
-                Position = contact.Position,
-                GuId = contact.GuID
-            };
+            ViewContact result = new ViewContact();
+            contact.ConvertTo(result);
+            result.EmailLists = contact.EmailLists.Select(p => p.EmailListName).ToList();
             return result;
         }
         public List<ViewContact> GetViewModelList(List<Contact> list)
         {
             var result = new List<ViewContact>();
             foreach (Contact contact in list)
-                result.Add(this.CreateViewContact(contact));
+                result.Add(CreateViewContact(contact));
             return result;
         }
-
-        // =======================================================================================
-        // new added working
         public ViewContact ViewContactGet(ViewContactLess less)
         {
-            var contacts = new ViewContact()
-            {
-                CompanyName = less.CompanyName,
-                Country = less.Country,
-                DateInserted = less.DateInserted,
-                Email = less.Email,
-                FullName = less.FullName,
-                GuId = less.GuId,
-                Position = less.Position
-            };
-            return contacts;
+            ViewContact contact = new ViewContact();
+            less.ConvertTo(contact);
+            return contact;
         }
-
         public List<ViewContact> GetViewContactListFromLessList(List<ViewContactLess> less)
         {
             var list = new List<ViewContact>();
             less.ForEach(i => list.Add(ViewContactGet(i)));
             return list;
         }
-        // =======================================================================================
-
         #region RETURNS contact
 
         public async Task<Contact> GetContactFromViewContact(ViewContact model, bool flag, List<EmailList> emailList = null)
@@ -80,7 +62,7 @@
             }
             else // false returns object from database 
             {
-                contact = await _database.Contacts.FirstOrDefaultAsync(p => p.GuID == model.GuId);
+                contact = await _database.Contacts.FirstOrDefaultAsync(p => p.GuID == model.GuID);
                 contact.FullName = model.FullName;
                 contact.CompanyName = model.CompanyName;
                 contact.Country = model.Country;
@@ -125,7 +107,6 @@
 
 
         #endregion
-
         #region VIEWcontactMODELLESS
 
         public List<ViewContactLess> CreateViewContactLessList(List<Contact> contacts)
@@ -137,10 +118,9 @@
                 {
                     CompanyName = p.CompanyName,
                     FullName = p.FullName,
-                    DateInserted = p.DateInserted,
                     Email = p.Email,
                     Position = p.Position,
-                    GuId = p.GuID,
+                    GuID = p.GuID,
                     Country = p.Country
                 });
             });
@@ -148,7 +128,6 @@
         }
 
         #endregion
-
         #region VIEWEMAILLIST
 
         public ViewEmailList GetViewEmailList(EmailList emailList)
@@ -160,10 +139,9 @@
                             {
                                 CompanyName = d.CompanyName,
                                 Country = d.Country,
-                                DateInserted = d.DateInserted,
                                 Email = d.Email,
                                 FullName = d.FullName,
-                                GuId = d.GuID,
+                                GuID = d.GuID,
                                 Position = d.Position
                             }).ToList(),
                 EmailListName = emailList.EmailListName,
@@ -176,7 +154,7 @@
             var result = new List<ViewEmailList>();
             foreach (EmailList emailList in list)
             {
-                result.Add(this.GetViewEmailList(emailList));
+                result.Add(GetViewEmailList(emailList));
             }
             return result;
         }
@@ -194,16 +172,13 @@
             }
             else // returns object from db
             {
-                using (var database = new CRMContext())
+                var list = await
+                    _database.EmailLists.FirstOrDefaultAsync(p => p.EmailListID == viewEmailList.EmailListId);
+                obj = new EmailList
                 {
-                    var list = await
-                        database.EmailLists.FirstOrDefaultAsync(p => p.EmailListID == viewEmailList.EmailListId);
-                    obj = new EmailList
-                    {
-                        EmailListName = viewEmailList.EmailListName,
-                        Contacts = list?.Contacts
-                    };
-                }
+                    EmailListName = viewEmailList.EmailListName,
+                    Contacts = list?.Contacts
+                };
             }
             return obj;
         }
@@ -213,14 +188,11 @@
         {
             _database.Dispose();
         }
-
         public ViewTemplate GetViewTemplate(Template template)
         {
-            return new ViewTemplate()
-            {
-                TemplateId = template.TemplateId,
-                TemplateName = template.TemplateName
-            };
+            ViewTemplate up = new ViewTemplate();
+            template.ConvertTo(up);
+            return up;
         }
         public List<ViewTemplate> GetViewTemplates(List<Template> templates)
         {

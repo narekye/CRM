@@ -38,7 +38,6 @@
 
         public async Task<bool> SendMail(Contact sendto, int templateid)
         {
-            // TODO: get the template and put to mail body. {templateid}
             var template = await _database.Templates.FirstOrDefaultAsync(p => p.TemplateId == templateid);
             var getpath = template.TemplatePath;
             Configuration config = System.Web.HttpContext.Current != null ?

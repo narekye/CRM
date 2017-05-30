@@ -7,6 +7,7 @@
     [Email]        VARCHAR (250)    NOT NULL UNIQUE,
     [GuID]         UNIQUEIDENTIFIER DEFAULT (newid()) NOT NULL,
     [DateInserted] DATETIME2 (7)    CONSTRAINT [DF_Contacts_DateInserted] DEFAULT (getdate()) NOT NULL,
+	[DateModified] DATETIME2 (7)	NULL, 
     CONSTRAINT [PK_Contacts] PRIMARY KEY CLUSTERED ([ContactId] ASC)
 );
 

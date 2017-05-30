@@ -55,13 +55,13 @@
                 return BadRequest(ex.Message);
             }
         }
-        public async Task<IHttpActionResult> PutContactAsync([FromBody] ViewContact c)
+        public async Task<IHttpActionResult> PutContactAsync([FromBody] ViewContactLess c)
         {
             // TODO: login/auth check with token
             if (ReferenceEquals(c, null) || !ModelState.IsValid) return BadRequest();
             try
             {
-                if (await _manager.UpdateConactAsync(c)) return Ok();
+                if (await _manager.UpdateContactAsync(c)) return Ok();
                 return BadRequest();
             }
             catch (Exception ex)
@@ -70,7 +70,7 @@
             }
 
         }
-        public async Task<IHttpActionResult> PostContactAsync([FromBody] ViewContact c)
+        public async Task<IHttpActionResult> PostContactAsync([FromBody] ViewContactLess c)
         {
             // TODO: login/auth check with token
             if (ReferenceEquals(c, null) || !ModelState.IsValid) return BadRequest();
@@ -114,8 +114,9 @@
             }
         }
         [Route("api/contacts/upload")]
-        public async Task<IHttpActionResult> PostContactByteArrayAsync([FromBody] byte[] array)
+        public async Task<IHttpActionResult> PostContactByteArrayAsync([FromBody] string base64)
         {
+            byte[] array = Convert.FromBase64String(base64);
             try
             {
                 if (await _manager.AddToDatabaseFromBytes(array)) return Ok();
