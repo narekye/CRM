@@ -118,7 +118,7 @@
             var data = new List<ViewContactLess>();
             contacts.ForEach(p =>
             {
-                data.Add(new ViewContactLess()
+                data.Add(new ViewContactLess
                 {
                     CompanyName = p.CompanyName,
                     FullName = p.FullName,

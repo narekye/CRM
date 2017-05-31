@@ -1,31 +1,32 @@
-﻿using CRM.WebApi.Models.Request;
-
-namespace CRM.WebApi.Controllers
+﻿namespace CRM.WebApi.Controllers
 {
     using System;
     using System.Web.Http;
     using System.Threading.Tasks;
     using InfrastructureModel.ApplicationManager;
-    using Models.Response;
+    using InfrastructureModel;
+    using Models.Request;
     public class EmailListsController : ApiController
     {
         private readonly ApplicationManager _manager;
+        private readonly LoggerManager _logger;
         public EmailListsController()
         {
+            _logger = new LoggerManager();
             _manager = new ApplicationManager();
         }
         public async Task<IHttpActionResult> GetAllEmailListsAsync()
         {
             try
             {
-                ApplicationManager.Logger.Info($"Request: {Request.Method} | URL: {Request.RequestUri}");
+                _logger.LogInfo(Request.Method, Request.RequestUri);
                 var data = await _manager.GetAllEmailListsAsync();
                 if (ReferenceEquals(data, null)) return NotFound();
                 return Ok(data);
             }
             catch (Exception ex)
             {
-                ApplicationManager.Logger.Error(ex, $"Request: {Request.Method} | URL: {Request.RequestUri}");
+                _logger.LogError(ex, Request.Method, Request.RequestUri);
                 return BadRequest();
             }
         }
@@ -33,14 +34,14 @@ namespace CRM.WebApi.Controllers
         {
             try
             {
-                ApplicationManager.Logger.Info($"Request: {Request.Method} | URL: {Request.RequestUri}");
+                _logger.LogInfo(Request.Method, Request.RequestUri);
                 var result = await _manager.GetEmailListById(id);
                 if (ReferenceEquals(result, null)) return NotFound();
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                ApplicationManager.Logger.Error(ex, $"Request: {Request.Method} | URL: {Request.RequestUri}");
+                _logger.LogError(ex,Request.Method, Request.RequestUri);
                 return BadRequest();
             }
         }
@@ -48,13 +49,13 @@ namespace CRM.WebApi.Controllers
         {
             try
             {
-                ApplicationManager.Logger.Info($"Request: {Request.Method} | URL: {Request.RequestUri}");
+                _logger.LogInfo(Request.Method, Request.RequestUri);
                 if (await _manager.AddNewEmailList(model)) return Ok();
                 return BadRequest();
             }
             catch (Exception ex)
             {
-                ApplicationManager.Logger.Error(ex, $"Request: {Request.Method} | URL: {Request.RequestUri}");
+                _logger.LogError(ex, Request.Method, Request.RequestUri);
                 return BadRequest();
             }
         }
@@ -62,13 +63,13 @@ namespace CRM.WebApi.Controllers
         {
             try
             {
-                ApplicationManager.Logger.Info($"Request: {Request.Method} | URL: {Request.RequestUri}");
+                _logger.LogInfo(Request.Method, Request.RequestUri);
                 var data = await _manager.UpdateEmailListAsync(emaillist);
                 return Ok(data);
             }
             catch (Exception ex)
             {
-                ApplicationManager.Logger.Error(ex, $"Request: {Request.Method} | URL: {Request.RequestUri}");
+                _logger.LogError(ex, Request.Method, Request.RequestUri);
                 return BadRequest();
             }
         }
@@ -76,13 +77,13 @@ namespace CRM.WebApi.Controllers
         {
             try
             {
-                ApplicationManager.Logger.Info($"Request: {Request.Method} | URL: {Request.RequestUri}");
+                _logger.LogInfo(Request.Method, Request.RequestUri);
                 if (await _manager.DeleteEmailListByIdAsync(id)) return Ok();
                 return NotFound();
             }
             catch (Exception ex)
             {
-                ApplicationManager.Logger.Error(ex, $"Request: {Request.Method} | URL: {Request.RequestUri}");
+                _logger.LogError(ex, Request.Method, Request.RequestUri);
                 return BadRequest();
             }
         }

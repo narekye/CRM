@@ -197,6 +197,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Templates\cerberus.html" />
+    <Content Include="Templates\log.html" />
     <Content Include="Templates\promotional.html" />
     <Content Include="Templates\simple.html" />
     <Content Include="Web.config" />
@@ -210,6 +211,7 @@
     <Compile Include="InfrastructureModel\ApplicationManager\ApplicationManagerContact.cs" />
     <Compile Include="InfrastructureModel\ApplicationManager\ApplicationManagerEmail.cs" />
     <Compile Include="InfrastructureModel\ApplicationManager\ApplicationManagerTemplate.cs" />
+    <Compile Include="InfrastructureModel\LoggerManager.cs" />
     <Compile Include="InfrastructureModel\MailManager.cs" />
     <Compile Include="InfrastructureModel\ModelFactory.cs" />
     <Compile Include="InfrastructureModel\ParserProvider.cs" />

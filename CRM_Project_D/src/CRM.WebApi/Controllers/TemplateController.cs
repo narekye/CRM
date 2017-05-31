@@ -5,7 +5,6 @@
     using System.Web.Http;
     using InfrastructureModel.ApplicationManager;
     using InfrastructureModel;
-
     public class TemplateController : ApiController
     {
         private readonly ApplicationManager _manager;

@@ -10,19 +10,13 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
     using Models.Response;
     using Converter;
     using NLog;
-
     public partial class ApplicationManager : IDisposable
     {
-        public static Logger Logger;
-        public static NLog.Targets.FileTarget LoggerTarget;
         private readonly CRMContext _database;
         private readonly ModelFactory _factory;
         private readonly ParserProvider _parser;
         public ApplicationManager()
         {
-            Logger = LogManager.GetCurrentClassLogger();
-            LoggerTarget = (NLog.Targets.FileTarget)LogManager.Configuration.FindTargetByName("file");
-            LoggerTarget.DeleteOldFileOnStartup = false;
             _parser = new ParserProvider();
             _factory = new ModelFactory();
             _database = new CRMContext();
@@ -38,7 +32,6 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, GetType().ToString());
                 throw new Exception(ex.Message);
             }
         }

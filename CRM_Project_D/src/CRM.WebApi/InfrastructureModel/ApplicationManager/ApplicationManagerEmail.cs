@@ -82,6 +82,7 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
                         await
                             _database.EmailLists.Include(p => p.Contacts)
                                 .FirstOrDefaultAsync(p => p.EmailListID == emaillist.EmailListID);
+                    original.Contacts.Clear();
                     var contacts = new List<Contact>();
                     foreach (Guid emaillistGuid in emaillist.Guids)
                         contacts.Add(await _database.Contacts.FirstOrDefaultAsync(p => p.GuID == emaillistGuid));
