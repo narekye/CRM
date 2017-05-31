@@ -23,18 +23,16 @@ namespace CRM.WebApi.Converter
             var dict = ConvertToDict<object, U>(old);
             var props = newobj.GetType().GetProperties();
             foreach (var prop in props)
-                foreach (var item in dict)
-                    if (prop.Name == item.Key)
-                    {
-                        try
-                        {
-                            newobj.GetType().GetProperty(prop.Name).SetValue(newobj, item.Value);
-                        }
-                        catch
-                        {
-                            continue;
-                        }
-                    }
+            {
+                try
+                {
+                    newobj.GetType().GetProperty(prop.Name).SetValue(newobj, dict[prop.Name]);
+                }
+                catch
+                {
+                    continue;
+                }
+            }
         }
         private static U Value<T, U>(T value, string propname)
         {

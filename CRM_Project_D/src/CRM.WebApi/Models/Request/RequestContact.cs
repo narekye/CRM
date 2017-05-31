@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
     using Response;
-    public class RequestQuery
+    public class RequestContact
     {
         public ViewContactLess FilterBy { get; set; }
         public Dictionary<string,string> SortBy { get; set; }

@@ -45,7 +45,8 @@
 
         public async Task<Contact> GetContactFromViewContact(ViewContact model, bool flag, List<EmailList> emailList = null)
         {
-            Contact contact;
+            Contact contact = new Contact();
+            model.ConvertTo(contact);
             if (flag) // true returns new object with new Guid from model without contactId and emaillist |
             {
                 contact = new Contact()
@@ -76,8 +77,11 @@
         public List<Contact> EntityGetContactListFromViewContactList(List<ViewContact> list, bool flag, List<EmailList> emailLists = null)
         {
             var result = new List<Contact>();
-            if (flag) list.ForEach(async i => result.Add(await this.GetContactFromViewContact(i, true, emailLists)));
-            list.ForEach(async z => result.Add(await this.GetContactFromViewContact(z, false)));
+            if (flag) list.ForEach(async i => result.Add(await GetContactFromViewContact(i, true, emailLists)));
+            else
+            {
+                list.ForEach(async z => result.Add(await GetContactFromViewContact(z, false)));
+            }
             return result;
         }
         #endregion
@@ -145,7 +149,7 @@
                                 Position = d.Position
                             }).ToList(),
                 EmailListName = emailList.EmailListName,
-                EmailListId = emailList.EmailListID
+                EmailListID = emailList.EmailListID
             };
         }
 
@@ -173,7 +177,7 @@
             else // returns object from db
             {
                 var list = await
-                    _database.EmailLists.FirstOrDefaultAsync(p => p.EmailListID == viewEmailList.EmailListId);
+                    _database.EmailLists.FirstOrDefaultAsync(p => p.EmailListID == viewEmailList.EmailListID);
                 obj = new EmailList
                 {
                     EmailListName = viewEmailList.EmailListName,

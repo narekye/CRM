@@ -1,5 +1,3 @@
-using CRM.WebApi.Converter;
-
 namespace CRM.WebApi.InfrastructureModel.ApplicationManager
 {
     using System;
@@ -10,13 +8,21 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
     using Entities;
     using Models.Request;
     using Models.Response;
+    using Converter;
+    using NLog;
+
     public partial class ApplicationManager : IDisposable
     {
+        public static Logger Logger;
+        public static NLog.Targets.FileTarget LoggerTarget;
         private readonly CRMContext _database;
         private readonly ModelFactory _factory;
         private readonly ParserProvider _parser;
         public ApplicationManager()
         {
+            Logger = LogManager.GetCurrentClassLogger();
+            LoggerTarget = (NLog.Targets.FileTarget)LogManager.Configuration.FindTargetByName("file");
+            LoggerTarget.DeleteOldFileOnStartup = false;
             _parser = new ParserProvider();
             _factory = new ModelFactory();
             _database = new CRMContext();
@@ -32,6 +38,7 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
             }
             catch (Exception ex)
             {
+                Logger.Error(ex, GetType().ToString());
                 throw new Exception(ex.Message);
             }
         }
@@ -44,7 +51,8 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
                     await
                         _database.Contacts.Include(p => p.EmailLists).FirstOrDefaultAsync(p => p.ContactId == id.Value);
                 if (ReferenceEquals(contact, null)) return null;
-                ViewContact data = _factory.CreateViewContact(contact);
+                ViewContact data = new ViewContact();
+                contact.ConvertTo(data); // _factory.CreateViewContact(contact);
                 return data;
             }
             catch (Exception ex)
@@ -59,7 +67,9 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
                 Contact contact =
                     await _database.Contacts.Include(p => p.EmailLists).FirstOrDefaultAsync(p => p.GuID == guid.Value);
                 if (ReferenceEquals(contact, null)) return null;
-                ViewContact data = _factory.CreateViewContact(contact);
+                ViewContact data = new ViewContact();
+                contact.ConvertTo(data);
+                data.EmailLists = contact.EmailLists.Select(p => p.EmailListName).ToList(); // _factory.CreateViewContact(contact);
                 return data;
             }
             catch (Exception ex)
@@ -67,6 +77,7 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
                 throw new Exception(ex.Message);
             }
         }
+        // working 
         public async Task<bool> UpdateContactAsync(ViewContactLess contact)
         {
             using (var transaction = _database.Database.BeginTransaction())
@@ -94,6 +105,8 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
         {
             Contact cont = new Contact();
             contact.ConvertTo(cont);
+            cont.GuID = Guid.NewGuid();
+            cont.DateInserted = DateTime.UtcNow;
             using (var transaction = _database.Database.BeginTransaction())
             {
                 try
@@ -136,7 +149,8 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
                 throw new Exception(ex.Message);
             }
         }
-        public async Task<List<ViewContactLess>> FilterOrderByRequestAsync(RequestQuery request)
+        #region FilterOrderPaging
+        public async Task<List<ViewContactLess>> FilterOrderByRequestAsync(RequestContact request)
         {
             if (ReferenceEquals(request, null)) return null;
             ViewContactLess filter = request.FilterBy;
@@ -178,7 +192,7 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
                 throw new Exception(ex.Message);
             }
         }
-        public async Task<List<ViewContactLess>> FilterSortAsync(RequestQuery model, FilterBy filter)
+        public async Task<List<ViewContactLess>> FilterSortAsync(RequestContact model, FilterBy filter)
         {
             var data = new List<Contact>();
             var sortby = model.SortBy;
@@ -308,6 +322,7 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
             if (count < skip || count == 0) return null;
             return contacts.Skip(skip).Take(count).ToList();
         }
+        #endregion
         public async Task<bool> AddToDatabaseFromBytes(byte[] bytes)
         {
             using (var transaction = _database.Database.BeginTransaction())

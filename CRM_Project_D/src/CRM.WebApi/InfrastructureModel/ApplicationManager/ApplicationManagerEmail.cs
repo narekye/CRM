@@ -1,4 +1,8 @@
-﻿namespace CRM.WebApi.InfrastructureModel.ApplicationManager
+﻿using System.Linq;
+using CRM.WebApi.Converter;
+using CRM.WebApi.Models.Request;
+
+namespace CRM.WebApi.InfrastructureModel.ApplicationManager
 {
     using System;
     using System.Collections.Generic;
@@ -24,7 +28,6 @@
                 throw new Exception(ex.Message);
             }
         }
-
         public async Task<ViewEmailList> GetEmailListById(int? id)
         {
             if (!id.HasValue) return null;
@@ -33,7 +36,12 @@
                 EmailList data = await _database.EmailLists.Include(p => p.Contacts)
                     .FirstOrDefaultAsync(p => p.EmailListID == id.Value);
                 if (ReferenceEquals(data, null)) return null;
-                var result = _factory.GetViewEmailList(data);
+                ViewEmailList result = new ViewEmailList();
+                data.ConvertTo(result);
+                result.Contacts = new List<ViewContactLess>();
+                var contacts = data.Contacts.ToList();
+                var contactless = _factory.CreateViewContactLessList(contacts);
+                result.Contacts = contactless;
                 return result;
             }
             catch (Exception ex)
@@ -41,18 +49,18 @@
                 throw new Exception(ex.Message);
             }
         }
-
-        public async Task<bool> AddEmailList(ViewEmailList emailList)
+        public async Task<bool> AddNewEmailList(RequestEmailList model)
         {
-            using (DbContextTransaction transaction = _database.Database.BeginTransaction())
+
+            using (var transaction = _database.Database.BeginTransaction())
             {
                 try
                 {
-                    EmailList entity = await _factory.EntityCreateEmailList(emailList, true);
-                    List<ViewContact> viewcontacts = _factory.GetViewContactListFromLessList(emailList.Contacts);
-                    List<Contact> entitycontacts = _factory.EntityGetContactListFromViewContactList(viewcontacts, true);
-                    entity.Contacts = entitycontacts;
-                    _database.EmailLists.Add(entity);
+                    EmailList original = new EmailList();
+                    model.ConvertTo(original);
+                    foreach (Guid modelGuid in model.Guids)
+                        original.Contacts.Add(await _database.Contacts.FirstOrDefaultAsync(p => p.GuID == modelGuid));
+                    _database.EmailLists.Add(original);
                     await _database.SaveChangesAsync();
                     transaction.Commit();
                     return true;
@@ -63,25 +71,27 @@
                     throw new Exception(ex.Message);
                 }
             }
-        }
-
-        // update emallist, need to be done...
-        public async Task<bool> UpdateEmailListAsync(ViewEmailList emaillists)
+        }        
+        public async Task<bool> UpdateEmailListAsync(RequestEmailList emaillist)
         {
-            EmailList original = await _database.EmailLists.Include(z => z.Contacts)
-                .FirstOrDefaultAsync(p => p.EmailListID == emaillists.EmailListId);
-            var viewcontacts = _factory.GetViewContactListFromLessList(emaillists.Contacts);
-            var contacts = _factory.EntityGetContactListFromViewContactList(viewcontacts, true);
-            var replace = _factory.EntityCreateEmailList(emaillists, true, contacts);
             using (var transaction = _database.Database.BeginTransaction())
             {
                 try
                 {
-                    _database.Entry(original).CurrentValues.SetValues(replace);
+                    var original =
+                        await
+                            _database.EmailLists.Include(p => p.Contacts)
+                                .FirstOrDefaultAsync(p => p.EmailListID == emaillist.EmailListID);
+                    var contacts = new List<Contact>();
+                    foreach (Guid emaillistGuid in emaillist.Guids)
+                        contacts.Add(await _database.Contacts.FirstOrDefaultAsync(p => p.GuID == emaillistGuid));
+                    original.Contacts = contacts;
+                    _database.Entry(original).State = EntityState.Modified;
                     await _database.SaveChangesAsync();
                     transaction.Commit();
                     return true;
                 }
+
                 catch (Exception ex)
                 {
                     transaction.Rollback();

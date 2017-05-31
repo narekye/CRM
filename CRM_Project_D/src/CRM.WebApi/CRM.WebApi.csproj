@@ -112,6 +112,10 @@
       <HintPath>..\..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NLog.5.0.0-beta07\lib\net45\NLog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
       <Private>True</Private>
@@ -128,11 +132,15 @@
       <HintPath>..\..\packages\LinqToExcel.1.10.1\lib\Remotion.Interfaces.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Web.Cors, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.AspNet.Cors.5.0.0\lib\net45\System.Web.Cors.dll</HintPath>
       <Private>True</Private>
@@ -171,6 +179,13 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="log\2017-05-30.log" />
+    <None Include="NLog.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Properties\PublishProfiles\crmbetd - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\crmbetd - Web Deploy.pubxml" />
     <None Include="Web.Debug.config">
@@ -198,7 +213,8 @@
     <Compile Include="InfrastructureModel\MailManager.cs" />
     <Compile Include="InfrastructureModel\ModelFactory.cs" />
     <Compile Include="InfrastructureModel\ParserProvider.cs" />
-    <Compile Include="Models\Request\RequestQuery.cs" />
+    <Compile Include="Models\Request\RequestContact.cs" />
+    <Compile Include="Models\Request\RequestEmailList.cs" />
     <Compile Include="Models\Response\ViewContact.cs" />
     <Compile Include="Models\Response\ViewContactLess.cs" />
     <Compile Include="Models\Response\ViewEmailList.cs" />

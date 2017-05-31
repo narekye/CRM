@@ -1,4 +1,6 @@
-﻿namespace CRM.WebApi.Controllers
+﻿using CRM.WebApi.Models.Request;
+
+namespace CRM.WebApi.Controllers
 {
     using System;
     using System.Web.Http;
@@ -16,58 +18,72 @@
         {
             try
             {
+                ApplicationManager.Logger.Info($"Request: {Request.Method} | URL: {Request.RequestUri}");
                 var data = await _manager.GetAllEmailListsAsync();
                 if (ReferenceEquals(data, null)) return NotFound();
                 return Ok(data);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message + "  " + ex.InnerException?.Message);
+                ApplicationManager.Logger.Error(ex, $"Request: {Request.Method} | URL: {Request.RequestUri}");
+                return BadRequest();
             }
         }
-
-        public async Task<IHttpActionResult> GetEmailListByIdAsync(int? id)
+        public async Task<IHttpActionResult> GetEmailListByIdAsync([FromUri] int? id)
         {
             try
             {
+                ApplicationManager.Logger.Info($"Request: {Request.Method} | URL: {Request.RequestUri}");
                 var result = await _manager.GetEmailListById(id);
                 if (ReferenceEquals(result, null)) return NotFound();
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                ApplicationManager.Logger.Error(ex, $"Request: {Request.Method} | URL: {Request.RequestUri}");
+                return BadRequest();
             }
         }
-        // working, can send a contact list if you want.
-        public async Task<IHttpActionResult> PostEmailListAsync([FromBody] ViewEmailList model)
+        public async Task<IHttpActionResult> PostEmailListAsync([FromBody] RequestEmailList model)
         {
             try
             {
-                if (await _manager.AddEmailList(model)) return Ok();
+                ApplicationManager.Logger.Info($"Request: {Request.Method} | URL: {Request.RequestUri}");
+                if (await _manager.AddNewEmailList(model)) return Ok();
                 return BadRequest();
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                ApplicationManager.Logger.Error(ex, $"Request: {Request.Method} | URL: {Request.RequestUri}");
+                return BadRequest();
             }
         }
-        // TODO: CHANGE
-        public async Task<IHttpActionResult> PutEmailListAsync([FromBody] ViewEmailList emaillist)
+        public async Task<IHttpActionResult> PutEmailListAsync([FromBody] RequestEmailList emaillist)
         {
-            var data = await _manager.UpdateEmailListAsync(emaillist);
-            return Ok(data);
+            try
+            {
+                ApplicationManager.Logger.Info($"Request: {Request.Method} | URL: {Request.RequestUri}");
+                var data = await _manager.UpdateEmailListAsync(emaillist);
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                ApplicationManager.Logger.Error(ex, $"Request: {Request.Method} | URL: {Request.RequestUri}");
+                return BadRequest();
+            }
         }
         public async Task<IHttpActionResult> DeleteEmailListById([FromUri] int? id)
         {
             try
             {
+                ApplicationManager.Logger.Info($"Request: {Request.Method} | URL: {Request.RequestUri}");
                 if (await _manager.DeleteEmailListByIdAsync(id)) return Ok();
                 return NotFound();
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                ApplicationManager.Logger.Error(ex, $"Request: {Request.Method} | URL: {Request.RequestUri}");
+                return BadRequest();
             }
         }
         protected override void Dispose(bool disposing)
