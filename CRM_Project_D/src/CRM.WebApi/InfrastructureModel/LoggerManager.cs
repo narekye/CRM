@@ -1,11 +1,10 @@
-﻿using System.IO;
-
-namespace CRM.WebApi.InfrastructureModel
+﻿namespace CRM.WebApi.InfrastructureModel
 {
     using System;
     using System.Net.Http;
     using NLog;
     using NLog.Targets;
+    using System.IO;
     public class LoggerManager
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
@@ -21,7 +20,7 @@ namespace CRM.WebApi.InfrastructureModel
         public void LogError(Exception ex, HttpMethod request, Uri uri)
         {
 
-            Logger.Error(new string('-', 60) + $"\nRequest: [ {request} ] | URL [ {uri} ]\nErr: [ {ex.Message} ] Inner: [ {ex.InnerException?.Message} ]\n" + new string('-', 120));
+            Logger.Error($"\nRequest: [ {request} ] | URL [ {uri} ]\nErr: [ {ex.Message} ] Inner: [ {ex.InnerException?.Message} ]\n" + new string('-', 120));
         }
 
         public string ReadData()

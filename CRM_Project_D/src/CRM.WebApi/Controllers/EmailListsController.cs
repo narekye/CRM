@@ -6,6 +6,9 @@
     using InfrastructureModel.ApplicationManager;
     using InfrastructureModel;
     using Models.Request;
+    using System.Net.Http;
+    using System.Net;
+
     public class EmailListsController : ApiController
     {
         private readonly ApplicationManager _manager;
@@ -15,76 +18,77 @@
             _logger = new LoggerManager();
             _manager = new ApplicationManager();
         }
-        public async Task<IHttpActionResult> GetAllEmailListsAsync()
+        public async Task<HttpResponseMessage> GetAllEmailListsAsync()
         {
             try
             {
                 _logger.LogInfo(Request.Method, Request.RequestUri);
                 var data = await _manager.GetAllEmailListsAsync();
-                if (ReferenceEquals(data, null)) return NotFound();
-                return Ok(data);
+                if (ReferenceEquals(data, null)) return Request.CreateResponse(HttpStatusCode.NotFound);
+                return Request.CreateResponse(HttpStatusCode.OK, data);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, Request.Method, Request.RequestUri);
-                return BadRequest();
+                return Request.CreateResponse(HttpStatusCode.Conflict);
             }
         }
-        public async Task<IHttpActionResult> GetEmailListByIdAsync([FromUri] int? id)
+        public async Task<HttpResponseMessage> GetEmailListByIdAsync([FromUri] int? id)
         {
             try
             {
                 _logger.LogInfo(Request.Method, Request.RequestUri);
-                var result = await _manager.GetEmailListById(id);
-                if (ReferenceEquals(result, null)) return NotFound();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex,Request.Method, Request.RequestUri);
-                return BadRequest();
-            }
-        }
-        public async Task<IHttpActionResult> PostEmailListAsync([FromBody] RequestEmailList model)
-        {
-            try
-            {
-                _logger.LogInfo(Request.Method, Request.RequestUri);
-                if (await _manager.AddNewEmailList(model)) return Ok();
-                return BadRequest();
+                var data = await _manager.GetEmailListById(id);
+                if (ReferenceEquals(data, null)) return Request.CreateResponse(HttpStatusCode.NotFound);
+                return Request.CreateResponse(HttpStatusCode.OK, data);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, Request.Method, Request.RequestUri);
-                return BadRequest();
+                return Request.CreateResponse(HttpStatusCode.Conflict);
             }
         }
-        public async Task<IHttpActionResult> PutEmailListAsync([FromBody] RequestEmailList emaillist)
+        public async Task<HttpResponseMessage> PostEmailListAsync([FromBody] RequestEmailList model)
         {
             try
             {
                 _logger.LogInfo(Request.Method, Request.RequestUri);
-                var data = await _manager.UpdateEmailListAsync(emaillist);
-                return Ok(data);
+                if (await _manager.AddNewEmailList(model)) return Request.CreateResponse(HttpStatusCode.Created);
+                return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, Request.Method, Request.RequestUri);
-                return BadRequest();
+                return Request.CreateResponse(HttpStatusCode.Conflict);
             }
         }
-        public async Task<IHttpActionResult> DeleteEmailListById([FromUri] int? id)
+        public async Task<HttpResponseMessage> PutEmailListAsync([FromBody] RequestEmailList model)
         {
             try
             {
                 _logger.LogInfo(Request.Method, Request.RequestUri);
-                if (await _manager.DeleteEmailListByIdAsync(id)) return Ok();
-                return NotFound();
+                if (await _manager.UpdateEmailListAsync(model))
+                    return Request.CreateResponse(HttpStatusCode.OK);
+                return Request.CreateResponse(HttpStatusCode.NotModified);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, Request.Method, Request.RequestUri);
-                return BadRequest();
+                return Request.CreateResponse(HttpStatusCode.Conflict);
+            }
+        }
+        public async Task<HttpResponseMessage> DeleteEmailListById([FromUri] int? id)
+        {
+            try
+            {
+                _logger.LogInfo(Request.Method, Request.RequestUri);
+                if (await _manager.DeleteEmailListByIdAsync(id)) return Request.CreateResponse(HttpStatusCode.OK);
+                return Request.CreateResponse(HttpStatusCode.BadGateway);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, Request.Method, Request.RequestUri);
+                return Request.CreateResponse(HttpStatusCode.Conflict);
             }
         }
         protected override void Dispose(bool disposing)

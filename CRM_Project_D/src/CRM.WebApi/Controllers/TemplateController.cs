@@ -3,43 +3,51 @@
     using System;
     using System.Threading.Tasks;
     using System.Web.Http;
+    using System.Net;
+    using System.Net.Http;
     using InfrastructureModel.ApplicationManager;
     using InfrastructureModel;
     public class TemplateController : ApiController
     {
         private readonly ApplicationManager _manager;
         private readonly ModelFactory _factory;
+        private readonly LoggerManager _logger;
         public TemplateController()
         {
+            _logger = new LoggerManager();
             _manager = new ApplicationManager();
             _factory = new ModelFactory();
         }
-        public async Task<IHttpActionResult> GetAllTemplatesAsync()
+        public async Task<HttpResponseMessage> GetAllTemplatesAsync()
         {
             try
             {
+                _logger.LogInfo(Request.Method, Request.RequestUri);
                 var data = await _manager.GetAllTemplatesListAsync();
-                if (ReferenceEquals(data, null)) return BadRequest();
+                if (ReferenceEquals(data, null)) return Request.CreateResponse(HttpStatusCode.NotFound);
                 var result = _factory.GetViewTemplates(data);
-                return Ok(result);
+                return Request.CreateResponse(HttpStatusCode.OK, result);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                _logger.LogError(ex, Request.Method, Request.RequestUri);
+                return Request.CreateResponse(HttpStatusCode.Conflict);
             }
         }
-        public async Task<IHttpActionResult> GetTemplateById(int? id)
+        public async Task<HttpResponseMessage> GetTemplateById(int? id)
         {
+            if (!id.HasValue) return Request.CreateResponse(HttpStatusCode.BadGateway);
             try
             {
                 var data = await _manager.GetTemplateByIdAsync(id);
-                if (ReferenceEquals(data, null)) return NotFound();
+                if (ReferenceEquals(data, null)) return Request.CreateResponse(HttpStatusCode.NotFound);
                 var result = _factory.GetViewTemplate(data);
-                return Ok(result);
+                return Request.CreateResponse(HttpStatusCode.OK, result);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                _logger.LogError(ex, Request.Method, Request.RequestUri);
+                return Request.CreateResponse(HttpStatusCode.Conflict);
             }
         }
         protected override void Dispose(bool disposing)

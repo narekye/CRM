@@ -5,24 +5,30 @@
     using System.Web.Http;
     using System.Threading.Tasks;
     using InfrastructureModel;
+    using System.Net.Http;
+    using System.Net;
     public class SendEmailController : ApiController
     {
         private readonly MailManager _manager;
+        private readonly LoggerManager _logger;
         public SendEmailController()
         {
+            _logger = new LoggerManager();
             _manager = new MailManager();
         }
-        public async Task<IHttpActionResult> PostSendToList([FromUri] int templateid, [FromBody] List<Guid> guids)
+        public async Task<HttpResponseMessage> PostSendToList([FromUri] int templateid, [FromBody] List<Guid> guids)
         {
             try
             {
+                _logger.LogInfo(Request.Method, Request.RequestUri);
                 var list = await _manager.GetListOfEmailsByGuids(guids);
                 await _manager.SendEmailToList(list, templateid);
-                return Ok();
+                return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                _logger.LogError(ex, Request.Method, Request.RequestUri);
+                return Request.CreateResponse(HttpStatusCode.Conflict);
             }
         }
         protected override void Dispose(bool disposing)
