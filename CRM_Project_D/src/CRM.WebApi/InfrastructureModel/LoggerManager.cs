@@ -19,10 +19,12 @@
         }
         public void LogError(Exception ex, HttpMethod request, Uri uri)
         {
-
-            Logger.Error($"\nRequest: [ {request} ] | URL [ {uri} ]\nErr: [ {ex.Message} ] Inner: [ {ex.InnerException?.Message} ]\n" + new string('-', 120));
+            Logger.Log(LogLevel.Fatal, $"\nRequest: [ {request} ] | URL [ {uri} ]\nErr: [ {ex.Message} ] Inner: [ {ex.InnerException?.Message} ]\n" + new string('-', 120));
         }
-
+        public void LogException(Exception ex)
+        {
+            Logger.Log(LogLevel.Fatal, ex, $"\nErr: {ex.Message}\nInner: {ex.InnerException?.Message}\n");
+        }
         public string ReadData()
         {
             var fileTarget = (FileTarget)LogManager.Configuration.FindTargetByName("file");

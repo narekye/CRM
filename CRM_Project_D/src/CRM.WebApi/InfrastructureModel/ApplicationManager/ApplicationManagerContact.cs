@@ -4,12 +4,12 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
     using System.Collections.Generic;
     using System.Data.Entity;
     using System.Linq;
+    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using Entities;
     using Models.Request;
     using Models.Response;
     using Converter;
-    using NLog;
     public partial class ApplicationManager : IDisposable
     {
         private readonly CRMContext _database;
@@ -17,6 +17,7 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
         private readonly ParserProvider _parser;
         public ApplicationManager()
         {
+            _logger = new LoggerManager();
             _parser = new ParserProvider();
             _factory = new ModelFactory();
             _database = new CRMContext();
@@ -24,53 +25,33 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
         }
         public async Task<List<ViewContactLess>> GetAllContactsAsync()
         {
-            try
-            {
-                List<Contact> list = await _database.Contacts.ToListAsync();
-                List<ViewContactLess> data = _factory.CreateViewContactLessList(list);
-                return data;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            var list = await _database.Contacts.ToListAsync();
+            if (ReferenceEquals(list, null)) return null;
+            var data = new List<ViewContactLess>();
+            await list.ConvertToList(data);
+            return data;
         }
         public async Task<ViewContact> GetContactByIdAsync(int? id)
         {
             if (!id.HasValue) return null;
-            try
-            {
-                Contact contact =
-                    await
-                        _database.Contacts.Include(p => p.EmailLists).FirstOrDefaultAsync(p => p.ContactId == id.Value);
-                if (ReferenceEquals(contact, null)) return null;
-                ViewContact data = new ViewContact();
-                contact.ConvertTo(data); // _factory.CreateViewContact(contact);
-                return data;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            var contact =
+                     await
+                         _database.Contacts.Include(p => p.EmailLists).FirstOrDefaultAsync(p => p.ContactId == id.Value);
+            if (ReferenceEquals(contact, null)) return null;
+            var data = new ViewContact();
+            contact.ConvertTo(data);
+            return data;
         }
         public async Task<ViewContact> GetContactByGuidAsync(Guid? guid)
         {
-            try
-            {
-                Contact contact =
+            var contact =
                     await _database.Contacts.Include(p => p.EmailLists).FirstOrDefaultAsync(p => p.GuID == guid.Value);
-                if (ReferenceEquals(contact, null)) return null;
-                ViewContact data = new ViewContact();
-                contact.ConvertTo(data);
-                data.EmailLists = contact.EmailLists.Select(p => p.EmailListName).ToList(); // _factory.CreateViewContact(contact);
-                return data;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            if (ReferenceEquals(contact, null)) return null;
+            ViewContact data = new ViewContact();
+            contact.ConvertTo(data);
+            data.EmailLists = contact.EmailLists.Select(p => p.EmailListName).ToList();
+            return data;
         }
-        // working 
         public async Task<bool> UpdateContactAsync(ViewContactLess contact)
         {
             using (var transaction = _database.Database.BeginTransaction())
@@ -81,22 +62,22 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
                     var replace = new Contact();
                     contact.ConvertTo(replace);
                     replace.ContactId = original.ContactId;
-                    replace.DateModified = DateTime.Now;
+                    replace.DateModified = DateTime.UtcNow;
                     _database.Entry(original).CurrentValues.SetValues(replace);
                     await _database.SaveChangesAsync();
                     transaction.Commit();
                     return true;
                 }
-                catch (Exception ex)
+                catch
                 {
                     transaction.Rollback();
-                    throw new Exception(ex.Message);
+                    throw;
                 }
             }
         }
         public async Task<bool> AddContactAsync(ViewContactLess contact)
         {
-            Contact cont = new Contact();
+            var cont = new Contact();
             contact.ConvertTo(cont);
             cont.GuID = Guid.NewGuid();
             cont.DateInserted = DateTime.UtcNow;
@@ -109,38 +90,24 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
                     transaction.Commit();
                     return true;
                 }
-                catch (Exception ex)
+                catch
                 {
                     transaction.Rollback();
-                    throw new Exception(ex.Message);
+                    throw;
                 }
             }
         }
         public async Task<bool> DeleteContactAsync(Guid guid)
         {
-            Contact cont = await _database.Contacts.FirstOrDefaultAsync(p => p.GuID == guid);
-            try
-            {
-                _database.Contacts.Remove(cont);
-                await _database.SaveChangesAsync();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            var cont = await _database.Contacts.FirstOrDefaultAsync(p => p.GuID == guid);
+            _database.Contacts.Remove(cont);
+            await _database.SaveChangesAsync();
+            return true;
         }
         public async Task<int> PageCountAsync()
         {
-            try
-            {
-                int count = await _database.Contacts.CountAsync();
-                return count / 10 + 1;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            int count = await _database.Contacts.CountAsync();
+            return count / 10 + 1;
         }
         #region FilterOrderPaging
         public async Task<List<ViewContactLess>> FilterOrderByRequestAsync(RequestContact request)
@@ -334,6 +301,13 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
                     throw new Exception(ex.Message);
                 }
             }
+        }
+        public bool CheckEmailAddress(string email)
+        {
+            return
+            Regex.IsMatch(email,
+                @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z",
+                RegexOptions.IgnoreCase);
         }
         public void Dispose()
         {

@@ -1,8 +1,4 @@
-﻿using System.Linq;
-using CRM.WebApi.Converter;
-using CRM.WebApi.Models.Request;
-
-namespace CRM.WebApi.InfrastructureModel.ApplicationManager
+﻿namespace CRM.WebApi.InfrastructureModel.ApplicationManager
 {
     using System;
     using System.Collections.Generic;
@@ -10,44 +6,33 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
     using System.Threading.Tasks;
     using Entities;
     using Models.Response;
+    using System.Linq;
+    using Converter;
+    using Models.Request;
 
     public partial class ApplicationManager
     {
         public async Task<List<ViewEmailListLess>> GetAllEmailListsAsync()
         {
-            try
-            {
-                List<EmailList> list = await _database.EmailLists.ToListAsync();
-                if (ReferenceEquals(list, null)) return null;
-                List<ViewEmailListLess> result = _factory.GetEmailListsLessList(list);
-                if (ReferenceEquals(result, null)) return null;
-                return result;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            var list = await _database.EmailLists.ToListAsync();
+            if (ReferenceEquals(list, null)) return null;
+            var result = new List<ViewEmailListLess>();
+            await list.ConvertToList(result);
+            return result;
         }
         public async Task<ViewEmailList> GetEmailListById(int? id)
         {
             if (!id.HasValue) return null;
-            try
-            {
-                EmailList data = await _database.EmailLists.Include(p => p.Contacts)
-                    .FirstOrDefaultAsync(p => p.EmailListID == id.Value);
-                if (ReferenceEquals(data, null)) return null;
-                ViewEmailList result = new ViewEmailList();
-                data.ConvertTo(result);
-                result.Contacts = new List<ViewContactLess>();
-                var contacts = data.Contacts.ToList();
-                var contactless = _factory.CreateViewContactLessList(contacts);
-                result.Contacts = contactless;
-                return result;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            EmailList data = await _database.EmailLists.Include(p => p.Contacts)
+                .FirstOrDefaultAsync(p => p.EmailListID == id.Value);
+            if (ReferenceEquals(data, null)) return null;
+            ViewEmailList result = new ViewEmailList();
+            data.ConvertTo(result);
+            result.Contacts = new List<ViewContactLess>();
+            var contacts = data.Contacts.ToList();
+            var contactless = _factory.CreateViewContactLessList(contacts);
+            result.Contacts = contactless;
+            return result;
         }
         public async Task<bool> AddNewEmailList(RequestEmailList model)
         {
@@ -56,7 +41,7 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
             {
                 try
                 {
-                    EmailList original = new EmailList();
+                    var original = new EmailList();
                     model.ConvertTo(original);
                     foreach (Guid modelGuid in model.Guids)
                         original.Contacts.Add(await _database.Contacts.FirstOrDefaultAsync(p => p.GuID == modelGuid));
@@ -65,13 +50,13 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
                     transaction.Commit();
                     return true;
                 }
-                catch (Exception ex)
+                catch
                 {
                     transaction.Rollback();
-                    throw new Exception(ex.Message);
+                    throw;
                 }
             }
-        }        
+        }
         public async Task<bool> UpdateEmailListAsync(RequestEmailList emaillist)
         {
             using (var transaction = _database.Database.BeginTransaction())
@@ -92,31 +77,30 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
                     transaction.Commit();
                     return true;
                 }
-
-                catch (Exception ex)
+                catch
                 {
                     transaction.Rollback();
-                    throw new Exception(ex.Message);
+                    throw;
                 }
             }
         }
         public async Task<bool> DeleteEmailListByIdAsync(int? id)
         {
             if (!id.HasValue) return false;
-            using (DbContextTransaction transaction = _database.Database.BeginTransaction())
+            using (var transaction = _database.Database.BeginTransaction())
             {
                 try
                 {
-                    EmailList emaillist = await _database.EmailLists.FirstOrDefaultAsync(p => p.EmailListID == id.Value);
+                    var emaillist = await _database.EmailLists.FirstOrDefaultAsync(p => p.EmailListID == id.Value);
                     _database.EmailLists.Remove(emaillist);
                     await _database.SaveChangesAsync();
                     transaction.Commit();
                     return true;
                 }
-                catch (Exception ex)
+                catch
                 {
                     transaction.Rollback();
-                    throw new Exception(ex.Message);
+                    throw;
                 }
             }
         }

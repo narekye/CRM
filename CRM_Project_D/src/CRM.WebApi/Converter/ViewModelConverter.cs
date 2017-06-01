@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
+
 namespace CRM.WebApi.Converter
 {
     public static class ViewModelConverter
@@ -18,7 +20,9 @@ namespace CRM.WebApi.Converter
             return result;
         }
         public static void ConvertTo<U, T>(this U old, T newobj) where T : class, new()
+            where U : new()
         {
+
             if (typeof(U) == typeof(T)) return;
             var dict = ConvertToDict<object, U>(old);
             var props = newobj.GetType().GetProperties();
@@ -30,10 +34,24 @@ namespace CRM.WebApi.Converter
                 }
                 catch
                 {
-                    continue;
+                    // ignored
                 }
             }
         }
+        public static async Task ConvertToList<T, U>(this List<T> list, List<U> data) where U : class, new()
+            where T : new()
+        {
+            await Task.Run(() =>
+            {
+                list.ForEach(p =>
+                {
+                    var u = new U();
+                    p.ConvertTo(u);
+                    data.Add(u);
+                });
+            });
+        }
+
         private static U Value<T, U>(T value, string propname)
         {
             return (U)value.GetType().GetProperties().Single(p => p.Name == propname).GetValue(value, null);

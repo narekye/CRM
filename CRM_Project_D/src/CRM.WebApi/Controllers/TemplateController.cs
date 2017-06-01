@@ -1,6 +1,5 @@
 ﻿namespace CRM.WebApi.Controllers
 {
-    using System;
     using System.Threading.Tasks;
     using System.Web.Http;
     using System.Net;
@@ -20,35 +19,18 @@
         }
         public async Task<HttpResponseMessage> GetAllTemplatesAsync()
         {
-            try
-            {
-                _logger.LogInfo(Request.Method, Request.RequestUri);
-                var data = await _manager.GetAllTemplatesListAsync();
-                if (ReferenceEquals(data, null)) return Request.CreateResponse(HttpStatusCode.NotFound);
-                var result = _factory.GetViewTemplates(data);
-                return Request.CreateResponse(HttpStatusCode.OK, result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, Request.Method, Request.RequestUri);
-                return Request.CreateResponse(HttpStatusCode.Conflict);
-            }
+            var data = await _manager.GetAllTemplatesListAsync();
+            if (ReferenceEquals(data, null)) return Request.CreateResponse(HttpStatusCode.NotFound);
+            var result = _factory.GetViewTemplates(data);
+            return Request.CreateResponse(HttpStatusCode.OK, result);
         }
         public async Task<HttpResponseMessage> GetTemplateById(int? id)
         {
             if (!id.HasValue) return Request.CreateResponse(HttpStatusCode.BadGateway);
-            try
-            {
-                var data = await _manager.GetTemplateByIdAsync(id);
-                if (ReferenceEquals(data, null)) return Request.CreateResponse(HttpStatusCode.NotFound);
-                var result = _factory.GetViewTemplate(data);
-                return Request.CreateResponse(HttpStatusCode.OK, result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, Request.Method, Request.RequestUri);
-                return Request.CreateResponse(HttpStatusCode.Conflict);
-            }
+            var data = await _manager.GetTemplateByIdAsync(id);
+            if (ReferenceEquals(data, null)) return Request.CreateResponse(HttpStatusCode.NotFound);
+            var result = _factory.GetViewTemplate(data);
+            return Request.CreateResponse(HttpStatusCode.OK, result);
         }
         protected override void Dispose(bool disposing)
         {

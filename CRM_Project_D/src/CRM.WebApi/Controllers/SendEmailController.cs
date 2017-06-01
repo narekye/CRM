@@ -10,7 +10,6 @@
     public class SendEmailController : ApiController
     {
         private readonly MailManager _manager;
-        private readonly LoggerManager _logger;
         public SendEmailController()
         {
             _logger = new LoggerManager();
@@ -18,18 +17,9 @@
         }
         public async Task<HttpResponseMessage> PostSendToList([FromUri] int templateid, [FromBody] List<Guid> guids)
         {
-            try
-            {
-                _logger.LogInfo(Request.Method, Request.RequestUri);
-                var list = await _manager.GetListOfEmailsByGuids(guids);
-                await _manager.SendEmailToList(list, templateid);
-                return Request.CreateResponse(HttpStatusCode.OK);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, Request.Method, Request.RequestUri);
-                return Request.CreateResponse(HttpStatusCode.Conflict);
-            }
+            var list = await _manager.GetListOfEmailsByGuids(guids);
+            await _manager.SendEmailToList(list, templateid);
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
         protected override void Dispose(bool disposing)
         {

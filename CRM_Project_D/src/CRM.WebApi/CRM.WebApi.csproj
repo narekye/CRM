@@ -208,6 +208,7 @@
     <Compile Include="Controllers\SendEmailController.cs" />
     <Compile Include="Controllers\TemplateController.cs" />
     <Compile Include="Converter\ViewModelConverter.cs" />
+    <Compile Include="Filters\ExceptionFiltersAttribute.cs" />
     <Compile Include="InfrastructureModel\ApplicationManager\ApplicationManagerContact.cs" />
     <Compile Include="InfrastructureModel\ApplicationManager\ApplicationManagerEmail.cs" />
     <Compile Include="InfrastructureModel\ApplicationManager\ApplicationManagerTemplate.cs" />

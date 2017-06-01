@@ -12,13 +12,13 @@
     using System.Security.Cryptography;
     using System.IO;
     using System.Text;
-
     public class MailManager : IDisposable
     {
         private readonly CRMContext _database = new CRMContext();
         private static readonly string PasswordHash = "P@@Sw0rd";
         private static readonly string SaltKey = "S@LT&KEY";
         private static readonly string VIKey = "@1B2c3D4e5F6g7H8";
+        // TODO: check for try catch clause.
         private string Decrypt(string encryptedText)
         {
             byte[] cipherTextBytes = Convert.FromBase64String(encryptedText);
@@ -35,7 +35,6 @@
             cryptoStream.Close();
             return Encoding.UTF8.GetString(plainTextBytes, 0, decryptedByteCount).TrimEnd("\0".ToCharArray());
         }
-
         public async Task<bool> SendMail(Contact sendto, int templateid)
         {
             var template = await _database.Templates.FirstOrDefaultAsync(p => p.TemplateId == templateid);
@@ -82,11 +81,10 @@
                 throw new Exception(ex.Message);
             }
         }
-
         public async Task SendEmailToList(List<Contact> list, int t)
         {
             foreach (Contact contact in list)
-               await SendMail(contact, t);
+                await SendMail(contact, t);
         }
         public async Task<List<Contact>> GetListOfEmailsByGuids(List<Guid> guids)
         {
@@ -95,7 +93,7 @@
             {
                 try
                 {
-                    list.Add((await _database.Contacts.FirstOrDefaultAsync(p => p.GuID == guid)));
+                    list.Add(await _database.Contacts.FirstOrDefaultAsync(p => p.GuID == guid));
                 }
                 catch (Exception ex)
                 {
