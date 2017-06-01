@@ -3,7 +3,6 @@
     using System.Web.Http;
     using System.Threading.Tasks;
     using InfrastructureModel.ApplicationManager;
-    using InfrastructureModel;
     using Models.Request;
     using System.Net.Http;
     using System.Net;
@@ -12,10 +11,8 @@
     public class EmailListsController : ApiController
     {
         private readonly ApplicationManager _manager;
-        private readonly LoggerManager _logger;
         public EmailListsController()
         {
-            _logger = new LoggerManager();
             _manager = new ApplicationManager();
         }
         public async Task<HttpResponseMessage> GetAllEmailListsAsync()
@@ -26,7 +23,7 @@
         }
         public async Task<HttpResponseMessage> GetEmailListByIdAsync([FromUri] int? id)
         {
-            if (!id.HasValue) return null; //check
+            if (!id.HasValue) return null;
             var data = await _manager.GetEmailListById(id);
             if (ReferenceEquals(data, null)) return Request.CreateResponse(HttpStatusCode.NotFound);
             return Request.CreateResponse(HttpStatusCode.OK, data);

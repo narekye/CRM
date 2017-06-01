@@ -9,17 +9,13 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
     using Entities;
     using Models.Request;
     using Models.Response;
-    using Converter;
     public partial class ApplicationManager : IDisposable
     {
         private readonly CRMContext _database;
-        private readonly ModelFactory _factory;
         private readonly ParserProvider _parser;
         public ApplicationManager()
         {
-            _logger = new LoggerManager();
             _parser = new ParserProvider();
-            _factory = new ModelFactory();
             _database = new CRMContext();
             _database.Configuration.LazyLoadingEnabled = false;
         }
@@ -28,18 +24,18 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
             var list = await _database.Contacts.ToListAsync();
             if (ReferenceEquals(list, null)) return null;
             var data = new List<ViewContactLess>();
-            await list.ConvertToList(data);
+            AutoMapper.Mapper.Map(list, data);
             return data;
         }
         public async Task<ViewContact> GetContactByIdAsync(int? id)
         {
-            if (!id.HasValue) return null;
             var contact =
                      await
                          _database.Contacts.Include(p => p.EmailLists).FirstOrDefaultAsync(p => p.ContactId == id.Value);
             if (ReferenceEquals(contact, null)) return null;
             var data = new ViewContact();
-            contact.ConvertTo(data);
+            AutoMapper.Mapper.Map(contact, data);
+            data.EmailLists = contact.EmailLists.Select(p => p.EmailListName).ToList();
             return data;
         }
         public async Task<ViewContact> GetContactByGuidAsync(Guid? guid)
@@ -47,20 +43,20 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
             var contact =
                     await _database.Contacts.Include(p => p.EmailLists).FirstOrDefaultAsync(p => p.GuID == guid.Value);
             if (ReferenceEquals(contact, null)) return null;
-            ViewContact data = new ViewContact();
-            contact.ConvertTo(data);
+            var data = new ViewContact();
+            AutoMapper.Mapper.Map(contact, data);
             data.EmailLists = contact.EmailLists.Select(p => p.EmailListName).ToList();
             return data;
         }
-        public async Task<bool> UpdateContactAsync(ViewContactLess contact)
+        public async Task<bool> UpdateContactAsync(ViewContactLess model)
         {
             using (var transaction = _database.Database.BeginTransaction())
             {
                 try
                 {
-                    var original = await _database.Contacts.FirstOrDefaultAsync(p => p.GuID == contact.GuID);
+                    var original = await _database.Contacts.FirstOrDefaultAsync(p => p.GuID == model.GuID);
                     var replace = new Contact();
-                    contact.ConvertTo(replace);
+                    AutoMapper.Mapper.Map(model, replace);
                     replace.ContactId = original.ContactId;
                     replace.DateModified = DateTime.UtcNow;
                     _database.Entry(original).CurrentValues.SetValues(replace);
@@ -75,17 +71,17 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
                 }
             }
         }
-        public async Task<bool> AddContactAsync(ViewContactLess contact)
+        public async Task<bool> AddContactAsync(ViewContactLess model)
         {
-            var cont = new Contact();
-            contact.ConvertTo(cont);
-            cont.GuID = Guid.NewGuid();
-            cont.DateInserted = DateTime.UtcNow;
+            var contact = new Contact();
+            AutoMapper.Mapper.Map(model, contact);
+            contact.GuID = Guid.NewGuid();
+            contact.DateInserted = DateTime.UtcNow;
             using (var transaction = _database.Database.BeginTransaction())
             {
                 try
                 {
-                    _database.Contacts.Add(cont);
+                    _database.Contacts.Add(contact);
                     await _database.SaveChangesAsync();
                     transaction.Commit();
                     return true;
@@ -106,8 +102,7 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
         }
         public async Task<int> PageCountAsync()
         {
-            int count = await _database.Contacts.CountAsync();
-            return count / 10 + 1;
+            return await _database.Contacts.CountAsync() / 10 + 1;
         }
         #region FilterOrderPaging
         public async Task<List<ViewContactLess>> FilterOrderByRequestAsync(RequestContact request)
@@ -260,7 +255,9 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
                     data = Sort(data, OrderBy.Descending);
             }
             #endregion
-            return _factory.CreateViewContactLessList(data);
+            var list = new List<ViewContactLess>();
+            AutoMapper.Mapper.Map(data, list);
+            return list;
         }
         public List<Contact> Sort(List<Contact> contacts, OrderBy sortby)
         {

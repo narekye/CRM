@@ -7,9 +7,7 @@
     using Entities;
     using Models.Response;
     using System.Linq;
-    using Converter;
     using Models.Request;
-
     public partial class ApplicationManager
     {
         public async Task<List<ViewEmailListLess>> GetAllEmailListsAsync()
@@ -17,7 +15,7 @@
             var list = await _database.EmailLists.ToListAsync();
             if (ReferenceEquals(list, null)) return null;
             var result = new List<ViewEmailListLess>();
-            await list.ConvertToList(result);
+            AutoMapper.Mapper.Map(list, result);
             return result;
         }
         public async Task<ViewEmailList> GetEmailListById(int? id)
@@ -27,24 +25,26 @@
                 .FirstOrDefaultAsync(p => p.EmailListID == id.Value);
             if (ReferenceEquals(data, null)) return null;
             ViewEmailList result = new ViewEmailList();
-            data.ConvertTo(result);
             result.Contacts = new List<ViewContactLess>();
             var contacts = data.Contacts.ToList();
-            var contactless = _factory.CreateViewContactLessList(contacts);
+            var contactless = new List<ViewContactLess>();
+            AutoMapper.Mapper.Map(data, result);
+            AutoMapper.Mapper.Map(contacts, contactless);
+            
             result.Contacts = contactless;
             return result;
         }
         public async Task<bool> AddNewEmailList(RequestEmailList model)
         {
-
             using (var transaction = _database.Database.BeginTransaction())
             {
                 try
                 {
                     var original = new EmailList();
-                    model.ConvertTo(original);
-                    foreach (Guid modelGuid in model.Guids)
-                        original.Contacts.Add(await _database.Contacts.FirstOrDefaultAsync(p => p.GuID == modelGuid));
+                    AutoMapper.Mapper.Map(model, original);
+                    if (!ReferenceEquals(model.Guids, null))
+                        foreach (Guid modelGuid in model.Guids)
+                            original.Contacts.Add(await _database.Contacts.FirstOrDefaultAsync(p => p.GuID == modelGuid));
                     _database.EmailLists.Add(original);
                     await _database.SaveChangesAsync();
                     transaction.Commit();
@@ -57,7 +57,7 @@
                 }
             }
         }
-        public async Task<bool> UpdateEmailListAsync(RequestEmailList emaillist)
+        public async Task<bool> UpdateEmailListAsync(RequestEmailList model)
         {
             using (var transaction = _database.Database.BeginTransaction())
             {
@@ -66,12 +66,16 @@
                     var original =
                         await
                             _database.EmailLists.Include(p => p.Contacts)
-                                .FirstOrDefaultAsync(p => p.EmailListID == emaillist.EmailListID);
-                    original.Contacts.Clear();
+                                .FirstOrDefaultAsync(p => p.EmailListID == model.EmailListID);
+
                     var contacts = new List<Contact>();
-                    foreach (Guid emaillistGuid in emaillist.Guids)
-                        contacts.Add(await _database.Contacts.FirstOrDefaultAsync(p => p.GuID == emaillistGuid));
-                    original.Contacts = contacts;
+                    if (!ReferenceEquals(model.Guids, null))
+                    {
+                        original.Contacts.Clear();
+                        foreach (Guid emaillistGuid in model.Guids)
+                            contacts.Add(await _database.Contacts.FirstOrDefaultAsync(p => p.GuID == emaillistGuid));
+                        original.Contacts = contacts;
+                    }
                     _database.Entry(original).State = EntityState.Modified;
                     await _database.SaveChangesAsync();
                     transaction.Commit();

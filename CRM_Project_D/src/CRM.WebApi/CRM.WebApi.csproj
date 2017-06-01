@@ -43,6 +43,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutoMapper, Version=6.0.2.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\AutoMapper.6.0.2\lib\net45\AutoMapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\..\packages\EntityFramework.6.2.0-beta1\lib\net45\EntityFramework.dll</HintPath>
       <Private>True</Private>
@@ -207,14 +211,12 @@
     <Compile Include="Controllers\EmailListsController.cs" />
     <Compile Include="Controllers\SendEmailController.cs" />
     <Compile Include="Controllers\TemplateController.cs" />
-    <Compile Include="Converter\ViewModelConverter.cs" />
     <Compile Include="Filters\ExceptionFiltersAttribute.cs" />
     <Compile Include="InfrastructureModel\ApplicationManager\ApplicationManagerContact.cs" />
     <Compile Include="InfrastructureModel\ApplicationManager\ApplicationManagerEmail.cs" />
     <Compile Include="InfrastructureModel\ApplicationManager\ApplicationManagerTemplate.cs" />
     <Compile Include="InfrastructureModel\LoggerManager.cs" />
     <Compile Include="InfrastructureModel\MailManager.cs" />
-    <Compile Include="InfrastructureModel\ModelFactory.cs" />
     <Compile Include="InfrastructureModel\ParserProvider.cs" />
     <Compile Include="Models\Request\RequestContact.cs" />
     <Compile Include="Models\Request\RequestEmailList.cs" />

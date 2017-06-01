@@ -4,15 +4,16 @@
     using System.Collections.Generic;
     using System.Web.Http;
     using System.Threading.Tasks;
+    using Filters;
     using InfrastructureModel;
     using System.Net.Http;
     using System.Net;
+    [ExceptionFilters]
     public class SendEmailController : ApiController
     {
         private readonly MailManager _manager;
         public SendEmailController()
         {
-            _logger = new LoggerManager();
             _manager = new MailManager();
         }
         public async Task<HttpResponseMessage> PostSendToList([FromUri] int templateid, [FromBody] List<Guid> guids)

@@ -16,6 +16,7 @@
     public class ContactsController : ApiController
     {
         private readonly ApplicationManager _manager;
+        private readonly LoggerManager _logger;
         public ContactsController()
         {
             _logger = new LoggerManager();
@@ -28,7 +29,7 @@
             if (ReferenceEquals(data, null)) return Request.CreateResponse(HttpStatusCode.NotFound);
             return Request.CreateResponse(HttpStatusCode.OK, data);
         }
-        public async Task<HttpResponseMessage> GetContactByIdAsync(int? id)
+        public async Task<HttpResponseMessage> GetContactByIdAsync([FromUri] int? id)
         {
             if (!id.HasValue) return Request.CreateResponse(HttpStatusCode.BadGateway, "Set ID parameter.");
             var contact = await _manager.GetContactByIdAsync(id);

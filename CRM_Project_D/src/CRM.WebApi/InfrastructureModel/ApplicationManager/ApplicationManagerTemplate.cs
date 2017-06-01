@@ -3,17 +3,24 @@
     using System.Data.Entity;
     using System.Threading.Tasks;
     using System.Collections.Generic;
-    using Entities;
+    using Models.Response;
     public partial class ApplicationManager
     {
-        public async Task<List<Template>> GetAllTemplatesListAsync()
+        public async Task<List<ViewTemplate>> GetAllTemplatesListAsync()
         {
-            return await _database.Templates.ToListAsync();
+            var data = await _database.Templates.ToListAsync();
+            var list = new List<ViewTemplate>();
+            AutoMapper.Mapper.Map(data, list);
+            return list;
         }
-        public async Task<Template> GetTemplateByIdAsync(int? id)
+        public async Task<ViewTemplate> GetTemplateByIdAsync(int? id)
         {
             if (!id.HasValue) return null;
-            return await _database.Templates.FirstOrDefaultAsync(p => p.TemplateId == id.Value);
+            var data = await _database.Templates.FirstOrDefaultAsync(p => p.TemplateId == id.Value);
+            if (ReferenceEquals(data, null)) return null;
+            var viewtemplate = new ViewTemplate();
+            AutoMapper.Mapper.Map(data, viewtemplate);
+            return viewtemplate;
         }
     }
 }

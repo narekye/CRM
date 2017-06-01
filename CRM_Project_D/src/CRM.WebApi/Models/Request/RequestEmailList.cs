@@ -7,6 +7,7 @@
     {
         [Required(ErrorMessage = "EmaillistId is required")]
         public int EmailListID { get; set; }
+        public string EmailListName { get; set; }
         [Required(ErrorMessage = "List of guids required")]
         public List<Guid> Guids { get; set; }
     }
