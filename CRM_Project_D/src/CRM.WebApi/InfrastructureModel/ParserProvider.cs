@@ -58,77 +58,85 @@
             }
             return t;
         }
+
+        private static bool Checking(List<string> allcolumns, ref List<string> columns)
+        {
+            int index = -1, index1 = -1, index2 = -1;
+
+            if (allcolumns.Count < 6
+                || (!Exist(allcolumns, "fullname", out index)
+                && !Exist(allcolumns, "full name", out index))
+                || (!Exist(allcolumns, "company", out index)
+                && !Exist(allcolumns, "company name", out index)
+                && !Exist(allcolumns, "companyname", out index))
+                || !Exist(allcolumns, "position", out index)
+                || !Exist(allcolumns, "country", out index)
+                || (!Exist(allcolumns, "email", out index)
+                && !Exist(allcolumns, "mail", out index))
+                || (!Exist(allcolumns, "data inserted", out index)
+                && !Exist(allcolumns, "datainserted", out index)))
+            {
+                return false;
+            }
+            if (Exist(allcolumns, "fullname", out index)
+                || Exist(allcolumns, "full name", out index1))
+            {
+                if (index1 == -1)
+                    columns.Add(allcolumns[index]);
+                else
+                    columns.Add(allcolumns[index1]);
+            }
+            if (Exist(allcolumns, "company", out index)
+                || Exist(allcolumns, "companyname", out index1)
+                || Exist(allcolumns, "company name", out index2))
+            {
+                if (index1 == -1 && index2 == -1)
+                    columns.Add(allcolumns[index]);
+                else if (index1 == -1)
+                    columns.Add(allcolumns[index2]);
+                else
+                    columns.Add(allcolumns[index1]);
+            }
+            if (Exist(allcolumns, "position", out index))
+                columns.Add(allcolumns[index]);
+            if (Exist(allcolumns, "country", out index))
+                columns.Add(allcolumns[index]);
+            if (Exist(allcolumns, "email", out index)
+                || Exist(allcolumns, "mail", out index1))
+            {
+                if (index1 == -1)
+                    columns.Add(allcolumns[index]);
+                else
+                    columns.Add(allcolumns[index1]);
+            }
+            if (Exist(allcolumns, "data inserted", out index)
+                || Exist(allcolumns, "datainserted", out index1))
+            {
+                if (index1 == -1)
+                    columns.Add(allcolumns[index]);
+                else
+                    columns.Add(allcolumns[index1]);
+            }
+
+            return true;
+
+        }
+        List<string> columns = new List<string>();
         private List<Contact> ReadFromExcel(byte[] bytes)
         {
             List<Contact> contactslist = new List<Contact>();
             string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "file.xlsx";
             try
             {
-                int index = -1, index1 = -1, index2 = -1;
                 File.WriteAllBytes(path, bytes);
                 ExcelQueryFactory excel = new ExcelQueryFactory(path);
                 var sheets = excel.GetWorksheetNames();
                 var contacts = (from c in excel.Worksheet<Row>(sheets.First())
                                 select c).ToList();
-                List<string> columns = new List<string>();
                 var worksheetcolumns = excel.GetColumnNames(sheets.First()).ToList();
-                if (worksheetcolumns.Count < 6)
-                    return null;
-                if (worksheetcolumns.Count < 6
-                    || (!Exist(worksheetcolumns, "fullname", out index)
-                    && !Exist(worksheetcolumns, "full name", out index))
-                    || (!Exist(worksheetcolumns, "company", out index)
-                    && !Exist(worksheetcolumns, "company name", out index)
-                    && !Exist(worksheetcolumns, "companyname", out index))
-                    || !Exist(worksheetcolumns, "position", out index)
-                    || !Exist(worksheetcolumns, "country", out index)
-                    || (!Exist(worksheetcolumns, "email", out index)
-                    && !Exist(worksheetcolumns, "mail", out index))
-                    || (!Exist(worksheetcolumns, "data inserted", out index)
-                    && !Exist(worksheetcolumns, "datainserted", out index)))
-                {
-                    return null;
-                }
-                if (Exist(worksheetcolumns, "fullname", out index)
-                    || Exist(worksheetcolumns, "full name", out index1))
-                {
-                    if (index1 == -1)
-                        columns.Add(worksheetcolumns[index]);
-                    else
-                        columns.Add(worksheetcolumns[index1]);
-                }
-                if (Exist(worksheetcolumns, "company", out index)
-                    || Exist(worksheetcolumns, "companyname", out index1)
-                    || Exist(worksheetcolumns, "company name", out index2))
-                {
-                    if (index1 == -1 && index2 == -1)
-                        columns.Add(worksheetcolumns[index]);
-                    else if (index1 == -1)
-                        columns.Add(worksheetcolumns[index2]);
-                    else
-                        columns.Add(worksheetcolumns[index1]);
-                }
-                if (Exist(worksheetcolumns, "position", out index))
-                    columns.Add(worksheetcolumns[index]);
-                if (Exist(worksheetcolumns, "country", out index))
-                    columns.Add(worksheetcolumns[index]);
-                if (Exist(worksheetcolumns, "email", out index)
-                    || Exist(worksheetcolumns, "mail", out index1))
-                {
-                    if (index1 == -1)
-                        columns.Add(worksheetcolumns[index]);
-                    else
-                        columns.Add(worksheetcolumns[index1]);
-                }
-                if (Exist(worksheetcolumns, "data inserted", out index)
-                    || Exist(worksheetcolumns, "datainserted", out index1))
-                {
-                    if (index1 == -1)
-                        columns.Add(worksheetcolumns[index]);
-                    else
-                        columns.Add(worksheetcolumns[index1]);
-                }
 
+                if (!Checking(worksheetcolumns, ref columns))
+                    return null;
 
                 foreach (var m in contacts)
                 {
@@ -159,7 +167,7 @@
             {
                 File.WriteAllBytes(path, bytes);
                 string[] lines = File.ReadAllLines(path);
-                string[] columns = lines[0].Split(',');
+                string[] allcolumns = lines[0].Split(',');
                 Dictionary<string, int> d = new Dictionary<string, int>();
                 d.Add("FullName", 0);
                 d.Add("Company", 1);
@@ -167,38 +175,39 @@
                 d.Add("Country", 3);
                 d.Add("Email", 4);
                 d.Add("DataInserted", 5);
-
-                for (int i = 1; i < lines.Length; i++)
-                {
-                    Contact contact = new Contact();
-                    string[] values = lines[i].Split(',');
-                    for (int j = 0; j < values.Length; j++)
+                if (!Checking(allcolumns.ToList(), ref columns))
+                    return null;
+                    for (int i = 1; i < lines.Length; i++)
                     {
-                        switch (j)
+                        Contact contact = new Contact();
+                        string[] values = lines[i].Split(',');
+                        for (int j = 0; j < values.Length; j++)
                         {
-                            case 0:
-                                contact.FullName = values[d["FullName"]];
-                                break;
-                            case 1:
-                                contact.CompanyName = values[d["Company"]];
-                                break;
-                            case 2:
-                                contact.Position = values[d["Position"]];
-                                break;
-                            case 3:
-                                contact.Country = values[d["Country"]];
-                                break;
-                            case 4:
-                                contact.Email = values[d["Email"]];
-                                break;
-                            case 5:
-                                contact.DateInserted = Convert.ToDateTime(values[d["DataInserted"]]);
-                                break;
+                            switch (j)
+                            {
+                                case 0:
+                                    contact.FullName = values[d["FullName"]];
+                                    break;
+                                case 1:
+                                    contact.CompanyName = values[d["Company"]];
+                                    break;
+                                case 2:
+                                    contact.Position = values[d["Position"]];
+                                    break;
+                                case 3:
+                                    contact.Country = values[d["Country"]];
+                                    break;
+                                case 4:
+                                    contact.Email = values[d["Email"]];
+                                    break;
+                                case 5:
+                                    contact.DateInserted = Convert.ToDateTime(values[d["DataInserted"]]);
+                                    break;
+                            }
                         }
+                        contact.GuID = new Guid();
+                        contactslist.Add(contact);
                     }
-                    contact.GuID = new Guid();
-                    contactslist.Add(contact);
-                }
                 File.Delete(path);
             }
             catch
