@@ -11,7 +11,6 @@
     using System.Net.Http;
     using System.Net.Http.Headers;
     using System.Net;
-
     [ExceptionFilters]
     public class ContactsController : ApiController
     {
@@ -22,7 +21,6 @@
             _logger = new LoggerManager();
             _manager = new ApplicationManager();
         }
-
         public async Task<HttpResponseMessage> GetAllContactsAsync()
         {
             var data = await _manager.GetAllContactsAsync();

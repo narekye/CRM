@@ -187,6 +187,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="log\2017-05-30.log" />
+    <Content Include="log\2017-05-31.log" />
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>
