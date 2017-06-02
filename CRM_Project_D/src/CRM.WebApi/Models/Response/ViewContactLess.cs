@@ -3,7 +3,9 @@
     using System;
     using Newtonsoft.Json;
     using System.ComponentModel.DataAnnotations;
+    using Microsoft.Practices.EnterpriseLibrary.Validation.Validators;
     [JsonObject]
+    [NotNullValidator]
     public class ViewContactLess
     {
         [JsonProperty("Full Name")]
@@ -14,6 +16,7 @@
         public string Position { get; set; }
         public string Country { get; set; }
         [Required(ErrorMessage = "Email is required.")]
+        [RegexValidator("^[a-zA-Z0-9_\\.-]+@([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$")]
         public string Email { get; set; }
         public Guid GuID { get; set; }
     }

@@ -41,7 +41,6 @@ namespace CRM.WebApi
                 z.CreateMap(typeof(RequestEmailList), typeof(EmailList));
                 z.CreateMap(typeof(Template), typeof(ViewTemplate));
                 z.CreateMap(typeof(List<Template>), typeof(List<ViewTemplate>));
-
             }));
         }
     }

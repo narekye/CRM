@@ -10,6 +10,7 @@
     using InfrastructureModel.ApplicationManager;
     using System.Net.Http;
     using System.Net.Http.Headers;
+    using System.Collections.Generic;
     using System.Net;
     [ExceptionFilters]
     public class ContactsController : ApiController
@@ -44,7 +45,6 @@
         public async Task<HttpResponseMessage> PutContactAsync([FromBody] ViewContactLess c)
         {
             if (ReferenceEquals(c, null) || !ModelState.IsValid) return Request.CreateResponse(HttpStatusCode.BadGateway);
-            if (!_manager.CheckEmailAddress(c.Email)) return Request.CreateResponse(HttpStatusCode.NotAcceptable, "Invalid email address detected.");
             if (await _manager.UpdateContactAsync(c)) return Request.CreateResponse(HttpStatusCode.Accepted);
             return Request.CreateResponse(HttpStatusCode.BadRequest);
         }
@@ -52,7 +52,6 @@
         {
             if (ReferenceEquals(c, null) || !ModelState.IsValid)
                 return Request.CreateResponse(HttpStatusCode.BadRequest);
-            if (!_manager.CheckEmailAddress(c.Email)) return Request.CreateResponse(HttpStatusCode.NotAcceptable, "Invalid email address detected.");
             if (await _manager.AddContactAsync(c)) return Request.CreateResponse(HttpStatusCode.Created);
             return Request.CreateResponse(HttpStatusCode.NotAcceptable);
         }
@@ -63,12 +62,18 @@
                 return Request.CreateResponse(HttpStatusCode.NoContent);
             return Request.CreateResponse(HttpStatusCode.BadRequest);
         }
-        [Route("api/contacts/filter")]
-        public async Task<IHttpActionResult> PostFilterOrderBy([FromBody] RequestContact request)
+        public async Task<HttpResponseMessage> DeleteContactsByGuidsAsync([FromBody] List<Guid> guids)
         {
-            var data = await _manager.FilterOrderByRequestAsync(request);
-            if (ReferenceEquals(data, null)) return BadRequest();
-            return Ok(data);
+            if (ReferenceEquals(guids, null)) return Request.CreateResponse(HttpStatusCode.BadGateway);
+            if (await _manager.DeleteContactsAsync(guids)) return Request.CreateResponse(HttpStatusCode.NoContent);
+            return Request.CreateResponse(HttpStatusCode.BadRequest);
+        }
+        [Route("api/contacts/filter")]
+        public async Task<HttpResponseMessage> PostFilterOrderBy([FromBody] RequestContact model)
+        {
+            var data = await _manager.FilterOrderByRequestAsync(model);
+            if (ReferenceEquals(data, null)) return Request.CreateResponse(HttpStatusCode.BadRequest);
+            return Request.CreateResponse(HttpStatusCode.OK, data);
         }
         [Route("api/contacts/upload")] // TODO: TEST
         public async Task<IHttpActionResult> PostContactByteArrayAsync([FromBody] string base64)
