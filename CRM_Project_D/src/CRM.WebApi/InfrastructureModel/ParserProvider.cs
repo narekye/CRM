@@ -131,25 +131,31 @@
                 File.WriteAllBytes(path, bytes);
                 ExcelQueryFactory excel = new ExcelQueryFactory(path);
                 var sheets = excel.GetWorksheetNames();
-                var contacts = (from c in excel.Worksheet<Row>(sheets.First())
-                                select c).ToList();
-                var worksheetcolumns = excel.GetColumnNames(sheets.First()).ToList();
 
-                if (!Checking(worksheetcolumns, ref columns))
-                    return null;
-
-                foreach (var m in contacts)
+                foreach (var sheet in sheets)
                 {
-                    Contact c = new Contact();
-                    c.FullName = m[columns[0]];
-                    c.CompanyName = m[columns[1]];
-                    c.Country = m[columns[2]];
-                    c.Position = m[columns[3]];
-                    c.Email = m[columns[4]];
-                    c.DateInserted = Convert.ToDateTime(m[columns[5]]);
-                    c.GuID = Guid.NewGuid();
-                    contactslist.Add(c);
+                    var contacts = (from c in excel.Worksheet<Row>(sheet)
+                                    select c).ToList();
+
+                    var worksheetcolumns = excel.GetColumnNames(sheet).ToList();
+
+                    if (!Checking(worksheetcolumns, ref columns))
+                        return null;
+
+                    foreach (var m in contacts)
+                    {
+                        Contact c = new Contact();
+                        c.FullName = m[columns[0]];
+                        c.CompanyName = m[columns[1]];
+                        c.Country = m[columns[2]];
+                        c.Position = m[columns[3]];
+                        c.Email = m[columns[4]];
+                        c.DateInserted = Convert.ToDateTime(m[columns[5]]);
+                        c.GuID = Guid.NewGuid();
+                        contactslist.Add(c);
+                    }
                 }
+
                 File.Delete(path);
             }
             catch
