@@ -1,4 +1,8 @@
-﻿namespace CRM.WebApi.Controllers
+﻿using System.IO;
+using System.Web;
+using CRM.Entities;
+
+namespace CRM.WebApi.Controllers
 {
     using Filters;
     using System;
@@ -76,10 +80,25 @@
             return Request.CreateResponse(HttpStatusCode.OK, data);
         }
         [Route("api/contacts/upload")] // TODO: TEST
-        public async Task<IHttpActionResult> PostContactByteArrayAsync([FromBody] string base64)
+        public async Task<IHttpActionResult> PostContactByteArrayAsync()
         {
-            byte[] array = Convert.FromBase64String(base64);
-            if (await _manager.AddToDatabaseFromBytes(array)) return Ok();
+            string root = HttpContext.Current.Server.MapPath("~/log");
+            var provider = new MultipartFormDataStreamProvider(root);
+
+            await Request.Content.ReadAsMultipartAsync(provider);
+
+            var contacts = new List<Contact>();
+            var parser = new ParserProvider();
+            foreach (var file in provider.FileData)
+            {
+                //fileNames.Add(file.Headers.ContentDisposition.FileName.Trim('\"'));
+                var buffer = File.ReadAllBytes(file.LocalFileName);
+
+                contacts = parser.ReadFromExcel(buffer);
+                //hash values, reject request if needed
+            }
+            // byte[] array = Convert.FromBase64String(base64);
+            // if (await _manager.AddToDatabaseFromBytes(array)) return Ok();
             return BadRequest();
         }
         [Route("api/contacts/count")]

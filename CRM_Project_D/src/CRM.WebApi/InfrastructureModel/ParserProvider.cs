@@ -14,36 +14,36 @@
 
         private static string DefaultMimeType = "application/octet-stream";
 
-        [DllImport(@"urlmon.dll", CharSet = CharSet.Auto)]
-        private static extern uint FindMimeFromData(
-            uint pBc,
-            [MarshalAs(UnmanagedType.LPStr)] string pwzUrl,
-            [MarshalAs(UnmanagedType.LPArray)] byte[] pBuffer,
-            uint cbSize,
-            [MarshalAs(UnmanagedType.LPStr)] string pwzMimeProposed,
-            uint dwMimeFlags,
-            out uint ppwzMimeOut,
-            uint dwReserverd
-        );
-        private string GetMimeFromBytes(byte[] data)
-        {
-            try
-            {
-                uint mimeType;
-                FindMimeFromData(0, null, data, (uint)MimeSampleSize, null, 0, out mimeType, 0);
+        //[DllImport(@"urlmon.dll", CharSet = CharSet.Auto)]
+        //private static extern uint FindMimeFromData(
+        //    uint pBc,
+        //    [MarshalAs(UnmanagedType.LPStr)] string pwzUrl,
+        //    [MarshalAs(UnmanagedType.LPArray)] byte[] pBuffer,
+        //    uint cbSize,
+        //    [MarshalAs(UnmanagedType.LPStr)] string pwzMimeProposed,
+        //    uint dwMimeFlags,
+        //    out uint ppwzMimeOut,
+        //    uint dwReserverd
+        //);
+        //private string GetMimeFromBytes(byte[] data)
+        //{
+        //    try
+        //    {
+        //        uint mimeType;
+        //        FindMimeFromData(0, null, data, (uint)MimeSampleSize, null, 0, out mimeType, 0);
 
-                var mimePointer = new IntPtr(mimeType);
-                var mime = Marshal.PtrToStringUni(mimePointer);
-                Marshal.FreeCoTaskMem(mimePointer);
+        //        var mimePointer = new IntPtr(mimeType);
+        //        var mime = Marshal.PtrToStringUni(mimePointer);
+        //        Marshal.FreeCoTaskMem(mimePointer);
 
-                return mime ?? DefaultMimeType;
-            }
-            catch
-            {
-                return DefaultMimeType;
-            }
-        }
-        private List<Contact> ReadFromExcel(byte[] bytes)
+        //        return mime ?? DefaultMimeType;
+        //    }
+        //    catch
+        //    {
+        //        return DefaultMimeType;
+        //    }
+        //}
+        public List<Contact> ReadFromExcel(byte[] bytes)
         {
             List<Contact> contactslist = new List<Contact>();
             string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "file.xlsx";
@@ -59,11 +59,11 @@
                 {
                     Contact c = new Contact
                     {
-                        FullName = m["fullname"],
-                        CompanyName = m["company"],
-                        Country = m["country"],
-                        Position = m["position"],
-                        Email = m["email"]
+                        FullName = m["FullName"],
+                        CompanyName = m["CompanyName"],
+                        Country = m["Country"],
+                        Position = m["Position"],
+                        Email = m["Email"]
                     };
                     contactslist.Add(c);
                 }
@@ -110,7 +110,7 @@
                                 contact.FullName = values[d["FullName"]];
                                 break;
                             case 1:
-                                contact.CompanyName = values[d["Company"]];
+                                contact.CompanyName = values[d["CompanyName"]];
                                 break;
                             case 2:
                                 contact.Position = values[d["Position"]];
@@ -138,25 +138,25 @@
             return contactslist;
         }
 
-        public List<Contact> GetContactsFromBytes(byte[] bytes)
-        {
-            List<Contact> list = new List<Contact>();
-            string p = GetMimeFromBytes(bytes);
-            switch (p)
-            {
-                case "text/csv":
-                case "text/plain":
-                    list = ReadFromCsv(bytes);
-                    break;
-                case "application/vnd.ms-excel":
-                case "application/x-zip-compressed":
-                    list = ReadFromExcel(bytes);
-                    break;
-                default:
-                    list = null;
-                    break;
-            }
-            return list;
-        }
+        //public List<Contact> GetContactsFromBytes(byte[] bytes)
+        //{
+        //    List<Contact> list = new List<Contact>();
+        //    string p = GetMimeFromBytes(bytes);
+        //    switch (p)
+        //    {
+        //        case "text/csv":
+        //        case "text/plain":
+        //            list = ReadFromCsv(bytes);
+        //            break;
+        //        case "application/vnd.ms-excel":
+        //        case "application/x-zip-compressed":
+        //            list = ReadFromExcel(bytes);
+        //            break;
+        //        default:
+        //            list = null;
+        //            break;
+        //    }
+        //    return list;
+        //}
     }
 }

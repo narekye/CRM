@@ -295,7 +295,7 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
             {
                 try
                 {
-                    List<Contact> contacts = _parser.GetContactsFromBytes(bytes);
+                    List<Contact> contacts = _parser.ReadFromExcel(bytes);
                     _database.Contacts.AddRange(contacts);
                     await _database.SaveChangesAsync();
                     transaction.Commit();
