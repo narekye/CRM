@@ -4,7 +4,6 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
     using System.Collections.Generic;
     using System.Data.Entity;
     using System.Linq;
-    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using Entities;
     using Models.Request;
@@ -97,6 +96,16 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
         {
             var cont = await _database.Contacts.FirstOrDefaultAsync(p => p.GuID == guid);
             _database.Contacts.Remove(cont);
+            await _database.SaveChangesAsync();
+            return true;
+        }
+        public async Task<bool> DeleteContactsAsync(List<Guid> guids)
+        {
+            var list = new List<Contact>();
+
+            foreach (Guid guid in guids)
+                list.Add(await _database.Contacts.FirstOrDefaultAsync(p => p.GuID == guid));
+            _database.Contacts.RemoveRange(list);
             await _database.SaveChangesAsync();
             return true;
         }
@@ -286,7 +295,7 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
             {
                 try
                 {
-                    List<Contact> contacts = _parser.GetContactsFromBytes(bytes);
+                    List<Contact> contacts = _parser.ReadFromExcel(bytes);
                     _database.Contacts.AddRange(contacts);
                     await _database.SaveChangesAsync();
                     transaction.Commit();
@@ -298,13 +307,6 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
                     throw new Exception(ex.Message);
                 }
             }
-        }
-        public bool CheckEmailAddress(string email)
-        {
-            return
-            Regex.IsMatch(email,
-                @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z",
-                RegexOptions.IgnoreCase);
         }
         public void Dispose()
         {

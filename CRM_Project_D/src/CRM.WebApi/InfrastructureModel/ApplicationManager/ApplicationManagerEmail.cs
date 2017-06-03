@@ -18,7 +18,7 @@
             AutoMapper.Mapper.Map(list, result);
             return result;
         }
-        public async Task<ViewEmailList> GetEmailListById(int? id)
+        public async Task<ViewEmailList> GetEmailListByIdAsync(int? id)
         {
             if (!id.HasValue) return null;
             EmailList data = await _database.EmailLists.Include(p => p.Contacts)
@@ -30,7 +30,6 @@
             var contactless = new List<ViewContactLess>();
             AutoMapper.Mapper.Map(data, result);
             AutoMapper.Mapper.Map(contacts, contactless);
-            
             result.Contacts = contactless;
             return result;
         }
@@ -67,16 +66,40 @@
                         await
                             _database.EmailLists.Include(p => p.Contacts)
                                 .FirstOrDefaultAsync(p => p.EmailListID == model.EmailListID);
-
-                    var contacts = new List<Contact>();
+                    if (!ReferenceEquals(model.EmailListName, null)) original.EmailListName = model.EmailListName;
                     if (!ReferenceEquals(model.Guids, null))
                     {
+                        var contacts = new List<Contact>();
                         original.Contacts.Clear();
                         foreach (Guid emaillistGuid in model.Guids)
                             contacts.Add(await _database.Contacts.FirstOrDefaultAsync(p => p.GuID == emaillistGuid));
                         original.Contacts = contacts;
                     }
                     _database.Entry(original).State = EntityState.Modified;
+                    await _database.SaveChangesAsync();
+                    transaction.Commit();
+                    return true;
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+        }
+        public async Task<bool> DeleteContactsFromEmailListAsync(RequestEmailList model)
+        {
+            var email =
+                await
+                    _database.EmailLists.Include(p => p.Contacts)
+                        .FirstOrDefaultAsync(o => o.EmailListID == model.EmailListID);
+            var list = new List<Contact>();
+            model.Guids.ForEach(p => list = email.Contacts.Where(z => z.GuID == p).ToList());
+            using (var transaction = _database.Database.BeginTransaction())
+            {
+                try
+                {
+                    list.ForEach(p => email.Contacts.Remove(p));
                     await _database.SaveChangesAsync();
                     transaction.Commit();
                     return true;

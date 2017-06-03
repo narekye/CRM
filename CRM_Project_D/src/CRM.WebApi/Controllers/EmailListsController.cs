@@ -24,18 +24,25 @@
         public async Task<HttpResponseMessage> GetEmailListByIdAsync([FromUri] int? id)
         {
             if (!id.HasValue) return null;
-            var data = await _manager.GetEmailListById(id);
+            var data = await _manager.GetEmailListByIdAsync(id);
             if (ReferenceEquals(data, null)) return Request.CreateResponse(HttpStatusCode.NotFound);
             return Request.CreateResponse(HttpStatusCode.OK, data);
         }
         public async Task<HttpResponseMessage> PostEmailListAsync([FromBody] RequestEmailList model)
         {
-            if (await _manager.AddNewEmailList(model)) return Request.CreateResponse(HttpStatusCode.Created);
+            if (await _manager.AddNewEmailList(model))
+                return Request.CreateResponse(HttpStatusCode.Created);
             return Request.CreateResponse(HttpStatusCode.BadRequest);
         }
         public async Task<HttpResponseMessage> PutEmailListAsync([FromBody] RequestEmailList model)
         {
             if (await _manager.UpdateEmailListAsync(model))
+                return Request.CreateResponse(HttpStatusCode.OK);
+            return Request.CreateResponse(HttpStatusCode.NotModified);
+        }
+        public async Task<HttpResponseMessage> DeleteEmailListContactsAsync([FromBody] RequestEmailList model)
+        {
+            if (await _manager.DeleteContactsFromEmailListAsync(model))
                 return Request.CreateResponse(HttpStatusCode.OK);
             return Request.CreateResponse(HttpStatusCode.NotModified);
         }

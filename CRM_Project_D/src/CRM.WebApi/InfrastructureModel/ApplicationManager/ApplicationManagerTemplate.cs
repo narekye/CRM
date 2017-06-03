@@ -4,13 +4,16 @@
     using System.Threading.Tasks;
     using System.Collections.Generic;
     using Models.Response;
+    using Entities;
+
     public partial class ApplicationManager
     {
         public async Task<List<ViewTemplate>> GetAllTemplatesListAsync()
         {
             var data = await _database.Templates.ToListAsync();
             var list = new List<ViewTemplate>();
-            AutoMapper.Mapper.Map(data, list);
+            foreach (Template template in data)
+                list.Add(await GetTemplateByIdAsync(template.TemplateId));
             return list;
         }
         public async Task<ViewTemplate> GetTemplateByIdAsync(int? id)
