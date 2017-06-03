@@ -94,7 +94,7 @@ namespace CRM.WebApi.Controllers
                 //fileNames.Add(file.Headers.ContentDisposition.FileName.Trim('\"'));
                 var buffer = File.ReadAllBytes(file.LocalFileName);
 
-                contacts = parser.ReadFromExcel(buffer);
+                contacts = parser.GetContactsFromBytes(buffer);
                 //hash values, reject request if needed
             }
             // byte[] array = Convert.FromBase64String(base64);

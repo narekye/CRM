@@ -125,19 +125,17 @@
         private List<Contact> ReadFromExcel(byte[] bytes)
         {
             List<Contact> contactslist = new List<Contact>();
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "file.xlsx";
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\file.xlsx";
             try
             {
                 File.WriteAllBytes(path, bytes);
                 ExcelQueryFactory excel = new ExcelQueryFactory(path);
                 var sheets = excel.GetWorksheetNames();
 
-                foreach (var sheet in sheets)
-                {
-                    var contacts = (from c in excel.Worksheet<Row>(sheet)
+                 var contacts = (from c in excel.Worksheet<Row>(sheets.First())
                                     select c).ToList();
 
-                    var worksheetcolumns = excel.GetColumnNames(sheet).ToList();
+                    var worksheetcolumns = excel.GetColumnNames(sheets.First()).ToList();
 
                     if (!Checking(worksheetcolumns, ref columns))
                         return null;
@@ -154,7 +152,7 @@
                         c.GuID = Guid.NewGuid();
                         contactslist.Add(c);
                     }
-                }
+                
 
                 File.Delete(path);
             }
@@ -168,7 +166,7 @@
         private List<Contact> ReadFromCsv(byte[] bytes)
         {
             List<Contact> contactslist = new List<Contact>();
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "file.csv";
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\file.csv";
             try
             {
                 int index = -1, index1 = -1, index2 = -1;
