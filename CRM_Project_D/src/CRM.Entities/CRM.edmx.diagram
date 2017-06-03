@@ -6,9 +6,21 @@
     <edmx:Diagrams>
       <Diagram DiagramId="84b13a9732eb4622899c558e08720181" Name="Diagram1">
         <EntityTypeShape EntityType="CRM.Contact" Width="1.5" PointX="0.75" PointY="1" IsExpanded="true" />
-        <EntityTypeShape EntityType="CRM.EmailList" Width="1.5" PointX="3" PointY="1.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="CRM.EmailList" Width="1.5" PointX="3" PointY="1" IsExpanded="true" />
         <AssociationConnector Association="CRM.EmailListContacts" ManuallyRouted="false" />
-        <EntityTypeShape EntityType="CRM.Template" Width="1.5" PointX="0.75" PointY="4.75" />
+        <EntityTypeShape EntityType="CRM.Template" Width="1.5" PointX="5" PointY="1" />
+        <EntityTypeShape EntityType="CRM.Role" Width="1.5" PointX="3.375" PointY="4.75" />
+        <EntityTypeShape EntityType="CRM.UserClaim" Width="1.5" PointX="5.375" PointY="0.75" />
+        <EntityTypeShape EntityType="CRM.UserLogin" Width="1.5" PointX="5.375" PointY="3.75" />
+        <EntityTypeShape EntityType="CRM.UserRole" Width="1.5" PointX="5.375" PointY="6.75" />
+        <EntityTypeShape EntityType="CRM.User" Width="1.5" PointX="7.375" PointY="0.75" />
+        <EntityTypeShape EntityType="CRM.AspNetRole" Width="1.5" PointX="0.75" PointY="4.625" />
+        <EntityTypeShape EntityType="CRM.AspNetUserClaim" Width="1.5" PointX="5" PointY="2.75" />
+        <EntityTypeShape EntityType="CRM.AspNetUserLogin" Width="1.5" PointX="5" PointY="5" />
+        <EntityTypeShape EntityType="CRM.AspNetUser" Width="1.5" PointX="3" PointY="2.75" />
+        <AssociationConnector Association="CRM.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" />
+        <AssociationConnector Association="CRM.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" />
+        <AssociationConnector Association="CRM.AspNetUserRoles" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

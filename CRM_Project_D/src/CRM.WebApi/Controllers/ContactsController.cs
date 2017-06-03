@@ -79,7 +79,7 @@ namespace CRM.WebApi.Controllers
             if (ReferenceEquals(data, null)) return Request.CreateResponse(HttpStatusCode.BadRequest);
             return Request.CreateResponse(HttpStatusCode.OK, data);
         }
-        [Route("api/contacts/upload")] // TODO: TEST
+        [Route("api/contacts/upload")]
         public async Task<IHttpActionResult> PostContactByteArrayAsync()
         {
             string root = HttpContext.Current.Server.MapPath("~/log");
@@ -99,7 +99,8 @@ namespace CRM.WebApi.Controllers
             }
             // byte[] array = Convert.FromBase64String(base64);
             // if (await _manager.AddToDatabaseFromBytes(array)) return Ok();
-            return BadRequest();
+            return this.Ok(contacts);
+            //return BadRequest();
         }
         [Route("api/contacts/count")]
         public async Task<int> GetContactsPageCountAsync()
