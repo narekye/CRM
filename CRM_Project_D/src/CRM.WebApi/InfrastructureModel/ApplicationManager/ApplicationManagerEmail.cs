@@ -8,6 +8,8 @@
     using Models.Response;
     using System.Linq;
     using Models.Request;
+    using Microsoft.Practices.EnterpriseLibrary.Common.Utility;
+
     public partial class ApplicationManager
     {
         public async Task<List<ViewEmailListLess>> GetAllEmailListsAsync()
@@ -75,6 +77,30 @@
                             contacts.Add(await _database.Contacts.FirstOrDefaultAsync(p => p.GuID == emaillistGuid));
                         original.Contacts = contacts;
                     }
+                    _database.Entry(original).State = EntityState.Modified;
+                    await _database.SaveChangesAsync();
+                    transaction.Commit();
+                    return true;
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+        }
+        public async Task<bool> AddContactsToExsistingList(RequestEmailList model)
+        {
+            using (var transaction = _database.Database.BeginTransaction())
+            {
+                try
+                {
+                    var original = await _database.EmailLists.FirstOrDefaultAsync(p => model.EmailListID == p.EmailListID);
+                    var list = new List<Contact>();
+                    model.Guids.ForEach(async p => list.Add(await _database.Contacts.FirstOrDefaultAsync(z => z.GuID == p)));
+                    await Task.WhenAll();
+                    original.Contacts.ForEach(z => { if (list.Contains(z)) list.Remove(z); });
+                    list.ForEach(p => original.Contacts.Add(p));
                     _database.Entry(original).State = EntityState.Modified;
                     await _database.SaveChangesAsync();
                     transaction.Commit();

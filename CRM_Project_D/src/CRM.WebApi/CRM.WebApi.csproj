@@ -197,6 +197,7 @@
     <Content Include="log\2017-05-30.log" />
     <Content Include="log\2017-05-31.log" />
     <Content Include="log\2017-06-01.log" />
+    <Content Include="log\2017-06-03.log" />
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>

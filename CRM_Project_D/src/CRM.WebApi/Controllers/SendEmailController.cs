@@ -22,6 +22,12 @@
             await _manager.SendEmailToList(list, templateid);
             return Request.CreateResponse(HttpStatusCode.OK);
         }
+        [Route("api/sendemail/list")]
+        public async Task<HttpResponseMessage> PostSendToEmailList([FromUri] int id, [FromUri] int template)
+        {
+            await _manager.SendEmailToEmailList(id, template);
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
         protected override void Dispose(bool disposing)
         {
             if (disposing)

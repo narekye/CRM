@@ -40,6 +40,12 @@
                 return Request.CreateResponse(HttpStatusCode.OK);
             return Request.CreateResponse(HttpStatusCode.NotModified);
         }
+        [Route("api/emaillists/add")]
+        public async Task<HttpResponseMessage> PutAddToExsistingEmailList([FromBody] RequestEmailList model)
+        {
+            if (await _manager.AddContactsToExsistingList(model)) return Request.CreateResponse(HttpStatusCode.OK);
+            return Request.CreateResponse(HttpStatusCode.BadRequest);
+        }
         public async Task<HttpResponseMessage> DeleteEmailListContactsAsync([FromBody] RequestEmailList model)
         {
             if (await _manager.DeleteContactsFromEmailListAsync(model))

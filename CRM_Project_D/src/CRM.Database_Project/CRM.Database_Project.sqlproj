@@ -129,8 +129,14 @@
     <Build Include="dbo\Tables\EmailLists.sql" />
     <Build Include="dbo\Tables\Templates.sql" />
     <Build Include="dbo\Stored Procedures\GetByPageProc.sql" />
+    <Build Include="dbo\Tables\Users.sql" />
+    <Build Include="dbo\Tables\Roles.sql" />
+    <Build Include="dbo\Tables\UserRoles.sql" />
+    <Build Include="dbo\Tables\UserClaims.sql" />
+    <Build Include="dbo\Tables\UserLogins.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CRM.Database_Project.publish.xml" />
+    <None Include="CRM.Database_Projectnew.publish.publish.xml" />
   </ItemGroup>
 </Project>

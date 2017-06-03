@@ -1,5 +1,6 @@
 ﻿namespace CRM.WebApi.InfrastructureModel
 {
+    using System.Linq;
     using System;
     using System.Data.Entity;
     using System.Net.Mail;
@@ -18,7 +19,6 @@
         private static readonly string PasswordHash = "P@@Sw0rd";
         private static readonly string SaltKey = "S@LT&KEY";
         private static readonly string VIKey = "@1B2c3D4e5F6g7H8";
-        // TODO: check for try catch clause.
         private string Decrypt(string encryptedText)
         {
             byte[] cipherTextBytes = Convert.FromBase64String(encryptedText);
@@ -85,6 +85,11 @@
         {
             foreach (Contact contact in list)
                 await SendMail(contact, t);
+        }
+        public async Task SendEmailToEmailList(int id, int template)
+        {
+            var emaillist = await _database.EmailLists.FirstOrDefaultAsync(p => p.EmailListID == id);
+            await SendEmailToList(emaillist.Contacts.ToList(), template);
         }
         public async Task<List<Contact>> GetListOfEmailsByGuids(List<Guid> guids)
         {
