@@ -12,18 +12,18 @@ namespace CRM.Entities
     using System;
     using System.Collections.Generic;
     
-    public partial class AspNetRole
+    public partial class Role
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public AspNetRole()
+        public Role()
         {
-            this.AspNetUsers = new HashSet<AspNetUser>();
+            this.Users = new HashSet<User>();
         }
     
         public string Id { get; set; }
         public string Name { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<AspNetUser> AspNetUsers { get; set; }
+        public virtual ICollection<User> Users { get; set; }
     }
 }

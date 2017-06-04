@@ -8,10 +8,11 @@ using Owin;
 [assembly: OwinStartup(typeof(CRM.WebApi.Startup))]
 namespace CRM.WebApi
 {
-    public class Startup
+    public partial class Startup
     {
         public void Configuration(IAppBuilder app)
         {
+            ConfigureOAuth(app);
             app.UseWelcomePage("/");
             var config = new HttpConfiguration();
             ConfigureWebApi(config);
@@ -21,6 +22,9 @@ namespace CRM.WebApi
         }
         private void ConfigureWebApi(HttpConfiguration config)
         {
+            config.Formatters.JsonFormatter
+            .SerializerSettings
+            .ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
             config.MapHttpAttributeRoutes();
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",

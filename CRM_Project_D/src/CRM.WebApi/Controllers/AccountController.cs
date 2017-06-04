@@ -1,19 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+﻿using CRM.Entities;
+using CRM.WebApi.InfrastructureOAuth;
 using System.Web.Http;
-using CRM.Entities;
-using Microsoft.AspNet.Identity;
 namespace CRM.WebApi.Controllers
 {
+    [Authorize]
     public class AccountController : ApiController
     {
+        private CrmUserManager manager;
         public AccountController()
         {
             var db = new CRMContext();
-            var manager = new UserManager<AspNetUser, string>(new UserStore.UserStore(db));
+            manager = new CrmUserManager(new UserStore(db));
+        }
+
+        [Authorize]
+        [Route("api/account/getusers")]
+        public IHttpActionResult GetUsers()
+        {
+            return BadRequest();
         }
     }
 }
