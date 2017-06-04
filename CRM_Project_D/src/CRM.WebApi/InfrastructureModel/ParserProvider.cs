@@ -1,15 +1,13 @@
-﻿using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
-
-namespace CRM.WebApi.InfrastructureModel
+﻿namespace CRM.WebApi.InfrastructureModel
 {
+    using DocumentFormat.OpenXml.Packaging;
+    using DocumentFormat.OpenXml.Spreadsheet;
     using Entities;
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
-
     public class ParserProvider
     {
         private static int MimeSampleSize = 256;
@@ -60,7 +58,6 @@ namespace CRM.WebApi.InfrastructureModel
             }
             return t;
         }
-
         private static bool Checking(List<string> allcolumns, ref List<string> columns)
         {
             int index = -1, index1 = -1, index2 = -1;
@@ -124,65 +121,38 @@ namespace CRM.WebApi.InfrastructureModel
 
         }
         List<string> columns = new List<string>();
-        private List<Contact> ReadFromExcel(byte[] bytes)
+        private List<Contact> ReadFromExcel(byte[] bytes, string path)
         {
-            List<Contact> contactslist = new List<Contact>();
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\file.xlsx";
+            var contactslist = new List<Contact>();
             try
             {
                 File.WriteAllBytes(path, bytes);
-
-                #region comm
-
-                //ExcelQueryFactory excel = new ExcelQueryFactory(path);
-                //var sheets = excel.GetWorksheetNames();
-
-                // var contacts = (from c in excel.Worksheet<Row>(sheets?.First())
-                //                    select c).ToList();
-
-                //    var worksheetcolumns = excel.GetColumnNames(sheets?.First()).ToList();
-
-                //    if (!Checking(worksheetcolumns, ref columns))
-                //        return null;
-
-                //    foreach (var m in contacts)
-                //    {
-                //        Contact c = new Contact();
-                //        c.FullName = m[columns[0]];
-                //        c.CompanyName = m[columns[1]];
-                //        c.Country = m[columns[2]];
-                //        c.Position = m[columns[3]];
-                //        c.Email = m[columns[4]];
-                //        c.DateInserted = Convert.ToDateTime(m[columns[5]]);
-                //        c.GuID = Guid.NewGuid();
-                //        contactslist.Add(c);
-                //    }
-
-                #endregion
-
-                contactslist = ReadExcelFileDOM(path);
-
+                contactslist = ReadExcelFileXml(path);
                 File.Delete(path);
             }
             catch
+            {
+                File.Delete(path);
+                throw;
+            }
+            finally
             {
                 File.Delete(path);
             }
             return contactslist;
         }
 
-        static List<Contact> ReadExcelFileDOM(string filename)
+        static List<Contact> ReadExcelFileXml(string filename)
         {
-
             string[] strProperties = new string[5];
-            List<Contact> lstBloggers = new List<Contact>();
+            List<Contact> list = new List<Contact>();
             Contact contact;
             int j = 0;
             using (SpreadsheetDocument myDoc = SpreadsheetDocument.Open(filename, true))
             {
                 WorkbookPart workbookPart = myDoc.WorkbookPart;
-                IEnumerable<Sheet> Sheets = myDoc.WorkbookPart.Workbook.GetFirstChild<Sheets>().Elements<Sheet>();
-                string relationshipId = Sheets?.First().Id.Value;
+                IEnumerable<Sheet> sheets = myDoc.WorkbookPart.Workbook.GetFirstChild<Sheets>().Elements<Sheet>();
+                string relationshipId = sheets?.First().Id.Value;
                 WorksheetPart worksheetPart = (WorksheetPart)myDoc.WorkbookPart.GetPartById(relationshipId);
                 SheetData sheetData = worksheetPart.Worksheet.GetFirstChild<SheetData>();
                 int i = 1;
@@ -217,9 +187,9 @@ namespace CRM.WebApi.InfrastructureModel
                     contact.Position = strProperties[2];
                     contact.Country = strProperties[3];
                     contact.Email = strProperties[4];
-                    lstBloggers.Add(contact);
+                    list.Add(contact);
                 }
-                return lstBloggers;
+                return list;
             }
         }
 
@@ -318,7 +288,7 @@ namespace CRM.WebApi.InfrastructureModel
             return contactslist;
         }
 
-        public List<Contact> GetContactsFromBytes(byte[] bytes)
+        public List<Contact> GetContactsFromBytes(byte[] bytes, string path)
         {
             List<Contact> list = new List<Contact>();
             string p = GetMimeFromBytes(bytes);
@@ -330,7 +300,7 @@ namespace CRM.WebApi.InfrastructureModel
                     break;
                 case "application/vnd.ms-excel":
                 case "application/x-zip-compressed":
-                    list = ReadFromExcel(bytes);
+                    list = ReadFromExcel(bytes, path + "//file.xlsx");
                     break;
                 default:
                     list = null;

@@ -291,11 +291,12 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
         #endregion
         public async Task AddToDatabaseFromBytes(byte[] bytes)
         {
+            string path = System.Web.HttpContext.Current?.Request.MapPath("~//log");
             using (var transaction = _database.Database.BeginTransaction())
             {
                 try
                 {
-                    List<Contact> contacts = _parser.GetContactsFromBytes(bytes);
+                    List<Contact> contacts = _parser.GetContactsFromBytes(bytes, path);
                     contacts.ForEach(p => p.GuID = Guid.NewGuid());
                     _database.Contacts.AddRange(contacts);
                     await _database.SaveChangesAsync();
