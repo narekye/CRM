@@ -1,10 +1,10 @@
-﻿using System;
-using CRM.Entities;
+﻿using CRM.Entities;
 using CRM.WebApi.InfrastructureOAuth;
 using CRM.WebApi.Providers;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.OAuth;
 using Owin;
+using System;
 
 namespace CRM.WebApi
 {

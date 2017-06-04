@@ -1,13 +1,13 @@
 namespace CRM.WebApi.InfrastructureModel.ApplicationManager
 {
+    using Entities;
+    using Models.Request;
+    using Models.Response;
     using System;
     using System.Collections.Generic;
     using System.Data.Entity;
     using System.Linq;
     using System.Threading.Tasks;
-    using Entities;
-    using Models.Request;
-    using Models.Response;
     public partial class ApplicationManager : IDisposable
     {
         private readonly CRMContext _database;
@@ -289,22 +289,22 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
             return contacts.Skip(skip).Take(count).ToList();
         }
         #endregion
-        public async Task<bool> AddToDatabaseFromBytes(byte[] bytes)
+        public async Task AddToDatabaseFromBytes(byte[] bytes)
         {
             using (var transaction = _database.Database.BeginTransaction())
             {
                 try
                 {
                     List<Contact> contacts = _parser.GetContactsFromBytes(bytes);
+                    contacts.ForEach(p => p.GuID = Guid.NewGuid());
                     _database.Contacts.AddRange(contacts);
                     await _database.SaveChangesAsync();
                     transaction.Commit();
-                    return true;
                 }
-                catch (Exception ex)
+                catch
                 {
                     transaction.Rollback();
-                    throw new Exception(ex.Message);
+                    throw;
                 }
             }
         }

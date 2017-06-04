@@ -1,5 +1,6 @@
 ﻿namespace CRM.WebApi.Filters
 {
+    using InfrastructureModel;
     using System;
     using System.Data;
     using System.Data.Entity.Core;
@@ -8,7 +9,6 @@
     using System.Threading;
     using System.Threading.Tasks;
     using System.Web.Http.Filters;
-    using InfrastructureModel;
     public class ExceptionFiltersAttribute : ExceptionFilterAttribute
     {
         private readonly LoggerManager _logger = new LoggerManager();
@@ -52,12 +52,9 @@
                     Content = new StringContent(string.Format($"Entity exception.\n{action.Exception.Message}\n{action.Exception.InnerException?.Message}")),
                     StatusCode = HttpStatusCode.Conflict
                 };
-            // notimplemented
-            else if (action.Exception is NotImplementedException)
-                action.Response = new HttpResponseMessage(HttpStatusCode.NotImplemented);
             // default case
             else 
-                action.Response = new HttpResponseMessage(HttpStatusCode.GatewayTimeout);
+                action.Response = new HttpResponseMessage(HttpStatusCode.InternalServerError);
                 return base.OnExceptionAsync(action, cancellationToken);
         }
     }

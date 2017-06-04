@@ -1,10 +1,10 @@
 ﻿namespace CRM.WebApi.InfrastructureModel
 {
-    using System;
-    using System.Net.Http;
     using NLog;
     using NLog.Targets;
+    using System;
     using System.IO;
+    using System.Net.Http;
     public class LoggerManager
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
@@ -23,7 +23,7 @@
             var logEventInfo = new LogEventInfo { TimeStamp = DateTime.Now };
             string fileName = fileTarget.FileName.Render(logEventInfo);
             if (!File.Exists(fileName))
-                throw new Exception("Log file does not exist.");
+                File.Create($"{logEventInfo.TimeStamp}.log");
             var data = File.ReadAllLines(fileName);
             string path = System.Web.HttpContext.Current?.Request.MapPath("~//Templates//log.html");
             var html = File.ReadAllText(path);

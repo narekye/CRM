@@ -1,11 +1,13 @@
-﻿namespace CRM.WebApi.InfrastructureModel
+﻿using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
+
+namespace CRM.WebApi.InfrastructureModel
 {
+    using Entities;
     using System;
     using System.Collections.Generic;
-    using Entities;
     using System.IO;
     using System.Linq;
-    using LinqToExcel;
     using System.Runtime.InteropServices;
 
     public class ParserProvider
@@ -129,30 +131,36 @@
             try
             {
                 File.WriteAllBytes(path, bytes);
-                ExcelQueryFactory excel = new ExcelQueryFactory(path);
-                var sheets = excel.GetWorksheetNames();
 
-                 var contacts = (from c in excel.Worksheet<Row>(sheets.First())
-                                    select c).ToList();
+                #region comm
 
-                    var worksheetcolumns = excel.GetColumnNames(sheets.First()).ToList();
+                //ExcelQueryFactory excel = new ExcelQueryFactory(path);
+                //var sheets = excel.GetWorksheetNames();
 
-                    if (!Checking(worksheetcolumns, ref columns))
-                        return null;
+                // var contacts = (from c in excel.Worksheet<Row>(sheets?.First())
+                //                    select c).ToList();
 
-                    foreach (var m in contacts)
-                    {
-                        Contact c = new Contact();
-                        c.FullName = m[columns[0]];
-                        c.CompanyName = m[columns[1]];
-                        c.Country = m[columns[2]];
-                        c.Position = m[columns[3]];
-                        c.Email = m[columns[4]];
-                        c.DateInserted = Convert.ToDateTime(m[columns[5]]);
-                        c.GuID = Guid.NewGuid();
-                        contactslist.Add(c);
-                    }
-                
+                //    var worksheetcolumns = excel.GetColumnNames(sheets?.First()).ToList();
+
+                //    if (!Checking(worksheetcolumns, ref columns))
+                //        return null;
+
+                //    foreach (var m in contacts)
+                //    {
+                //        Contact c = new Contact();
+                //        c.FullName = m[columns[0]];
+                //        c.CompanyName = m[columns[1]];
+                //        c.Country = m[columns[2]];
+                //        c.Position = m[columns[3]];
+                //        c.Email = m[columns[4]];
+                //        c.DateInserted = Convert.ToDateTime(m[columns[5]]);
+                //        c.GuID = Guid.NewGuid();
+                //        contactslist.Add(c);
+                //    }
+
+                #endregion
+
+                contactslist = ReadExcelFileDOM(path);
 
                 File.Delete(path);
             }
@@ -161,6 +169,58 @@
                 File.Delete(path);
             }
             return contactslist;
+        }
+
+        static List<Contact> ReadExcelFileDOM(string filename)
+        {
+
+            string[] strProperties = new string[5];
+            List<Contact> lstBloggers = new List<Contact>();
+            Contact contact;
+            int j = 0;
+            using (SpreadsheetDocument myDoc = SpreadsheetDocument.Open(filename, true))
+            {
+                WorkbookPart workbookPart = myDoc.WorkbookPart;
+                IEnumerable<Sheet> Sheets = myDoc.WorkbookPart.Workbook.GetFirstChild<Sheets>().Elements<Sheet>();
+                string relationshipId = Sheets?.First().Id.Value;
+                WorksheetPart worksheetPart = (WorksheetPart)myDoc.WorkbookPart.GetPartById(relationshipId);
+                SheetData sheetData = worksheetPart.Worksheet.GetFirstChild<SheetData>();
+                int i = 1;
+                string value;
+                foreach (Row r in sheetData.Elements<Row>())
+                {
+                    if (i != 1)
+                    {
+                        foreach (Cell c in r.Elements<Cell>())
+                        {
+                            if (c == null) continue;
+                            value = c.InnerText;
+                            if (c.DataType != null)
+                            {
+                                var stringTable = workbookPart.GetPartsOfType<SharedStringTablePart>().FirstOrDefault();
+                                if (stringTable != null)
+                                {
+                                    value = stringTable.SharedStringTable.
+                                        ElementAt(int.Parse(value)).InnerText;
+                                }
+                            }
+                            strProperties[j] = value;
+                            j = j + 1;
+                        }
+                    }
+                    j = 0;
+                    i = i + 1;
+                    if (strProperties.Any(p => p == null)) continue; // checks all nulls
+                    contact = new Contact();
+                    contact.FullName = strProperties[0];
+                    contact.CompanyName = strProperties[1];
+                    contact.Position = strProperties[2];
+                    contact.Country = strProperties[3];
+                    contact.Email = strProperties[4];
+                    lstBloggers.Add(contact);
+                }
+                return lstBloggers;
+            }
         }
 
         private List<Contact> ReadFromCsv(byte[] bytes)

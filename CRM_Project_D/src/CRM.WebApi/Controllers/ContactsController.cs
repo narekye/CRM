@@ -1,21 +1,20 @@
-﻿using System.IO;
-using System.Web;
-using CRM.Entities;
-
-namespace CRM.WebApi.Controllers
+﻿namespace CRM.WebApi.Controllers
 {
     using Filters;
-    using System;
-    using System.Web.Http;
-    using System.Threading.Tasks;
-    using Models.Request;
-    using Models.Response;
     using InfrastructureModel;
     using InfrastructureModel.ApplicationManager;
+    using Models.Request;
+    using Models.Response;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Net;
     using System.Net.Http;
     using System.Net.Http.Headers;
-    using System.Collections.Generic;
-    using System.Net;
+    using System.Threading.Tasks;
+    using System.Web;
+    using System.Web.Http;
+
     [ExceptionFilters]
     public class ContactsController : ApiController
     {
@@ -80,27 +79,17 @@ namespace CRM.WebApi.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, data);
         }
         [Route("api/contacts/upload")]
-        public async Task<IHttpActionResult> PostContactByteArrayAsync()
+        public async Task<HttpResponseMessage> PostContactByteArrayAsync()
         {
             string root = HttpContext.Current.Server.MapPath("~/log");
             var provider = new MultipartFormDataStreamProvider(root);
-
             await Request.Content.ReadAsMultipartAsync(provider);
-
-            var contacts = new List<Contact>();
-            var parser = new ParserProvider();
             foreach (var file in provider.FileData)
             {
-                //fileNames.Add(file.Headers.ContentDisposition.FileName.Trim('\"'));
                 var buffer = File.ReadAllBytes(file.LocalFileName);
-
-                contacts = parser.GetContactsFromBytes(buffer);
-                //hash values, reject request if needed
+                await _manager.AddToDatabaseFromBytes(buffer);
             }
-            // byte[] array = Convert.FromBase64String(base64);
-            // if (await _manager.AddToDatabaseFromBytes(array)) return Ok();
-            return this.Ok(contacts);
-            //return BadRequest();
+            return Request.CreateResponse(HttpStatusCode.Accepted);
         }
         [Route("api/contacts/count")]
         public async Task<int> GetContactsPageCountAsync()

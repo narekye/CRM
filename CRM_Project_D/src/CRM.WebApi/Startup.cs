@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Web.Http;
-using CRM.Entities;
+﻿using CRM.Entities;
 using CRM.WebApi.Models.Request;
 using CRM.WebApi.Models.Response;
 using Microsoft.Owin;
 using Owin;
+using System.Collections.Generic;
+using System.Web.Http;
 [assembly: OwinStartup(typeof(CRM.WebApi.Startup))]
 namespace CRM.WebApi
 {
