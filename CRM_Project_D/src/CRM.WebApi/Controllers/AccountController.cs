@@ -1,9 +1,16 @@
-﻿using CRM.Entities;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Web;
+using CRM.Entities;
 using CRM.WebApi.InfrastructureOAuth;
 using System.Web.Http;
+using System.Workflow.ComponentModel.Design;
+using CRM.WebApi.Models.Identity;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
 namespace CRM.WebApi.Controllers
 {
-    [Authorize]
     public class AccountController : ApiController
     {
         private CrmUserManager manager;
@@ -13,11 +20,24 @@ namespace CRM.WebApi.Controllers
             manager = new CrmUserManager(new UserStore(db));
         }
 
-        [Authorize]
-        [Route("api/account/getusers")]
-        public IHttpActionResult GetUsers()
+        public async Task<IHttpActionResult> PostRegisterUser(RegisterUserModel model)
         {
-            return BadRequest();
+            User user = new User
+            {
+                Email = model.Email,
+                UserName = model.FirstName + model.LastName,
+                // Id = Guid.NewGuid().ToString(),
+                PhoneNumberConfirmed = false,
+                ConfirmedEmail = false,
+                EmailConfirmed = false,
+                PhoneNumber = model.PhoneNumber,
+                TwoFactorEnabled = false,
+                AccessFailedCount = 0,
+                LockoutEnabled = false
+            };
+            IdentityResult identity = await this.manager.CreateAsync(user);
+            if (identity.Succeeded) return Ok();
+            return this.Ok(identity.Errors.ToList());
         }
     }
 }

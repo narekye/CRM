@@ -10,7 +10,8 @@ using System.Threading.Tasks;
 
 namespace CRM.WebApi.InfrastructureOAuth
 {
-    public partial class UserStore : IUserStore<User>, IUserPasswordStore<User>, IQueryableUserStore<User>, IUserRoleStore<User>
+    public partial class UserStore : IUserStore<User>, IUserPasswordStore<User>,
+        IQueryableUserStore<User>, IUserRoleStore<User>
     {
         private CRMContext db = new CRMContext();
 
@@ -20,18 +21,19 @@ namespace CRM.WebApi.InfrastructureOAuth
         }
         public IQueryable<User> Users
         {
-            get { return db.Users; }
+            get { return db.Users.AsQueryable(); }
         }
 
         public UserStore(CRMContext db)
         {
             // if (db == null) throw new ArgumentNullException();
-            if (db != null)
+            if (this.db != null)
                 this.db = db;
         }
 
         public Task CreateAsync(User user)
         {
+            // didnt validated...
             db.Users.Add(user);
             var error = db.GetValidationErrors();
             if (error.Any())
@@ -51,7 +53,6 @@ namespace CRM.WebApi.InfrastructureOAuth
 
         public Task DeleteAsync(User user)
         {
-            // return null;
             db.Users.Remove(user);
             return db.SaveChangesAsync();
         }
@@ -59,7 +60,6 @@ namespace CRM.WebApi.InfrastructureOAuth
 
         public async Task<User> FindByIdAsync(string userId)
         {
-            // return null;
             var user = await db.Users.FirstOrDefaultAsync(p => p.Id == userId);
             if (ReferenceEquals(user, null)) return null;
             return user;
@@ -76,9 +76,7 @@ namespace CRM.WebApi.InfrastructureOAuth
         public Task SetPasswordHashAsync(User user, string passwordHash)
         {
             user.PasswordHash = passwordHash;
-            //  db.Entry(user).State = EntityState.Modified;
-            // return db.SaveChangesAsync();
-            return Task.FromResult("");
+            return Task.FromResult(0);
         }
 
 
@@ -86,18 +84,15 @@ namespace CRM.WebApi.InfrastructureOAuth
         {
             var us = db.Users.FirstOrDefaultAsync(p => p.Id == user.Id).Result;
             return Task.FromResult<string>(us.PasswordHash);
-
         }
 
 
         public Task<bool> HasPasswordAsync(User user)
         {
-            // demo
-            return Task.FromResult(true);
+            if (user.PasswordHash != null) return Task.FromResult(true);
+            return Task.FromResult(false);
         }
-
-
-
+        
         public Task AddToRoleAsync(User user, string roleName)
         {
             return null;
@@ -128,7 +123,7 @@ namespace CRM.WebApi.InfrastructureOAuth
         }
         public void Dispose()
         {
-            db.Dispose();
+            this.db?.Dispose();
         }
 
     }

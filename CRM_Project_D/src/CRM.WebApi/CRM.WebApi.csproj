@@ -207,6 +207,7 @@
       <HintPath>..\..\packages\Microsoft.AspNet.WebApi.WebHost.5.2.3\lib\net45\System.Web.Http.WebHost.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Workflow.ComponentModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
@@ -261,7 +262,8 @@
     <Compile Include="InfrastructureModel\LoggerManager.cs" />
     <Compile Include="InfrastructureModel\MailManager.cs" />
     <Compile Include="InfrastructureModel\ParserProvider.cs" />
-    <Compile Include="InfrastructureOAuth\CRMUserManager.cs" />
+    <Compile Include="InfrastructureOAuth\CRM.UserManager.cs" />
+    <Compile Include="Models\Identity\UserViewModels.cs" />
     <Compile Include="Models\Request\RequestContact.cs" />
     <Compile Include="Models\Request\RequestEmailList.cs" />
     <Compile Include="Models\Response\ContactViewModels.cs" />
@@ -269,7 +271,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\ApplicationOAuthProvider.cs" />
     <Compile Include="Startup.cs" />
-    <Compile Include="InfrastructureOAuth\UserStore.cs" />
+    <Compile Include="InfrastructureOAuth\CRM.UserStore.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CRM.Entities\CRM.Entities.csproj">
