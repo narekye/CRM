@@ -1,10 +1,10 @@
-﻿using CRM.Entities;
+﻿using System;
+using CRM.Entities;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
-using System;
 
-namespace CRM.WebApi.InfrastructureOAuth
+namespace CRM.WebApi.InfrastructureOAuth.CRM.UserManager
 {
     public class CrmUserManager : UserManager<User>
     {

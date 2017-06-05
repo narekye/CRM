@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using CRM.Entities;
+﻿using CRM.Entities;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 
-namespace CRM.WebApi.InfrastructureOAuth
+namespace CRM.WebApi.InfrastructureOAuth.CRM.RoleManager
 {
     public class CrmRoleManager : RoleManager<Role>
     {

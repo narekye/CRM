@@ -265,9 +265,11 @@
     <Compile Include="InfrastructureModel\LoggerManager.cs" />
     <Compile Include="InfrastructureModel\MailManager.cs" />
     <Compile Include="InfrastructureModel\ParserProvider.cs" />
-    <Compile Include="InfrastructureOAuth\CRM.RoleManager.cs" />
-    <Compile Include="InfrastructureOAuth\CRM.RoleStore.cs" />
-    <Compile Include="InfrastructureOAuth\CRM.UserManager.cs" />
+    <Compile Include="InfrastructureOAuth\CRM.RoleManager\CRM.RoleManager.cs" />
+    <Compile Include="InfrastructureOAuth\CRM.RoleManager\CRM.RoleStore.cs" />
+    <Compile Include="InfrastructureOAuth\CRM.UserManager\CRM.UserManager.cs" />
+    <Compile Include="InfrastructureOAuth\CRM.UserManager\CRM.UserPasswordStore.cs" />
+    <Compile Include="InfrastructureOAuth\CRM.UserManager\CRM.UserRoleStore.cs" />
     <Compile Include="Models\Identity\UserViewModels.cs" />
     <Compile Include="Models\Request\RequestContact.cs" />
     <Compile Include="Models\Request\RequestEmailList.cs" />
@@ -276,7 +278,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\ApplicationOAuthProvider.cs" />
     <Compile Include="Startup.cs" />
-    <Compile Include="InfrastructureOAuth\CRM.UserStore.cs" />
+    <Compile Include="InfrastructureOAuth\CRM.UserManager\CRM.UserStore.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CRM.Entities\CRM.Entities.csproj">

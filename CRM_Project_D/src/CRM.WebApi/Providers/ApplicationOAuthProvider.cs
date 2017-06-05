@@ -1,9 +1,9 @@
 ﻿using CRM.Entities;
-using CRM.WebApi.InfrastructureOAuth;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security.OAuth;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using CRM.WebApi.InfrastructureOAuth.CRM.UserManager;
 
 namespace CRM.WebApi.Providers
 {

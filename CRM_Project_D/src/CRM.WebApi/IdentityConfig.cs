@@ -5,6 +5,8 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security.OAuth;
 using Owin;
 using System;
+using CRM.WebApi.InfrastructureOAuth.CRM.RoleManager;
+using CRM.WebApi.InfrastructureOAuth.CRM.UserManager;
 
 namespace CRM.WebApi
 {

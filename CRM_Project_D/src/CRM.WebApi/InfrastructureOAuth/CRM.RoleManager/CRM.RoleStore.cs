@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using CRM.Entities;
 using Microsoft.AspNet.Identity;
 
-namespace CRM.WebApi.InfrastructureOAuth
+namespace CRM.WebApi.InfrastructureOAuth.CRM.RoleManager
 {
     public class RoleStore : IRoleStore<Role>
     {
