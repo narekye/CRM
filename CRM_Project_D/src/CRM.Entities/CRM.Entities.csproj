@@ -76,7 +76,7 @@
     <Compile Include="EmailList.cs">
       <DependentUpon>CRM.tt</DependentUpon>
     </Compile>
-    <Compile Include="IdentityModel.cs" />
+    <Compile Include="IdentityModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Role.cs">
       <DependentUpon>CRM.tt</DependentUpon>

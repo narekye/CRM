@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Core;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,6 +20,7 @@ namespace CRM.WebApi.InfrastructureOAuth
         {
             this.db.Configuration.LazyLoadingEnabled = false;
         }
+
         public IQueryable<User> Users
         {
             get { return db.Users.AsQueryable(); }
@@ -43,13 +45,11 @@ namespace CRM.WebApi.InfrastructureOAuth
             return db.SaveChangesAsync();
         }
 
-
         public Task UpdateAsync(User user)
         {
             this.db.Entry(user).State = EntityState.Modified;
             return db.SaveChangesAsync();
         }
-
 
         public Task DeleteAsync(User user)
         {
@@ -92,7 +92,7 @@ namespace CRM.WebApi.InfrastructureOAuth
             if (user.PasswordHash != null) return Task.FromResult(true);
             return Task.FromResult(false);
         }
-        
+
         public Task AddToRoleAsync(User user, string roleName)
         {
             return null;
@@ -124,6 +124,7 @@ namespace CRM.WebApi.InfrastructureOAuth
         public void Dispose()
         {
             this.db?.Dispose();
+            GC.SuppressFinalize(this);
         }
 
     }

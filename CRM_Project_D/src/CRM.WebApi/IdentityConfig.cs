@@ -12,8 +12,9 @@ namespace CRM.WebApi
     {
         private void ConfigureOAuth(IAppBuilder app)
         {
-            app.CreatePerOwinContext<CrmUserManager>(CrmUserManager.Create);
             app.CreatePerOwinContext(CRMContext.Create);
+            app.CreatePerOwinContext<CrmUserManager>(CrmUserManager.Create);
+            app.CreatePerOwinContext<CrmRoleManager>(CrmRoleManager.Create);
 
             var options = new OAuthAuthorizationServerOptions
             {

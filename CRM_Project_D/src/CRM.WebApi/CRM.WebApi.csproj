@@ -265,6 +265,8 @@
     <Compile Include="InfrastructureModel\LoggerManager.cs" />
     <Compile Include="InfrastructureModel\MailManager.cs" />
     <Compile Include="InfrastructureModel\ParserProvider.cs" />
+    <Compile Include="InfrastructureOAuth\CRM.RoleManager.cs" />
+    <Compile Include="InfrastructureOAuth\CRM.RoleStore.cs" />
     <Compile Include="InfrastructureOAuth\CRM.UserManager.cs" />
     <Compile Include="Models\Identity\UserViewModels.cs" />
     <Compile Include="Models\Request\RequestContact.cs" />

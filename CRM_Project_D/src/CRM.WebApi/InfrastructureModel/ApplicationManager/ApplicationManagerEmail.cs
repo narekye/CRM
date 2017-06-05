@@ -115,17 +115,19 @@
         }
         public async Task<bool> DeleteContactsFromEmailListAsync(RequestEmailList model)
         {
-            var email =
-                await
-                    _database.EmailLists.Include(p => p.Contacts)
-                        .FirstOrDefaultAsync(o => o.EmailListID == model.EmailListID);
+            var emails =
+                    _database.EmailLists.Include(p => p.Contacts);
+            var email = await emails.FirstOrDefaultAsync(p => p.EmailListID == model.EmailListID);
+            if (!email.Contacts.Any()) return false;
             var list = new List<Contact>();
-            model.Guids.ForEach(p => list = email.Contacts.Where(z => z.GuID == p).ToList());
+            model.Guids.ForEach(p => list.Add(email.Contacts.SingleOrDefault(z => z.GuID == p)));
             using (var transaction = _database.Database.BeginTransaction())
             {
                 try
                 {
+                    this._database.Configuration.LazyLoadingEnabled = false;
                     list.ForEach(p => email.Contacts.Remove(p));
+                    _database.Entry(email).State = EntityState.Modified;
                     await _database.SaveChangesAsync();
                     transaction.Commit();
                     return true;

@@ -49,7 +49,7 @@
         public async Task<HttpResponseMessage> DeleteEmailListContactsAsync([FromBody] RequestEmailList model)
         {
             if (await _manager.DeleteContactsFromEmailListAsync(model))
-                return Request.CreateResponse(HttpStatusCode.OK);
+                return Request.CreateResponse(HttpStatusCode.Accepted);
             return Request.CreateResponse(HttpStatusCode.NotModified);
         }
         public async Task<HttpResponseMessage> DeleteEmailListById([FromUri] int? id)
