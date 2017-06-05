@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.Entity;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -12,6 +13,13 @@ using Microsoft.Owin.Security.DataProtection;
 
 namespace CRM.WebApi.Controllers
 {
+    internal enum Role
+    {
+        SuperAdmin,
+        Admin,
+        User
+    }
+    [RoutePrefix("api/account")]
     public class AccountController : ApiController
     {
         private CrmUserManager manager;
@@ -21,6 +29,15 @@ namespace CRM.WebApi.Controllers
             db.Configuration.LazyLoadingEnabled = false;
             manager = new CrmUserManager(new UserStore(db));
         }
+        [Authorize] // only superadmin
+        [Route("admin/users")]
+        public async Task<HttpResponseMessage> GetAllUsers()
+        {
+            var principal = RequestContext.Principal;
+            if (!principal.IsInRole(Role.SuperAdmin.ToString())) return Request.CreateResponse(HttpStatusCode.NotFound);
+            var data = await this.manager.Users.ToListAsync();
+            return Request.CreateResponse(HttpStatusCode.OK, data);
+        }
 
         [AllowAnonymous]
         public async Task<HttpResponseMessage> PostRegisterUser(RegisterUserModel model)
@@ -28,7 +45,7 @@ namespace CRM.WebApi.Controllers
             User user = new User
             {
                 Email = model.Email,
-                UserName = model.FirstName + model.LastName,
+                UserName = $"{model.FirstName} {model.LastName}",
                 Id = Guid.NewGuid().ToString(),
                 PhoneNumberConfirmed = false,
                 ConfirmedEmail = false,

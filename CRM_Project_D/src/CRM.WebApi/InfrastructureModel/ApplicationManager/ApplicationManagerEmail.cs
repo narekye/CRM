@@ -97,8 +97,13 @@
                 {
                     var original = await _database.EmailLists.FirstOrDefaultAsync(p => model.EmailListID == p.EmailListID);
                     var list = new List<Contact>();
-                    model.Guids.ForEach(async p => list.Add(await _database.Contacts.FirstOrDefaultAsync(z => z.GuID == p)));
-                    await Task.WhenAll();
+                    // model.Guids.ForEach( p => list.Add());
+                    foreach (Guid modelGuid in model.Guids)
+                    {
+                        var item = await _database.Contacts.FirstOrDefaultAsync(z => z.GuID == modelGuid);
+                        list.Add(item);
+                    }
+                    // await Task.WhenAll();
                     original.Contacts.ForEach(z => { if (list.Contains(z)) list.Remove(z); });
                     list.ForEach(p => original.Contacts.Add(p));
                     _database.Entry(original).State = EntityState.Modified;

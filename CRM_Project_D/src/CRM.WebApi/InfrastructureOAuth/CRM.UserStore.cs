@@ -8,16 +8,19 @@ using System.Data.Entity.Core;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
+using CRM.WebApi.Filters;
 
 namespace CRM.WebApi.InfrastructureOAuth
 {
+    [ExceptionFilters]
     public partial class UserStore : IUserStore<User>, IUserPasswordStore<User>,
-        IQueryableUserStore<User>, IUserRoleStore<User>
+        IQueryableUserStore<User>, IUserRoleStore<User>, IUserEmailStore<User>, IUserPhoneNumberStore<User>
     {
-        private CRMContext db = new CRMContext();
+        private CRMContext db;
 
         public UserStore()
         {
+            db = new CRMContext();
             this.db.Configuration.LazyLoadingEnabled = false;
         }
 
@@ -28,14 +31,12 @@ namespace CRM.WebApi.InfrastructureOAuth
 
         public UserStore(CRMContext db)
         {
-            // if (db == null) throw new ArgumentNullException();
             if (this.db != null)
                 this.db = db;
         }
 
         public Task CreateAsync(User user)
         {
-            // didnt validated...
             db.Users.Add(user);
             var error = db.GetValidationErrors();
             if (error.Any())
@@ -57,7 +58,6 @@ namespace CRM.WebApi.InfrastructureOAuth
             return db.SaveChangesAsync();
         }
 
-
         public async Task<User> FindByIdAsync(string userId)
         {
             var user = await db.Users.FirstOrDefaultAsync(p => p.Id == userId);
@@ -65,13 +65,11 @@ namespace CRM.WebApi.InfrastructureOAuth
             return user;
         }
 
-
         public Task<User> FindByNameAsync(string userName)
         {
             var user = db.Users.FirstOrDefaultAsync(p => p.UserName == userName);
             return user;
         }
-
 
         public Task SetPasswordHashAsync(User user, string passwordHash)
         {
@@ -79,13 +77,11 @@ namespace CRM.WebApi.InfrastructureOAuth
             return Task.FromResult(0);
         }
 
-
         public Task<string> GetPasswordHashAsync(User user)
         {
             var us = db.Users.FirstOrDefaultAsync(p => p.Id == user.Id).Result;
             return Task.FromResult<string>(us.PasswordHash);
         }
-
 
         public Task<bool> HasPasswordAsync(User user)
         {
@@ -95,7 +91,8 @@ namespace CRM.WebApi.InfrastructureOAuth
 
         public Task AddToRoleAsync(User user, string roleName)
         {
-            return null;
+            user.Roles.Add(this.db.Roles.SingleOrDefault(p => p.Name == roleName));
+            return this.db.SaveChangesAsync();
         }
 
         public Task RemoveFromRoleAsync(User user, string roleName)
@@ -128,5 +125,54 @@ namespace CRM.WebApi.InfrastructureOAuth
             GC.SuppressFinalize(this);
         }
 
+        public Task SetEmailAsync(User user, string email)
+        {
+            user.Email = email;
+            this.db.Entry(user).State = EntityState.Modified;
+            return this.db.SaveChangesAsync();
+        }
+
+        public Task<string> GetEmailAsync(User user)
+        {
+            var email = this.db.Users.SingleOrDefault(p => p.Id == user.Id)?.Email;
+            return Task.FromResult(email);
+        }
+
+        public Task<bool> GetEmailConfirmedAsync(User user)
+        {
+            var flag = this.db.Users.SingleOrDefault(p => p.Id == user.Id)?.ConfirmedEmail;
+            if (flag.HasValue) return Task.FromResult(true);
+            return Task.FromResult(false);
+        }
+
+        public Task SetEmailConfirmedAsync(User user, bool confirmed)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<User> FindByEmailAsync(string email)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SetPhoneNumberAsync(User user, string phoneNumber)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<string> GetPhoneNumberAsync(User user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> GetPhoneNumberConfirmedAsync(User user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SetPhoneNumberConfirmedAsync(User user, bool confirmed)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
