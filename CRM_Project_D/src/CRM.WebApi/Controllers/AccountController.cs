@@ -5,6 +5,7 @@ using System.Web;
 using CRM.Entities;
 using CRM.WebApi.InfrastructureOAuth;
 using System.Web.Http;
+using System.Web.Http.Controllers;
 using System.Workflow.ComponentModel.Design;
 using CRM.WebApi.Models.Identity;
 using Microsoft.AspNet.Identity;
@@ -14,6 +15,7 @@ namespace CRM.WebApi.Controllers
     public class AccountController : ApiController
     {
         private CrmUserManager manager;
+
         public AccountController()
         {
             var db = new CRMContext();
@@ -38,6 +40,17 @@ namespace CRM.WebApi.Controllers
             IdentityResult identity = await this.manager.CreateAsync(user);
             if (identity.Succeeded) return Ok();
             return this.Ok(identity.Errors.ToList());
+        }
+
+        [Authorize(Roles = "Admin")]
+        public IHttpActionResult GetAll()
+        {
+            // if()
+            // var t = User.Identity;
+            // IdentityResult v = t as IdentityResult;
+            if (!User.IsInRole("SuperAdmin")) return this.BadRequest();
+            var result = this.manager.Users.ToList();
+            return this.Ok(result);
         }
     }
 }
