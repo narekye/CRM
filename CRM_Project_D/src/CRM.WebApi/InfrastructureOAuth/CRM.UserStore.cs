@@ -121,6 +121,7 @@ namespace CRM.WebApi.InfrastructureOAuth
             bool result = user.Roles.Any(p => p.Name == roleName);
             return Task.FromResult(result);
         }
+
         public void Dispose()
         {
             this.db?.Dispose();

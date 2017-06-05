@@ -1,34 +1,35 @@
 ﻿using System;
-using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web;
 using CRM.Entities;
 using CRM.WebApi.InfrastructureOAuth;
 using System.Web.Http;
-using System.Web.Http.Controllers;
-using System.Workflow.ComponentModel.Design;
 using CRM.WebApi.Models.Identity;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
+using Microsoft.Owin.Security.DataProtection;
+
 namespace CRM.WebApi.Controllers
 {
     public class AccountController : ApiController
     {
         private CrmUserManager manager;
-
         public AccountController()
         {
             var db = new CRMContext();
+            db.Configuration.LazyLoadingEnabled = false;
             manager = new CrmUserManager(new UserStore(db));
         }
 
-        public async Task<IHttpActionResult> PostRegisterUser(RegisterUserModel model)
+        [AllowAnonymous]
+        public async Task<HttpResponseMessage> PostRegisterUser(RegisterUserModel model)
         {
             User user = new User
             {
                 Email = model.Email,
                 UserName = model.FirstName + model.LastName,
-                // Id = Guid.NewGuid().ToString(),
+                Id = Guid.NewGuid().ToString(),
                 PhoneNumberConfirmed = false,
                 ConfirmedEmail = false,
                 EmailConfirmed = false,
@@ -37,20 +38,37 @@ namespace CRM.WebApi.Controllers
                 AccessFailedCount = 0,
                 LockoutEnabled = false
             };
-            IdentityResult identity = await this.manager.CreateAsync(user);
-            if (identity.Succeeded) return Ok();
-            return this.Ok(identity.Errors.ToList());
+            IdentityResult identity = await this.manager.CreateAsync(user, model.Password);
+            if (!identity.Succeeded) return Request.CreateResponse(HttpStatusCode.Accepted, user);
+
+            this.manager.UserTokenProvider = new DataProtectorTokenProvider<User>(new DpapiDataProtectionProvider().Create("EmailConfirm"));
+            var message = await this.manager.GenerateEmailConfirmationTokenAsync(this.manager.FindAsync(user.UserName, model.Password).Result.Id);
+            var callback = new Uri(Url.Link("ConfirmEmailRoute", new { userid = user.Id, message }));
+
+            await this.manager.SendEmailAsync(user.Id, "", "");
+
+            return Request.CreateResponse(HttpStatusCode.BadRequest);
+        }
+        [Route("ConfirmEmail", Name = "ConfirmEmailRoute")]
+        public async Task<IHttpActionResult> ConfirmEmail(string userId = "", string code = "")
+        {
+            if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(code))
+            {
+                ModelState.AddModelError("", "User Id and Code are required");
+                return BadRequest(ModelState);
+            }
+
+            IdentityResult result = await this.manager.ConfirmEmailAsync(userId, code);
+
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest(result.ToString());
+            }
         }
 
-        [Authorize(Roles = "Admin")]
-        public IHttpActionResult GetAll()
-        {
-            // if()
-            // var t = User.Identity;
-            // IdentityResult v = t as IdentityResult;
-            if (!User.IsInRole("SuperAdmin")) return this.BadRequest();
-            var result = this.manager.Users.ToList();
-            return this.Ok(result);
-        }
     }
 }
