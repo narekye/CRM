@@ -132,11 +132,10 @@
     <Build Include="dbo\Tables\dbo.AspNetUsers.sql" />
     <Build Include="dbo\Tables\dbo.AspNetRoles.sql" />
     <Build Include="dbo\Tables\dbo.AspNetUserRoles.sql" />
-    <Build Include="dbo\Tables\dbo.AspNetUserLogins.sql" />
-    <Build Include="dbo\Tables\dbo.AspNetUserClaims.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CRM.Database_Project.publish.xml" />
     <None Include="CRM.Database_Projectnew.publish.publish.xml" />
+    <None Include="CRM_1.Database_Project.publish.xml" />
   </ItemGroup>
 </Project>

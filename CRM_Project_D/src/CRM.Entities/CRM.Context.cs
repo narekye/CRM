@@ -29,8 +29,6 @@ namespace CRM.Entities
         public virtual DbSet<EmailList> EmailLists { get; set; }
         public virtual DbSet<Template> Templates { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
-        public virtual DbSet<UserClaim> UserClaims { get; set; }
-        public virtual DbSet<UserLogin> UserLogins { get; set; }
         public virtual DbSet<User> Users { get; set; }
     }
 }

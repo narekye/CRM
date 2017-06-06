@@ -87,12 +87,6 @@
     <Compile Include="User.cs">
       <DependentUpon>CRM.tt</DependentUpon>
     </Compile>
-    <Compile Include="UserClaim.cs">
-      <DependentUpon>CRM.tt</DependentUpon>
-    </Compile>
-    <Compile Include="UserLogin.cs">
-      <DependentUpon>CRM.tt</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.Config" />

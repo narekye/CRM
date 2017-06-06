@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
+﻿using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using CRM.Entities;
 using Microsoft.AspNet.Identity;
 
@@ -14,6 +11,7 @@ namespace CRM.WebApi.InfrastructureOAuth.CRM.UserManager
         public Task SetPasswordHashAsync(User user, string passwordHash)
         {
             user.PasswordHash = passwordHash;
+            this.db.Entry(user).State = EntityState.Modified;
             return Task.FromResult(0);
         }
 
@@ -25,7 +23,8 @@ namespace CRM.WebApi.InfrastructureOAuth.CRM.UserManager
 
         public Task<bool> HasPasswordAsync(User user)
         {
-            if (user.PasswordHash != null) return Task.FromResult(true);
+            if (this.db.Users.SingleOrDefault(p => p.Id == user.Id)?.PasswordHash != null)
+                return Task.FromResult(true);
             return Task.FromResult(false);
         }
     }

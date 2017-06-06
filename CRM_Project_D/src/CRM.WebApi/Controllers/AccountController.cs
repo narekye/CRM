@@ -48,12 +48,8 @@ namespace CRM.WebApi.Controllers
                 UserName = $"{model.FirstName} {model.LastName}",
                 Id = Guid.NewGuid().ToString(),
                 PhoneNumberConfirmed = false,
-                ConfirmedEmail = false,
                 EmailConfirmed = false,
                 PhoneNumber = model.PhoneNumber,
-                TwoFactorEnabled = false,
-                AccessFailedCount = 0,
-                LockoutEnabled = false
             };
             IdentityResult identity = await this.manager.CreateAsync(user, model.Password);
             if (!identity.Succeeded) return Request.CreateResponse(HttpStatusCode.Accepted, user);

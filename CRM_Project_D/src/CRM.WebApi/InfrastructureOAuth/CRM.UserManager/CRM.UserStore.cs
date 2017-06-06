@@ -81,15 +81,14 @@ namespace CRM.WebApi.InfrastructureOAuth.CRM.UserManager
 
         public Task<bool> GetEmailConfirmedAsync(User user)
         {
-            var flag = this.db.Users.SingleOrDefault(p => p.Id == user.Id)?.ConfirmedEmail;
+            var flag = this.db.Users.SingleOrDefault(p => p.Id == user.Id)?.EmailConfirmed;
             if (flag.HasValue) return Task.FromResult(true);
             return Task.FromResult(false);
         }
 
         public Task SetEmailConfirmedAsync(User user, bool confirmed)
         {
-            user.EmailConfirmed = confirmed;
-            user.ConfirmedEmail = confirmed;
+            user.EmailConfirmed = confirmed;            
             this.db.Entry(user).State = EntityState.Modified;
             return this.db.SaveChangesAsync();
         }

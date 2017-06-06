@@ -1,11 +1,9 @@
 ﻿using CRM.Entities;
-using CRM.WebApi.InfrastructureOAuth;
 using CRM.WebApi.Providers;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.OAuth;
 using Owin;
 using System;
-using CRM.WebApi.InfrastructureOAuth.CRM.RoleManager;
 using CRM.WebApi.InfrastructureOAuth.CRM.UserManager;
 
 namespace CRM.WebApi
@@ -16,8 +14,7 @@ namespace CRM.WebApi
         {
             app.CreatePerOwinContext(CRMContext.Create);
             app.CreatePerOwinContext<CrmUserManager>(CrmUserManager.Create);
-            app.CreatePerOwinContext<CrmRoleManager>(CrmRoleManager.Create);
-
+            
             var options = new OAuthAuthorizationServerOptions
             {
                 AllowInsecureHttp = true,
