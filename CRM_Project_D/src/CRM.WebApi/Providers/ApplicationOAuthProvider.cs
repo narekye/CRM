@@ -1,7 +1,6 @@
 ﻿using CRM.Entities;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security.OAuth;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using CRM.WebApi.InfrastructureOAuth.CRM.UserManager;
 
@@ -17,35 +16,25 @@ namespace CRM.WebApi.Providers
 
         public override async Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)
         {
-
             var allowedOrigin = "*";
-
             context.OwinContext.Response.Headers.Add("Access-Control-Allow-Origin", new[] { allowedOrigin });
-
             var userManager = context.OwinContext.GetUserManager<CrmUserManager>();
-
             User user = await userManager.FindAsync(context.UserName, context.Password);
-
             if (user == null)
             {
-                context.SetError("invalid_grant", "The user name or password is incorrect.");
+                context.SetError("Grant invalid.", "The user name or password is incorrect.");
                 return;
             }
-
-            if (!user.EmailConfirmed)
-            {
-                context.SetError("invalid_grant", "User did not confirm email.");
-                return;
-            }
-
-            var identity = new ClaimsIdentity(context.Options.AuthenticationType);
-            
-            identity.AddClaim(new Claim(ClaimTypes.Name, context.UserName));
-            
-            identity.AddClaim(new Claim(ClaimTypes.Role, "SuperAdmin"));
-            
-            context.Validated(identity);
-
+            // email isnt confirmed
+            //if (!user.EmailConfirmed)
+            //{
+            //    context.SetError("invalid_grant", "User did not confirm email.");
+            //    return;
+            //}
+            //var identity = new ClaimsIdentity(context.Options.AuthenticationType);
+            //identity.AddClaim(new Claim(ClaimTypes.Name, context.UserName));
+            //identity.AddClaim(new Claim(ClaimTypes.Role, "SuperAdmin"));
+            context.Validated(/*identity*/);
         }
     }
 }

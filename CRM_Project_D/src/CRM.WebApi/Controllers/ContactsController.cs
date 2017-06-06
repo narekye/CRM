@@ -18,63 +18,63 @@
     [ExceptionFilters]
     public class ContactsController : ApiController
     {
-        private readonly ApplicationManager _manager;
-        private readonly LoggerManager _logger;
+        private readonly ApplicationManager manager;
+        private readonly LoggerManager logger;
         public ContactsController()
         {
-            _logger = new LoggerManager();
-            _manager = new ApplicationManager();
+            logger = new LoggerManager();
+            manager = new ApplicationManager();
         }
         public async Task<HttpResponseMessage> GetAllContactsAsync()
         {
-            var data = await _manager.GetAllContactsAsync();
+            var data = await manager.GetAllContactsAsync();
             if (ReferenceEquals(data, null)) return Request.CreateResponse(HttpStatusCode.NotFound);
             return Request.CreateResponse(HttpStatusCode.OK, data);
         }
         public async Task<HttpResponseMessage> GetContactByIdAsync([FromUri] int? id)
         {
             if (!id.HasValue) return Request.CreateResponse(HttpStatusCode.BadGateway, "Set ID parameter.");
-            var contact = await _manager.GetContactByIdAsync(id);
+            var contact = await manager.GetContactByIdAsync(id);
             if (ReferenceEquals(contact, null)) return Request.CreateResponse(HttpStatusCode.NotFound);
             return Request.CreateResponse(HttpStatusCode.OK, contact);
         }
         public async Task<HttpResponseMessage> GetContactByGuidAsync([FromUri] Guid? guid)
         {
             if (!guid.HasValue) return Request.CreateResponse(HttpStatusCode.BadGateway);
-            var contact = await _manager.GetContactByGuidAsync(guid);
+            var contact = await manager.GetContactByGuidAsync(guid);
             if (ReferenceEquals(contact, null)) return Request.CreateResponse(HttpStatusCode.NotFound);
             return Request.CreateResponse(HttpStatusCode.OK, contact);
         }
         public async Task<HttpResponseMessage> PutContactAsync([FromBody] ViewContactLess c)
         {
             if (ReferenceEquals(c, null) || !ModelState.IsValid) return Request.CreateResponse(HttpStatusCode.BadGateway);
-            if (await _manager.UpdateContactAsync(c)) return Request.CreateResponse(HttpStatusCode.Accepted);
+            if (await manager.UpdateContactAsync(c)) return Request.CreateResponse(HttpStatusCode.Accepted);
             return Request.CreateResponse(HttpStatusCode.BadRequest);
         }
         public async Task<HttpResponseMessage> PostContactAsync([FromBody] ViewContactLess c)
         {
             if (ReferenceEquals(c, null) || !ModelState.IsValid)
                 return Request.CreateResponse(HttpStatusCode.BadRequest);
-            if (await _manager.AddContactAsync(c)) return Request.CreateResponse(HttpStatusCode.Created);
+            if (await manager.AddContactAsync(c)) return Request.CreateResponse(HttpStatusCode.Created);
             return Request.CreateResponse(HttpStatusCode.NotAcceptable);
         }
         public async Task<HttpResponseMessage> DeleteContactByGuIdAsync([FromUri] Guid? guid)
         {
             if (!guid.HasValue) return Request.CreateResponse(HttpStatusCode.BadGateway);
-            if (await _manager.DeleteContactAsync(guid.Value))
+            if (await manager.DeleteContactAsync(guid.Value))
                 return Request.CreateResponse(HttpStatusCode.NoContent);
             return Request.CreateResponse(HttpStatusCode.BadRequest);
         }
         public async Task<HttpResponseMessage> DeleteContactsByGuidsAsync([FromBody] List<Guid> guids)
         {
             if (ReferenceEquals(guids, null)) return Request.CreateResponse(HttpStatusCode.BadGateway);
-            if (await _manager.DeleteContactsAsync(guids)) return Request.CreateResponse(HttpStatusCode.NoContent);
+            if (await manager.DeleteContactsAsync(guids)) return Request.CreateResponse(HttpStatusCode.NoContent);
             return Request.CreateResponse(HttpStatusCode.BadRequest);
         }
         [Route("api/contacts/filter")]
         public async Task<HttpResponseMessage> PostFilterOrderBy([FromBody] RequestContact model)
         {
-            var data = await _manager.FilterOrderByRequestAsync(model);
+            var data = await manager.FilterOrderByRequestAsync(model);
             if (ReferenceEquals(data, null)) return Request.CreateResponse(HttpStatusCode.BadRequest);
             return Request.CreateResponse(HttpStatusCode.OK, data);
         }
@@ -87,25 +87,25 @@
             foreach (var file in provider.FileData)
             {
                 var buffer = File.ReadAllBytes(file.LocalFileName);
-                await _manager.AddToDatabaseFromBytes(buffer);
+                await manager.AddToDatabaseFromBytes(buffer);
             }
             return Request.CreateResponse(HttpStatusCode.Accepted);
         }
         [Route("api/contacts/count")]
         public async Task<int> GetContactsPageCountAsync()
         {
-            return await _manager.PageCountAsync();
+            return await manager.PageCountAsync();
         }
         [Route("api/contacts/developer")]
         public HttpResponseMessage GetLog()
         {
-            var response = new HttpResponseMessage { Content = new StringContent(_logger.ReadData()) };
+            var response = new HttpResponseMessage { Content = new StringContent(logger.ReadData()) };
             response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/html");
             return response;
         }
         protected override void Dispose(bool disposing)
         {
-            if (disposing) _manager.Dispose();
+            if (disposing) manager.Dispose();
             base.Dispose(disposing);
         }
     }

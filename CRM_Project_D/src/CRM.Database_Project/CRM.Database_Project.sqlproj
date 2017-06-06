@@ -124,18 +124,13 @@
     <Folder Include="dbo\Stored Procedures\" />
   </ItemGroup>
   <ItemGroup>
+    <Build Include="dbo\Stored Procedures\GetByPageProc.sql" />
     <Build Include="dbo\Tables\Contacts.sql" />
     <Build Include="dbo\Tables\EmailListContacts.sql" />
     <Build Include="dbo\Tables\EmailLists.sql" />
+    <Build Include="dbo\Tables\Roles.sql" />
     <Build Include="dbo\Tables\Templates.sql" />
-    <Build Include="dbo\Stored Procedures\GetByPageProc.sql" />
-    <Build Include="dbo\Tables\dbo.AspNetUsers.sql" />
-    <Build Include="dbo\Tables\dbo.AspNetRoles.sql" />
-    <Build Include="dbo\Tables\dbo.AspNetUserRoles.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="CRM.Database_Project.publish.xml" />
-    <None Include="CRM.Database_Projectnew.publish.publish.xml" />
-    <None Include="CRM_1.Database_Project.publish.xml" />
+    <Build Include="dbo\Tables\UserRoles.sql" />
+    <Build Include="dbo\Tables\Users.sql" />
   </ItemGroup>
 </Project>

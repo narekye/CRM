@@ -9,7 +9,7 @@ using Microsoft.AspNet.Identity;
 namespace CRM.WebApi.InfrastructureOAuth.CRM.UserManager
 {
     [ExceptionFilters]
-    public partial class UserStore : IUserStore<User>, IQueryableUserStore<User>, IUserEmailStore<User>, IUserPhoneNumberStore<User>
+    public partial class UserStore : IUserStore<User>, IQueryableUserStore<User>, IUserEmailStore<User>
     {
         private readonly CRMContext db;
 
@@ -110,19 +110,6 @@ namespace CRM.WebApi.InfrastructureOAuth.CRM.UserManager
         {
             var phone = this.db.Users.SingleOrDefaultAsync(p => p.Id == user.Id);
             return Task.FromResult(phone.Result.Email);
-        }
-
-        public Task<bool> GetPhoneNumberConfirmedAsync(User user)
-        {
-            var confirmed = this.db.Users.SingleOrDefaultAsync(p => p.Id == user.Id);
-            return Task.FromResult(confirmed.Result.PhoneNumberConfirmed);
-        }
-
-        public Task SetPhoneNumberConfirmedAsync(User user, bool confirmed)
-        {
-            user.PhoneNumberConfirmed = confirmed;
-            this.db.Entry(user).State = EntityState.Modified;
-            return this.db.SaveChangesAsync();
         }
         public void Dispose()
         {

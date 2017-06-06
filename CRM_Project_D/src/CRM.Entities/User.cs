@@ -25,7 +25,6 @@ namespace CRM.Entities
         public bool EmailConfirmed { get; set; }
         public string PasswordHash { get; set; }
         public string PhoneNumber { get; set; }
-        public bool PhoneNumberConfirmed { get; set; }
         public string UserName { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

@@ -259,9 +259,9 @@
     <Compile Include="Controllers\TemplateController.cs" />
     <Compile Include="Filters\ExceptionFiltersAttribute.cs" />
     <Compile Include="IdentityConfig.cs" />
-    <Compile Include="InfrastructureModel\ApplicationManager\ApplicationManagerContact.cs" />
-    <Compile Include="InfrastructureModel\ApplicationManager\ApplicationManagerEmail.cs" />
-    <Compile Include="InfrastructureModel\ApplicationManager\ApplicationManagerTemplate.cs" />
+    <Compile Include="InfrastructureModel\ApplicationManager\Contacts.cs" />
+    <Compile Include="InfrastructureModel\ApplicationManager\EmailLists.cs" />
+    <Compile Include="InfrastructureModel\ApplicationManager\Templates.cs" />
     <Compile Include="InfrastructureModel\LoggerManager.cs" />
     <Compile Include="InfrastructureModel\MailManager.cs" />
     <Compile Include="InfrastructureModel\ParserProvider.cs" />

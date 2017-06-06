@@ -11,27 +11,27 @@
     [ExceptionFilters]
     public class SendEmailController : ApiController
     {
-        private readonly MailManager _manager;
+        private readonly MailManager manager;
         public SendEmailController()
         {
-            _manager = new MailManager();
+            manager = new MailManager();
         }
         public async Task<HttpResponseMessage> PostSendToList([FromUri] int templateid, [FromBody] List<Guid> guids)
         {
-            var list = await _manager.GetListOfEmailsByGuids(guids);
-            await _manager.SendEmailToList(list, templateid);
+            var list = await manager.GetListOfEmailsByGuids(guids);
+            await manager.SendEmailToList(list, templateid);
             return Request.CreateResponse(HttpStatusCode.OK);
         }
         [Route("api/sendemail/list")]
         public async Task<HttpResponseMessage> PostSendToEmailList([FromUri] int id, [FromUri] int template)
         {
-            await _manager.SendEmailToEmailList(id, template);
+            await manager.SendEmailToEmailList(id, template);
             return Request.CreateResponse(HttpStatusCode.OK);
         }
         protected override void Dispose(bool disposing)
         {
             if (disposing)
-                _manager.Dispose();
+                manager.Dispose();
             base.Dispose(disposing);
         }
     }

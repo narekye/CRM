@@ -5,6 +5,8 @@ using Microsoft.Owin;
 using Owin;
 using System.Collections.Generic;
 using System.Web.Http;
+using System.Web.Routing;
+
 [assembly: OwinStartup(typeof(CRM.WebApi.Startup))]
 namespace CRM.WebApi
 {
@@ -23,15 +25,15 @@ namespace CRM.WebApi
         private void ConfigureWebApi(HttpConfiguration config)
         {
             config.Formatters.JsonFormatter
-            .SerializerSettings
-            .ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                        .SerializerSettings
+                        .ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
             config.MapHttpAttributeRoutes();
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
-            // config.Filters.Add(new AuthorizeAttribute());
+            RouteTable.Routes.MapPageRoute("api", "home", "~/Templates/simple.html"); // front end sample
         }
         private void Mapper()
         {

@@ -16,7 +16,6 @@ namespace CRM.WebApi.Controllers
     internal enum Role
     {
         SuperAdmin,
-        Admin,
         User
     }
     [RoutePrefix("api/account")]
@@ -28,33 +27,52 @@ namespace CRM.WebApi.Controllers
             var db = new CRMContext();
             db.Configuration.LazyLoadingEnabled = false;
             manager = new CrmUserManager(new UserStore(db));
+            manager.UserTokenProvider = new DataProtectorTokenProvider<User>(new DpapiDataProtectionProvider().Create("EmailConfirm"));
         }
-        [Authorize] // only superadmin
+
+        [Authorize]
         [Route("admin/users")]
-        public async Task<HttpResponseMessage> GetAllUsers()
+        public async Task<HttpResponseMessage> GetAllUsersAsync()
         {
-            var principal = RequestContext.Principal;
-            if (!principal.IsInRole(Role.SuperAdmin.ToString())) return Request.CreateResponse(HttpStatusCode.NotFound);
+            if (!this.IsInRole(Role.SuperAdmin)) return Request.CreateResponse(HttpStatusCode.NotFound);
             var data = await this.manager.Users.ToListAsync();
             return Request.CreateResponse(HttpStatusCode.OK, data);
         }
 
+        [Authorize]
+        [Route("admin/delete")]
+        public async Task<HttpResponseMessage> DeleteUserAsync([FromBody] Guid guid)
+        {
+            var user = await this.manager.FindByIdAsync(guid.ToString());
+            IdentityResult result = await this.manager.DeleteAsync(user);
+            if (!result.Succeeded) return Request.CreateResponse(HttpStatusCode.NotModified, result.Errors);
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+        [Authorize]
+        [Route("admin/change")]
+        public async Task<HttpResponseMessage> PutUserAsync(User user)
+        {
+            var result = await this.manager.UpdateAsync(user);
+            if (!result.Succeeded) return Request.CreateResponse(HttpStatusCode.NotModified);
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+        // register user
         [AllowAnonymous]
         public async Task<HttpResponseMessage> PostRegisterUser(RegisterUserModel model)
         {
             User user = new User
             {
                 Email = model.Email,
-                UserName = $"{model.FirstName} {model.LastName}",
+                UserName = $"{model.FirstName}{model.LastName}",
                 Id = Guid.NewGuid().ToString(),
-                PhoneNumberConfirmed = false,
                 EmailConfirmed = false,
                 PhoneNumber = model.PhoneNumber,
             };
             IdentityResult identity = await this.manager.CreateAsync(user, model.Password);
             if (!identity.Succeeded) return Request.CreateResponse(HttpStatusCode.Accepted, user);
 
-            this.manager.UserTokenProvider = new DataProtectorTokenProvider<User>(new DpapiDataProtectionProvider().Create("EmailConfirm"));
+
             var message = await this.manager.GenerateEmailConfirmationTokenAsync(this.manager.FindAsync(user.UserName, model.Password).Result.Id);
             var callback = new Uri(Url.Link("ConfirmEmailRoute", new { userid = user.Id, message }));
 
@@ -83,5 +101,15 @@ namespace CRM.WebApi.Controllers
             }
         }
 
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing) this.manager.Dispose();
+            base.Dispose(disposing);
+        }
+
+        private bool IsInRole(Role role)
+        {
+            return RequestContext.Principal.IsInRole(role.ToString());
+        }
     }
 }

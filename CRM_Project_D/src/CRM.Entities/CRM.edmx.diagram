@@ -10,9 +10,9 @@
         <AssociationConnector Association="CRM.EmailListContacts" ManuallyRouted="false" />
         <EntityTypeShape EntityType="CRM.Template" Width="1.5" PointX="5" PointY="1" />
         <EntityTypeShape EntityType="CRM.UserRole" Width="1.5" PointX="5.375" PointY="6.75" />
-        <EntityTypeShape EntityType="CRM.Role" Width="1.5" PointX="5" PointY="2.875" />
-        <EntityTypeShape EntityType="CRM.User" Width="1.5" PointX="3" PointY="2.875" />
-        <AssociationConnector Association="CRM.AspNetUserRoles" />
+        <EntityTypeShape EntityType="CRM.Role" Width="1.5" PointX="3" PointY="2.875" />
+        <EntityTypeShape EntityType="CRM.User" Width="1.5" PointX="5" PointY="2.75" />
+        <AssociationConnector Association="CRM.UserRoles" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
