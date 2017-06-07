@@ -124,7 +124,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Function Name="RESETDATATODEFAULT" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="ResetDatabaseToStock" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <EntityContainer Name="CRMStoreContainer">
           <EntitySet Name="Contacts" EntityType="Self.Contacts" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="EmailListContacts" EntityType="Self.EmailListContacts" Schema="dbo" store:Type="Tables" />
@@ -196,6 +196,7 @@
             <End Role="User" EntitySet="Users" />
           </AssociationSet>
           <FunctionImport Name="RESETDATATODEFAULT" />
+          <FunctionImport Name="ResetDatabaseToStock" />
         </EntityContainer>
         <EntityType Name="Template">
           <Key>
@@ -303,7 +304,7 @@
               <ScalarProperty Name="Id" ColumnName="RoleId" />
             </EndProperty>
           </AssociationSetMapping>
-          <FunctionImportMapping FunctionImportName="RESETDATATODEFAULT" FunctionName="CRM.Store.RESETDATATODEFAULT" />
+          <FunctionImportMapping FunctionImportName="ResetDatabaseToStock" FunctionName="CRM.Store.ResetDatabaseToStock" />
           </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

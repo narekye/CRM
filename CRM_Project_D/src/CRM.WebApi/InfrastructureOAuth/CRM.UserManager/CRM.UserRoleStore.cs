@@ -15,7 +15,6 @@ namespace CRM.WebApi.InfrastructureOAuth.CRM.UserManager
             user.Roles.Add(this.db.Roles.SingleOrDefault(p => p.Name == roleName));
             return this.db.SaveChangesAsync();
         }
-
         public Task RemoveFromRoleAsync(User user, string roleName)
         {
             if (user == null || string.IsNullOrWhiteSpace(roleName)) throw new ArgumentNullException();
@@ -26,14 +25,12 @@ namespace CRM.WebApi.InfrastructureOAuth.CRM.UserManager
             }
             return Task.FromResult(0);
         }
-
         public Task<IList<string>> GetRolesAsync(User user)
         {
             IList<string> list = new List<string>();
             user.Roles.ForEach(p => list.Add(p.Name));
             return Task.FromResult(list);
         }
-
         public Task<bool> IsInRoleAsync(User user, string roleName)
         {
             bool result = user.Roles.Any(p => p.Name == roleName);

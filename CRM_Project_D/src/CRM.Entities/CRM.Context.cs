@@ -37,5 +37,10 @@ namespace CRM.Entities
         {
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("RESETDATATODEFAULT");
         }
+    
+        public virtual int ResetDatabaseToStock()
+        {
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("ResetDatabaseToStock");
+        }
     }
 }

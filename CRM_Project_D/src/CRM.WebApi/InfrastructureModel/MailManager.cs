@@ -110,7 +110,7 @@
         public async Task<bool> SendConfirmationEmail(string whom = "", string code = "")
         {
             if (string.IsNullOrWhiteSpace(whom) || string.IsNullOrWhiteSpace(code)) return false;
-            code = $"<a href={code}>Confirm your account</a>";
+            // code = $"<a href=''>Confirm your account</a>";
 
             Configuration config = System.Web.HttpContext.Current != null ?
                System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration("~") :

@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using CRM.Entities;
 using System.Web.Http;
+using CRM.WebApi.Filters;
 using CRM.WebApi.InfrastructureModel;
 using CRM.WebApi.InfrastructureOAuth.CRM.UserManager;
 using CRM.WebApi.Models.Identity;
@@ -15,10 +16,12 @@ namespace CRM.WebApi.Controllers
     internal enum Role
     {
         SuperAdmin,
+        Admin,
         User
     }
 
     [RoutePrefix("api/account")]
+    [ExceptionFilters]
     public class AccountController : ApiController
     {
         private CrmUserManager manager;
@@ -61,6 +64,7 @@ namespace CRM.WebApi.Controllers
 
         // register user
         [AllowAnonymous]
+        [Route("register")]
         public async Task<HttpResponseMessage> PostRegisterUser(RegisterUserModel model)
         {
             User user = new User
@@ -71,17 +75,17 @@ namespace CRM.WebApi.Controllers
                 EmailConfirmed = false,
                 PhoneNumber = model.PhoneNumber,
             };
+
             IdentityResult identity = await this.manager.CreateAsync(user, model.Password);
             if (!identity.Succeeded) return Request.CreateResponse(HttpStatusCode.NotAcceptable, identity.Errors);
             var codef = await this.manager.GenerateEmailConfirmationTokenAsync(user.Id);
-            var callback = new Uri(Url.Link("ConfirmEmailRoute", new {userid = user.Id, code = codef}));
+            var callback = new Uri(Url.Link("ConfirmEmailRoute", new { userid = user.Id, code = codef }));
             if (await this.mailmanager.SendConfirmationEmail(user.Email, callback.ToString()))
             {
                 return Request.CreateResponse(HttpStatusCode.OK, "Email sended.");
             }
             return Request.CreateResponse(HttpStatusCode.BadRequest);
         }
-
         // email confirmation
         [Route("ConfirmEmail", Name = "ConfirmEmailRoute")]
         public async Task<HttpResponseMessage> GetConfirmEmail(string userId = "", string code = "")
@@ -102,22 +106,42 @@ namespace CRM.WebApi.Controllers
             }
         }
 
+        [Authorize, Route("admin/register")]
+        public async Task<HttpResponseMessage> RegisterAdmin(RegisterUserModel model)
+        {
+            User user = new User()
+            {
+                Email = model.Email,
+                Id = Guid.NewGuid().ToString(),
+                EmailConfirmed = true,
+                PhoneNumber = model.PhoneNumber,
+                UserName = model.UserName,
+            };
+            IdentityResult result = await this.manager.AddToRoleAsync(user.Id, Role.Admin.ToString());
+            if (result.Succeeded)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, "Created");
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.NotAcceptable, result.Errors);
+            }
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing) this.manager.Dispose();
             base.Dispose(disposing);
         }
-
         private bool IsInRole(Role role)
         {
             return RequestContext.Principal.IsInRole(role.ToString());
         }
-
         [HttpGet, Route("reset")]
         public HttpResponseMessage ResetDatabaseToStock()
         {
             var context = new CRMContext();
-            context.RESETDATATODEFAULT();
+            context.ResetDatabaseToStock(); // stored proc
             return Request.CreateResponse(HttpStatusCode.OK, "Reseted to defaults");
         }
     }

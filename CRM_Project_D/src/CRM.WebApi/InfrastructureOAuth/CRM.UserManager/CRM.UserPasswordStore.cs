@@ -14,13 +14,11 @@ namespace CRM.WebApi.InfrastructureOAuth.CRM.UserManager
             this.db.Entry(user).State = EntityState.Modified;
             return Task.FromResult(0);
         }
-
         public Task<string> GetPasswordHashAsync(User user)
         {
             var us = this.db.Users.FirstOrDefaultAsync(p => p.Id == user.Id).Result;
             return Task.FromResult<string>(us.PasswordHash);
         }
-
         public Task<bool> HasPasswordAsync(User user)
         {
             if (this.db.Users.SingleOrDefault(p => p.Id == user.Id)?.PasswordHash != null)

@@ -12,9 +12,7 @@
     public class ParserProvider
     {
         private static int MimeSampleSize = 256;
-
         private static string DefaultMimeType = "application/octet-stream";
-
         [DllImport(@"urlmon.dll", CharSet = CharSet.Auto)]
         private static extern uint FindMimeFromData(
             uint pBc,
@@ -64,7 +62,6 @@
             }
             return contactslist;
         }
-
         static List<Contact> ReadExcelFileXml(string filename)
         {
             string[] strProperties = new string[5];
@@ -126,11 +123,9 @@
                 File.WriteAllBytes(csvFileName, csvbytes);
                 string worksheetsName = "sheet1";
                 bool firstRowIsHeader = true;
-
                 var format = new ExcelTextFormat();
                 format.Delimiter = ',';
                 format.EOL = "\r";
-
                 using (ExcelPackage package = new ExcelPackage(new FileInfo(excelFileName)))
                 {
                     ExcelWorksheet worksheet = package.Workbook.Worksheets.Add(worksheetsName);

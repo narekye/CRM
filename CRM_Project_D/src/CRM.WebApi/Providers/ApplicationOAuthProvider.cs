@@ -14,7 +14,6 @@ namespace CRM.WebApi.Providers
             context.Validated();
             return Task.FromResult<object>(null);
         }
-
         public override async Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)
         {
             var allowedOrigin = "*";
@@ -23,13 +22,13 @@ namespace CRM.WebApi.Providers
             User user = await userManager.FindAsync(context.UserName, context.Password);
             if (user == null)
             {
-                context.SetError("Grant invalid.", "The user name or password is incorrect.");
+                context.SetError("InvalidGrant", "The user name or password is incorrect.");
                 return;
             }
-            // email isnt confirmed
+            // check if email is confirmed
             if (!user.EmailConfirmed)
             {
-                context.SetError("invalid_grant", "User did not confirm email.");
+                context.SetError("InvalidGrant", "User did not confirm email.");
                 return;
             }
             var identity = new ClaimsIdentity(context.Options.AuthenticationType);

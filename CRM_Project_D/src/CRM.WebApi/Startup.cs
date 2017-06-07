@@ -5,12 +5,15 @@ using Microsoft.Owin;
 using Owin;
 using System.Collections.Generic;
 using System.Web.Http;
+using Microsoft.Owin.Security.DataProtection;
 
 [assembly: OwinStartup(typeof(CRM.WebApi.Startup))]
 namespace CRM.WebApi
 {
     public partial class Startup
     {
+        internal static IDataProtectionProvider DataProtectionProvider { get; private set; }
+
         public void Configuration(IAppBuilder app)
         {
             ConfigureOAuth(app);

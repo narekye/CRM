@@ -25,26 +25,14 @@
             logger = new LoggerManager();
             manager = new ApplicationManager();
         }
+
         public async Task<HttpResponseMessage> GetAllContactsAsync()
         {
             var data = await manager.GetAllContactsAsync();
             if (ReferenceEquals(data, null)) return Request.CreateResponse(HttpStatusCode.NotFound);
             return Request.CreateResponse(HttpStatusCode.OK, data);
         }
-        public async Task<HttpResponseMessage> GetContactByIdAsync([FromUri] int? id)
-        {
-            if (!id.HasValue) return Request.CreateResponse(HttpStatusCode.BadGateway, "Set ID parameter.");
-            var contact = await manager.GetContactByIdAsync(id);
-            if (ReferenceEquals(contact, null)) return Request.CreateResponse(HttpStatusCode.NotFound);
-            return Request.CreateResponse(HttpStatusCode.OK, contact);
-        }
-        public async Task<HttpResponseMessage> GetContactByGuidAsync([FromUri] Guid? guid)
-        {
-            if (!guid.HasValue) return Request.CreateResponse(HttpStatusCode.BadGateway);
-            var contact = await manager.GetContactByGuidAsync(guid);
-            if (ReferenceEquals(contact, null)) return Request.CreateResponse(HttpStatusCode.NotFound);
-            return Request.CreateResponse(HttpStatusCode.OK, contact);
-        }
+
         public async Task<HttpResponseMessage> PutContactAsync([FromBody] ViewContactLess c)
         {
             if (ReferenceEquals(c, null) || !ModelState.IsValid) return Request.CreateResponse(HttpStatusCode.BadGateway);

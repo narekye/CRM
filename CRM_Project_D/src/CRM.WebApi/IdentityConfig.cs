@@ -5,6 +5,7 @@ using Microsoft.Owin.Security.OAuth;
 using Owin;
 using System;
 using CRM.WebApi.InfrastructureOAuth.CRM.UserManager;
+using Microsoft.Owin.Security.DataProtection;
 
 namespace CRM.WebApi
 {
@@ -12,6 +13,8 @@ namespace CRM.WebApi
     {
         private void ConfigureOAuth(IAppBuilder app)
         {
+            DataProtectionProvider = app.GetDataProtectionProvider();
+
             app.CreatePerOwinContext(CRMContext.Create);
             app.CreatePerOwinContext<CrmUserManager>(CrmUserManager.Create);
 
@@ -22,6 +25,7 @@ namespace CRM.WebApi
                 AccessTokenExpireTimeSpan = TimeSpan.FromDays(1),
                 Provider = new ApplicationOAuthProvider()
             };
+
             app.UseOAuthAuthorizationServer(options);
             app.UseOAuthBearerAuthentication
             (

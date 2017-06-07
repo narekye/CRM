@@ -26,27 +26,6 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
             AutoMapper.Mapper.Map(list, data);
             return data;
         }
-        public async Task<ViewContact> GetContactByIdAsync(int? id)
-        {
-            var contact =
-                     await
-                         _database.Contacts.Include(p => p.EmailLists).FirstOrDefaultAsync(p => p.ContactId == id.Value);
-            if (ReferenceEquals(contact, null)) return null;
-            var data = new ViewContact();
-            AutoMapper.Mapper.Map(contact, data);
-            data.EmailLists = contact.EmailLists.Select(p => p.EmailListName).ToList();
-            return data;
-        }
-        public async Task<ViewContact> GetContactByGuidAsync(Guid? guid)
-        {
-            var contact =
-                    await _database.Contacts.Include(p => p.EmailLists).FirstOrDefaultAsync(p => p.GuID == guid.Value);
-            if (ReferenceEquals(contact, null)) return null;
-            var data = new ViewContact();
-            AutoMapper.Mapper.Map(contact, data);
-            data.EmailLists = contact.EmailLists.Select(p => p.EmailListName).ToList();
-            return data;
-        }
         public async Task<bool> UpdateContactAsync(ViewContactLess model)
         {
             using (var transaction = _database.Database.BeginTransaction())
