@@ -14,7 +14,7 @@ namespace CRM.WebApi
         {
             app.CreatePerOwinContext(CRMContext.Create);
             app.CreatePerOwinContext<CrmUserManager>(CrmUserManager.Create);
-            
+
             var options = new OAuthAuthorizationServerOptions
             {
                 AllowInsecureHttp = true,

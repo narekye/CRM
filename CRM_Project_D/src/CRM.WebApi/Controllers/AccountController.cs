@@ -5,11 +5,10 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using CRM.Entities;
 using System.Web.Http;
+using CRM.WebApi.InfrastructureModel;
 using CRM.WebApi.InfrastructureOAuth.CRM.UserManager;
 using CRM.WebApi.Models.Identity;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
-using Microsoft.Owin.Security.DataProtection;
 
 namespace CRM.WebApi.Controllers
 {
@@ -18,16 +17,18 @@ namespace CRM.WebApi.Controllers
         SuperAdmin,
         User
     }
+
     [RoutePrefix("api/account")]
     public class AccountController : ApiController
     {
         private CrmUserManager manager;
+        private MailManager mailmanager;
+
         public AccountController()
         {
             var db = new CRMContext();
-            db.Configuration.LazyLoadingEnabled = false;
-            manager = new CrmUserManager(new UserStore(db));
-            manager.UserTokenProvider = new DataProtectorTokenProvider<User>(new DpapiDataProtectionProvider().Create("EmailConfirm"));
+            manager = CrmUserManager.UserManager;
+            this.mailmanager = new MailManager();
         }
 
         [Authorize]
@@ -57,6 +58,7 @@ namespace CRM.WebApi.Controllers
             if (!result.Succeeded) return Request.CreateResponse(HttpStatusCode.NotModified);
             return Request.CreateResponse(HttpStatusCode.OK);
         }
+
         // register user
         [AllowAnonymous]
         public async Task<HttpResponseMessage> PostRegisterUser(RegisterUserModel model)
@@ -64,40 +66,39 @@ namespace CRM.WebApi.Controllers
             User user = new User
             {
                 Email = model.Email,
-                UserName = $"{model.FirstName}{model.LastName}",
+                UserName = model.UserName,
                 Id = Guid.NewGuid().ToString(),
                 EmailConfirmed = false,
                 PhoneNumber = model.PhoneNumber,
             };
             IdentityResult identity = await this.manager.CreateAsync(user, model.Password);
-            if (!identity.Succeeded) return Request.CreateResponse(HttpStatusCode.Accepted, user);
-
-
-            var message = await this.manager.GenerateEmailConfirmationTokenAsync(this.manager.FindAsync(user.UserName, model.Password).Result.Id);
-            var callback = new Uri(Url.Link("ConfirmEmailRoute", new { userid = user.Id, message }));
-
-            await this.manager.SendEmailAsync(user.Id, "", "");
-
+            if (!identity.Succeeded) return Request.CreateResponse(HttpStatusCode.NotAcceptable, identity.Errors);
+            var codef = await this.manager.GenerateEmailConfirmationTokenAsync(user.Id);
+            var callback = new Uri(Url.Link("ConfirmEmailRoute", new {userid = user.Id, code = codef}));
+            if (await this.mailmanager.SendConfirmationEmail(user.Email, callback.ToString()))
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, "Email sended.");
+            }
             return Request.CreateResponse(HttpStatusCode.BadRequest);
         }
+
+        // email confirmation
         [Route("ConfirmEmail", Name = "ConfirmEmailRoute")]
-        public async Task<IHttpActionResult> ConfirmEmail(string userId = "", string code = "")
+        public async Task<HttpResponseMessage> GetConfirmEmail(string userId = "", string code = "")
         {
             if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(code))
             {
-                ModelState.AddModelError("", "User Id and Code are required");
-                return BadRequest(ModelState);
+                ModelState.AddModelError("Err", "User Id and Code are required");
+                return Request.CreateResponse(HttpStatusCode.NotFound, ModelState);
             }
-
             IdentityResult result = await this.manager.ConfirmEmailAsync(userId, code);
-
             if (result.Succeeded)
             {
-                return Ok();
+                return Request.CreateResponse(HttpStatusCode.OK, "You have successfully confirmed your email.");
             }
             else
             {
-                return BadRequest(result.ToString());
+                return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
         }
 
@@ -110,6 +111,14 @@ namespace CRM.WebApi.Controllers
         private bool IsInRole(Role role)
         {
             return RequestContext.Principal.IsInRole(role.ToString());
+        }
+
+        [HttpGet, Route("reset")]
+        public HttpResponseMessage ResetDatabaseToStock()
+        {
+            var context = new CRMContext();
+            context.RESETDATATODEFAULT();
+            return Request.CreateResponse(HttpStatusCode.OK, "Reseted to defaults");
         }
     }
 }

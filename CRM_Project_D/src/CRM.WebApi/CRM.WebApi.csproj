@@ -221,6 +221,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="build\index.html" />
+    <Content Include="build\service-worker.js" />
+    <Content Include="build\static\css\main.a5374820.css" />
+    <Content Include="build\static\js\main.51237cc1.js" />
+    <Content Include="build\static\media\send_mail.17e7bebc.gif" />
     <Content Include="packages.config" />
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -232,6 +237,11 @@
     <Content Include="log\2017-05-31.log" />
     <Content Include="log\2017-06-01.log" />
     <Content Include="log\2017-06-03.log" />
+    <Content Include="build\asset-manifest.json" />
+    <Content Include="build\manifest.json" />
+    <Content Include="build\static\css\main.a5374820.css.map" />
+    <Content Include="build\static\js\main.51237cc1.js.map" />
+    <Content Include="build\static\media\Quicksand-Regular.f87b9b4f.ttf" />
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>

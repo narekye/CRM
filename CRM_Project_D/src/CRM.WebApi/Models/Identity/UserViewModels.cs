@@ -6,10 +6,7 @@ namespace CRM.WebApi.Models.Identity
     {
         [Required]
         [StringLength(50)]
-        public string FirstName { get; set; }
-        [Required]
-        [StringLength(50)]
-        public string LastName { get; set; }
+        public string UserName { get; set; }
         [Required]
         [DataType(DataType.PhoneNumber)]
         public string PhoneNumber { get; set; }

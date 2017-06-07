@@ -5,7 +5,6 @@ using Microsoft.Owin;
 using Owin;
 using System.Collections.Generic;
 using System.Web.Http;
-using System.Web.Routing;
 
 [assembly: OwinStartup(typeof(CRM.WebApi.Startup))]
 namespace CRM.WebApi
@@ -15,7 +14,6 @@ namespace CRM.WebApi
         public void Configuration(IAppBuilder app)
         {
             ConfigureOAuth(app);
-            app.UseWelcomePage("/");
             var config = new HttpConfiguration();
             ConfigureWebApi(config);
             Mapper();
@@ -33,7 +31,6 @@ namespace CRM.WebApi
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
-            RouteTable.Routes.MapPageRoute("api", "home", "~/Templates/simple.html"); // front end sample
         }
         private void Mapper()
         {

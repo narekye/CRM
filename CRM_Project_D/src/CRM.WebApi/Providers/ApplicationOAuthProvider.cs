@@ -1,4 +1,5 @@
-﻿using CRM.Entities;
+﻿using System.Security.Claims;
+using CRM.Entities;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security.OAuth;
 using System.Threading.Tasks;
@@ -26,15 +27,15 @@ namespace CRM.WebApi.Providers
                 return;
             }
             // email isnt confirmed
-            //if (!user.EmailConfirmed)
-            //{
-            //    context.SetError("invalid_grant", "User did not confirm email.");
-            //    return;
-            //}
-            //var identity = new ClaimsIdentity(context.Options.AuthenticationType);
-            //identity.AddClaim(new Claim(ClaimTypes.Name, context.UserName));
-            //identity.AddClaim(new Claim(ClaimTypes.Role, "SuperAdmin"));
-            context.Validated(/*identity*/);
+            if (!user.EmailConfirmed)
+            {
+                context.SetError("invalid_grant", "User did not confirm email.");
+                return;
+            }
+            var identity = new ClaimsIdentity(context.Options.AuthenticationType);
+            identity.AddClaim(new Claim(ClaimTypes.Name, context.UserName));
+            identity.AddClaim(new Claim(ClaimTypes.Role, "SuperAdmin"));
+            context.Validated(identity);
         }
     }
 }

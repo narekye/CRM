@@ -12,6 +12,8 @@ namespace CRM.Entities
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
+    using System.Data.Entity.Core.Objects;
+    using System.Linq;
     
     public partial class CRMContext : DbContext
     {
@@ -30,5 +32,10 @@ namespace CRM.Entities
         public virtual DbSet<Template> Templates { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<User> Users { get; set; }
+    
+        public virtual int RESETDATATODEFAULT()
+        {
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("RESETDATATODEFAULT");
+        }
     }
 }
