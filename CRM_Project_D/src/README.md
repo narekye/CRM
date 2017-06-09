@@ -747,6 +747,7 @@ Sends emails to contacts by guid</br>
 <td></td>
 </tr>
 </table>
+
 ## 3.2 Post
 Sends emails to contacts by email list id</br>
 <b>Request</b></br>
@@ -791,6 +792,46 @@ Sends emails to contacts by email list id</br>
 <tr>
 <tr>
 <td>400</td>
+<td></td>
+</tr>
+<tr>
+<td>500</td>
+<td></td>
+</tr>
+</table>
+
+# 4 Email Templates
+## 4.1 Get
+Gets all templates
+<b>Request</b></br>
+<table>
+<tr>
+<td>Method</td>
+<td>URL</td>
+</tr>
+<tr>
+<td>Get</td>
+<td><a href="http://crmbetd.azurewebsites.net/api/template">http://crmbetd.azurewebsites.net/api/template</a></td>
+</tr>
+</table>
+
+<b>Response</b>
+<table>
+<tr>
+<td>Status</td>
+<td>Responce</td>
+</tr>
+<tr>
+<td>200 OK</td>
+<td>An array of templates [ { "TemplateId": 1, "TemplateName": "NewYear.html" }, { "TemplateId": 2, "TemplateName": "BirthdayWish.html" }, { "TemplateId": 3, "TemplateName": "LabourDay.html" } ]</td>
+</tr>
+<tr>
+<tr>
+<td>400</td>
+<td>Exception and InnerException Message</td>
+</tr>
+<tr>
+<td>404</td>
 <td></td>
 </tr>
 <tr>
