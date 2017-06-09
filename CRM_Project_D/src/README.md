@@ -361,3 +361,338 @@ Returns contacts by paiges filtered and ordered by specific fields</br></br>
 </tr>
 </table>
 
+# 2 Email Lists
+## <b>2.1 Get</b>
+Gets all email lists from database without contacts
+<b>Request</b></br>
+<table>
+<tr>
+<td>Method</td>
+<td>URL</td>
+</tr>
+<tr>
+<td>Get</td>
+<td><a href="http://crmbetd.azurewebsites.net/api/emaillists">http://crmbetd.azurewebsites.net/api/emaillists</a></td>
+</tr>
+</table>
+<b>Response</b>
+<table>
+<tr>
+<td>Status</td>
+<td>Responce</td>
+</tr>
+<tr>
+<td>200 OK</td>
+<td>[ { "EmailListID": 1, "EmailListName": "All" }, { "EmailListID": 2, "EmailListName": "VIP Partners" } ]</td>
+</tr>
+<tr>
+<tr>
+<td>400</td>
+<td>Exception and InnerException Message</td>
+</tr>
+<tr>
+<td>404</td>
+<td></td>
+</tr>
+</table>
+
+## <b>2.2 Get (by id)</b>
+Gets specific email list by Id</br>
+<b>Request</b></br>
+<table>
+<tr>
+<td>Method</td>
+<td>URL</td>
+</tr>
+<tr>
+<td>Get</td>
+<td><a href="http://crmbetd.azurewebsites.net/api/emaillists?id=1">http://crmbetd.azurewebsites.net/api/emaillists?id=1</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td>Type</td>
+<td>Param Name</td>
+<td>Value</td>
+</tr>
+<tr>
+<td>URL_PARAM</td>
+<td>id</td>
+<td>integer</td>
+</tr>
+</table>
+
+<b>Response</b>
+<table>
+<tr>
+<td>Status</td>
+<td>Responce</td>
+</tr>
+<tr>
+<td>200 OK</td>
+<td>{ "EmailListID": 1, "EmailListName": "All", "Contacts": [ { "Full Name": "Aghasi Lorsabyan", "Company Name": "TUMO", "Position": "Mentor", "Country": "Armenia", "Email": "lorsabyan@gmail.com", "GuID": "1d8cecd5-2d4c-43c1-bcd1-085664eb6bdc" } ] }</td>
+</tr>
+<tr>
+<tr>
+<td>400</td>
+<td>Exception and InnerException Message</td>
+</tr>
+<tr>
+<td>404</td>
+<td></td>
+</tr>
+</table>
+
+
+## <b>2.3 Post (creates email list)</b>
+Creates new email list</br>
+<b>Request</b></br>
+<table>
+<tr>
+<td>Method</td>
+<td>URL</td>
+</tr>
+<tr>
+<td>Post</td>
+<td><a href="http://crmbetd.azurewebsites.net/api/emaillists">http://crmbetd.azurewebsites.net/api/emaillists</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td>Type</td>
+
+<td>Value</td>
+</tr>
+<tr>
+<td>Post_Body_Param</td>
+
+<td>{ "EmailListName": "All 2", "Contacts": [ "1d8cecd5-2d4c-43c1-bcd1-085664eb6bdc", "943d9186-6350-4ecb-a826-048a0306228a" ] }
+The "Contacts": field is optional and can be ignored in request (in this case the created email list will be empty)</td>
+</tr>
+</table>
+
+<b>Response</b>
+<table>
+<tr>
+<td>Status</td>
+<td>Responce</td>
+</tr>
+<tr>
+<td>200 OK</td>
+<td>{ "EmailListID": 22, "EmailListName": "All 2", "Contacts": [ { "Full Name": "Aghasi Lorsabyan", "Company Name": "TUMO", "Position": "Mentor", "Country": "Armenia", "Email": "lorsabyan@gmail.com", "GuID": "1d8cecd5-2d4c-43c1-bcd1-085664eb6bdc" }, { "Full Name": "meri Sahakyan", "Company Name": "Mic Armenia", "Position": "Developer", "Country": "Armenia", "Email": "sahakyan_m@bk.ru", "GuID": "943d9186-6350-4ecb-a826-048a0306228a" } ] }</td>
+</tr>
+<tr>
+<tr>
+<td>400</td>
+<td>Exception and InnerException Message</td>
+</tr>
+<tr>
+<td>500</td>
+<td></td>
+</tr>
+</table>
+
+## <b>2.4 Put (updates email list)</b>
+Updates specific email list</br>
+<b>Request</b></br>
+<table>
+<tr>
+<td>Method</td>
+<td>URL</td>
+</tr>
+<tr>
+<td>Put</td>
+<td><a href="http://crmbetd.azurewebsites.net/api/emaillists">http://crmbetd.azurewebsites.net/api/emaillists</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td>Type</td>
+
+<td>Value</td>
+</tr>
+<tr>
+<td>Post_Body_Param</td>
+
+<td>{ "EmailListName": "All 2", "Contacts": [ "1d8cecd5-2d4c-43c1-bcd1-085664eb6bdc", "943d9186-6350-4ecb-a826-048a0306228a" ] }
+The "Contacts": field is optional and can be ignored in request (in this case the created email list will be empty)</td>
+</tr>
+</table>
+
+<b>Response</b>
+<table>
+<tr>
+<td>Status</td>
+<td>Responce</td>
+</tr>
+<tr>
+<td>200 OK</td>
+<td>{ "EmailListID": 22, "EmailListName": "All 2", "Contacts": [ { "Full Name": "Aghasi Lorsabyan", "Company Name": "TUMO", "Position": "Mentor", "Country": "Armenia", "Email": "lorsabyan@gmail.com", "GuID": "1d8cecd5-2d4c-43c1-bcd1-085664eb6bdc" }, { "Full Name": "meri Sahakyan", "Company Name": "Mic Armenia", "Position": "Developer", "Country": "Armenia", "Email": "sahakyan_m@bk.ru", "GuID": "943d9186-6350-4ecb-a826-048a0306228a" } ] }</td>
+</tr>
+<tr>
+<tr>
+<td>400</td>
+<td>Exception and InnerException Message</td>
+</tr>
+<tr>
+<td>404</td>
+<td>If email list with such id is not found in database</td>
+</tr>
+<tr>
+<td>500</td>
+<td></td>
+</tr>
+</table>
+
+
+## <b>2.5 Put (updates email list contacts)</b>
+Adds specific email list contacts.</br>
+<b>Request</b></br>
+<table>
+<tr>
+<td>Method</td>
+<td>URL</td>
+</tr>
+<tr>
+<td>Put</td>
+<td><a href="http://crmbetd.azurewebsites.net/api/emaillists">http://crmbetd.azurewebsites.net/api/emaillists</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td>Type</td>
+
+<td>Value</td>
+</tr>
+<tr>
+<td>Post_Body_Param</td>
+
+<td>{ "EmailListName": "All 2", "Contacts": [ "1d8cecd5-2d4c-43c1-bcd1-085664eb6bdc", "943d9186-6350-4ecb-a826-048a0306228a" ] }
+The "Contacts": field is optional and can be ignored in request (in this case the created email list will be empty)</td>
+</tr>
+</table>
+
+<b>Response</b>
+<table>
+<tr>
+<td>Status</td>
+<td>Responce</td>
+</tr>
+<tr>
+<td>200 OK</td>
+<td>{ "EmailListID": 22, "EmailListName": "All 2", "Contacts": [ { "Full Name": "Aghasi Lorsabyan", "Company Name": "TUMO", "Position": "Mentor", "Country": "Armenia", "Email": "lorsabyan@gmail.com", "GuID": "1d8cecd5-2d4c-43c1-bcd1-085664eb6bdc" }, { "Full Name": "meri Sahakyan", "Company Name": "Mic Armenia", "Position": "Developer", "Country": "Armenia", "Email": "sahakyan_m@bk.ru", "GuID": "943d9186-6350-4ecb-a826-048a0306228a" } ] }</td>
+</tr>
+<tr>
+<tr>
+<td>400</td>
+<td>Exception and InnerException Message</td>
+</tr>
+<tr>
+<td>500</td>
+<td></td>
+</tr>
+</table>
+
+
+## <b>2.6 Delete (deletes contacts)</b>
+Deletes contacts from given email list</br>
+<b>Request</b></br>
+<table>
+<tr>
+<td>Method</td>
+<td>URL</td>
+</tr>
+<tr>
+<td>Delete</td>
+<td><a href="http://crmbetd.azurewebsites.net/api/emaillists">http://crmbetd.azurewebsites.net/api/emaillists</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td>Type</td>
+
+<td>Value</td>
+</tr>
+<tr>
+<td>Post_Body_Param</td>
+
+<td>{ "EmailListName": "All 2", "Contacts": [ "1d8cecd5-2d4c-43c1-bcd1-085664eb6bdc", "943d9186-6350-4ecb-a826-048a0306228a" ] }
+The "Contacts": field is optional and can be ignored in request (in this case the created email list will be empty)</td>
+</tr>
+</table>
+
+<b>Response</b>
+<table>
+<tr>
+<td>Status</td>
+<td>Responce</td>
+</tr>
+<tr>
+<td>200 OK</td>
+<td></td>
+</tr>
+<tr>
+<tr>
+<td>400</td>
+<td>Exception and InnerException Message</td>
+</tr>
+<tr>
+<td>404</td>
+<td>If email list with such guid is not found in database</td>
+</tr>
+</table>
+
+## <b>2.7 Delete (by id)</b>
+Deletes the specific email list by Id</br>
+<b>Request</b></br>
+<table>
+<tr>
+<td>Method</td>
+<td>URL</td>
+</tr>
+<tr>
+<td>Delete</td>
+<td><a href="http://crmbetd.azurewebsites.net/api/emaillists?id=1">http://crmbetd.azurewebsites.net/api/emaillists?id=1</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td>Type</td>
+<td>Param Name</td>
+<td>Value</td>
+</tr>
+<tr>
+<td>URL_PARAM</td>
+<td>id</td>
+<td>integer</td>
+</tr>
+</table>
+
+<b>Response</b>
+<table>
+<tr>
+<td>Status</td>
+<td>Responce</td>
+</tr>
+<tr>
+<td>200 OK</td>
+<td></td>
+</tr>
+<tr>
+<tr>
+<td>400</td>
+<td>Exception and InnerException Message</td>
+</tr>
+<tr>
+<td>404</td>
+<td>If email list with such guid is not found in database</td>
+</tr>
+</table>
+
+
