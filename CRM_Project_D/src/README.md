@@ -39,7 +39,6 @@ Yerevan
 
 ## Accounts
 * Get (returns all users in database)
-* Get (email confirmation)
 * Get (resets database to stock)
 * Delete (deletes user by guid)
 * Put (updates user information)
@@ -836,6 +835,186 @@ Gets all templates
 </tr>
 <tr>
 <td>500</td>
+<td></td>
+</tr>
+</table>
+
+# 5 Accounts
+## 5.1 Get 
+Returns all users in database </br>
+<b>Request</b></br>
+<table>
+<tr>
+<td>Method</td>
+<td>URL</td>
+</tr>
+<tr>
+<td>Get</td>
+<td><a href="http://crmbetd.azurewebsites.net/api/account/admin/users">http://crmbetd.azurewebsites.net/api/account/admin/users</a></td>
+</tr>
+</table>
+<b>Response</b>
+
+<table>
+<tr>
+<td>Status Code</td>
+<td>Responce</td>
+</tr>
+<tr>
+<td>200 OK</td>
+<td>[{ "UserName": "username", "PhoneNumber": "099999999", "Email": "simple@gmail.com", "Password": "passord1"},{ "UserName": "username2", "PhoneNumber": "099999991", "Email": "simple2@gmail.com", "Password": "password2"]</td>
+</tr>
+<tr>
+<td>400</td>
+<td>Exception and InnerException Message</td>
+</tr>
+<tr>
+<td>404</td>
+<td></td>
+</tr>
+</table>
+
+## 5.2 Get (reset)
+Resets database to stock </br>
+<b>Request</b></br>
+<table>
+<tr>
+<td>Method</td>
+<td>URL</td>
+</tr>
+<tr>
+<td>Get</td>
+<td><a href="http://crmbetd.azurewebsites.net/api/account/reset">http://crmbetd.azurewebsites.net/api/account/reset</a></td>
+</tr>
+</table>
+<b>Response</b>
+
+<table>
+<tr>
+<td>Status Code</td>
+<td>Responce</td>
+</tr>
+<tr>
+<td>200 OK</td>
+<td>"Reseted to defaults"</td>
+</tr>
+<tr>
+<td>400</td>
+<td></td>
+</tr>
+</table>
+
+## 5.3 Delete
+Deletes user by guid </br>
+<b>Request</b></br>
+<table>
+<tr>
+<td>Method</td>
+<td>URL</td>
+</tr>
+<tr>
+<td>Delete</td>
+<td><a href="http://crmbetd.azurewebsites.net/api/account/admin/delete">http://crmbetd.azurewebsites.net/api/account/admin/delete</a></td>
+</tr>
+</table>
+<table>
+<tr>
+<td>Type</td>
+
+<td>Value</td>
+</tr>
+<tr>
+<td>Post_Body_Param</td>
+
+<td>{ [ "1d8cecd5-2d4c-43c1-bcd1-085664eb6bdc"] }</td>
+</tr>
+</table>
+<b>Response</b>
+
+<table>
+<tr>
+<td>Status Code</td>
+<td>Responce</td>
+</tr>
+<tr>
+<td>200 OK</td>
+<td></td>
+</tr>
+<tr>
+<td>400</td>
+<td></td>
+</tr>
+<tr>
+<td>404</td>
+<td></td>
+</tr>
+</table>
+
+## 5.4 Put
+Updates user information </br>
+<b>Request</b></br>
+<table>
+<tr>
+<td>Method</td>
+<td>URL</td>
+</tr>
+<tr>
+<td>Put</td>
+<td><a href="http://crmbetd.azurewebsites.net/api/account/admin/change">http://crmbetd.azurewebsites.net/api/account/admin/change</a></td>
+</tr>
+</table>
+
+<b>Response</b>
+
+<table>
+<tr>
+<td>Status Code</td>
+<td>Responce</td>
+</tr>
+<tr>
+<td>200 OK</td>
+<td></td>
+</tr>
+<tr>
+<td>400</td>
+<td></td>
+</tr>
+<tr>
+<td>404</td>
+<td></td>
+</tr>
+</table>
+## 5.5 Post
+Creates new user </br>
+<b>Request</b></br>
+<table>
+<tr>
+<td>Method</td>
+<td>URL</td>
+</tr>
+<tr>
+<td>Post</td>
+<td><a href="http://crmbetd.azurewebsites.net/api/account/register">http://crmbetd.azurewebsites.net/api/account/register</a></td>
+</tr>
+</table>
+
+<b>Response</b>
+
+<table>
+<tr>
+<td>Status Code</td>
+<td>Responce</td>
+</tr>
+<tr>
+<td>200 OK</td>
+<td></td>
+</tr>
+<tr>
+<td>400</td>
+<td></td>
+</tr>
+<tr>
+<td>404</td>
 <td></td>
 </tr>
 </table>
