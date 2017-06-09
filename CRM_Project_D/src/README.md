@@ -984,6 +984,7 @@ Updates user information </br>
 <td></td>
 </tr>
 </table>
+
 ## 5.5 Post
 Creates new user </br>
 <b>Request</b></br>
