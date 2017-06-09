@@ -695,4 +695,106 @@ Deletes the specific email list by Id</br>
 </tr>
 </table>
 
+# 3 Send Email
+## 3.1 Post
+Sends emails to contacts by guid</br>
+<b>Request</b></br>
+<table>
+<tr>
+<td>Method</td>
+<td>URL</td>
+</tr>
+<tr>
+<td>Post</td>
+<td><a href="http://crmbetd.azurewebsites.net/api/sendemail?templateid=1">http://crmbetd.azurewebsites.net/api/sendemail?templateid=1</a></td>
+</tr>
+</table>
 
+<table>
+<tr>
+<td>Type</td>
+<td>Param Name</td>
+<td>Value</td>
+</tr>
+<tr>
+<td>URL_PARAM</td>
+<td>templateid</td>
+<td>integer</td>
+</tr>
+<tr>
+<td>Post_Body_Param</td>
+<td>Array of Guids</td>
+<td>[ "b3e48661-7979-440d-bf33-c8da8ed2cb62, "Dab7e4fb-171f-4e65-8a5a-7640fb113fe5" ]</td>
+</tr>
+</table>
+<b>Response</b>
+<table>
+<tr>
+<td>Status</td>
+<td>Responce</td>
+</tr>
+<tr>
+<td>200 OK</td>
+<td></td>
+</tr>
+<tr>
+<tr>
+<td>400</td>
+<td></td>
+</tr>
+<tr>
+<td>500</td>
+<td></td>
+</tr>
+</table>
+## 3.2 Post
+Sends emails to contacts by email list id</br>
+<b>Request</b></br>
+<table>
+<tr>
+<td>Method</td>
+<td>URL</td>
+</tr>
+<tr>
+<td>Post</td>
+<td><a href="http://crmbetd.azurewebsites.net/api/sendemailtemplateid=1&id=1">http://crmbetd.azurewebsites.net/api/sendemail/templateid=1&id=1</a></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td>Type</td>
+<td>Param Name</td>
+<td>Value</td>
+</tr>
+<tr>
+<td>URL_PARAM</td>
+<td>templateid</td>
+<td>integer</td>
+</tr>
+<tr>
+<td>Post_Body_Param</td>
+<td>id</td>
+<td>integer</td>
+</tr>
+</table>
+<b>Response</b>
+<table>
+<tr>
+<td>Status</td>
+<td>Responce</td>
+</tr>
+<tr>
+<td>200 OK</td>
+<td></td>
+</tr>
+<tr>
+<tr>
+<td>400</td>
+<td></td>
+</tr>
+<tr>
+<td>500</td>
+<td></td>
+</tr>
+</table>
