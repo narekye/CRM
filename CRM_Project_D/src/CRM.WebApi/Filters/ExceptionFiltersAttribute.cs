@@ -30,6 +30,7 @@
                     StatusCode = HttpStatusCode.BadRequest
                 };
             }
+            // null isnt allowed
             else if (action.Exception is NoNullAllowedException)
             {
                 action.Response = new HttpResponseMessage

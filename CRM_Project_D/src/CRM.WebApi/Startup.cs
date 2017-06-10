@@ -17,10 +17,10 @@ namespace CRM.WebApi
         public void Configuration(IAppBuilder app)
         {
             ConfigureOAuth(app);
+            app.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
             var config = new HttpConfiguration();
             ConfigureWebApi(config);
-            Mapper();
-            app.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
+            InitMapper();
             app.UseWebApi(config);
         }
         private void ConfigureWebApi(HttpConfiguration config)
@@ -35,7 +35,7 @@ namespace CRM.WebApi
                 defaults: new { id = RouteParameter.Optional }
             );
         }
-        private void Mapper()
+        private void InitMapper()
         {
             AutoMapper.Mapper.Initialize(p => p.CreateProfile("ModelsToViewModels", z =>
             {

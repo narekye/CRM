@@ -13,7 +13,7 @@ using Microsoft.AspNet.Identity;
 
 namespace CRM.WebApi.Controllers
 {
-    internal enum Role
+    enum Role
     {
         SuperAdmin,
         Admin,
@@ -29,8 +29,7 @@ namespace CRM.WebApi.Controllers
 
         public AccountController()
         {
-            var db = new CRMContext();
-            manager = CrmUserManager.UserManager;
+            manager = CrmUserManager.UserManager; // get current from owin context
             this.mailmanager = new MailManager();
         }
 
@@ -38,7 +37,7 @@ namespace CRM.WebApi.Controllers
         [Route("admin/users")]
         public async Task<HttpResponseMessage> GetAllUsersAsync()
         {
-            if (!this.IsInRole(Role.SuperAdmin)) return Request.CreateResponse(HttpStatusCode.NotFound);
+            if (!IsInRole(Role.SuperAdmin)) return Request.CreateResponse(HttpStatusCode.NotFound);
             var data = await this.manager.Users.ToListAsync();
             return Request.CreateResponse(HttpStatusCode.OK, data);
         }
@@ -47,6 +46,7 @@ namespace CRM.WebApi.Controllers
         [Route("admin/delete")]
         public async Task<HttpResponseMessage> DeleteUserAsync([FromBody] Guid guid)
         {
+            if (!IsInRole(Role.SuperAdmin)) return Request.CreateResponse(HttpStatusCode.Unauthorized);
             var user = await this.manager.FindByIdAsync(guid.ToString());
             IdentityResult result = await this.manager.DeleteAsync(user);
             if (!result.Succeeded) return Request.CreateResponse(HttpStatusCode.NotModified, result.Errors);
@@ -57,6 +57,7 @@ namespace CRM.WebApi.Controllers
         [Route("admin/change")]
         public async Task<HttpResponseMessage> PutUserAsync(User user)
         {
+            if (!IsInRole(Role.SuperAdmin)) return Request.CreateResponse(HttpStatusCode.Unauthorized);
             var result = await this.manager.UpdateAsync(user);
             if (!result.Succeeded) return Request.CreateResponse(HttpStatusCode.NotModified);
             return Request.CreateResponse(HttpStatusCode.OK);
@@ -77,22 +78,25 @@ namespace CRM.WebApi.Controllers
             };
 
             IdentityResult identity = await this.manager.CreateAsync(user, model.Password);
+
             if (!identity.Succeeded) return Request.CreateResponse(HttpStatusCode.NotAcceptable, identity.Errors);
-            var codef = await this.manager.GenerateEmailConfirmationTokenAsync(user.Id);
-            var callback = new Uri(Url.Link("ConfirmEmailRoute", new { userid = user.Id, code = codef }));
+
+            var code = await this.manager.GenerateEmailConfirmationTokenAsync(user.Id);
+            var callback = new Uri(Url.Link("ConfirmEmailRoute", new { userid = user.Id, code }));
             if (await this.mailmanager.SendConfirmationEmail(user.Email, callback.ToString()))
             {
                 return Request.CreateResponse(HttpStatusCode.OK, "Email sended.");
             }
             return Request.CreateResponse(HttpStatusCode.BadRequest);
         }
+
         // email confirmation
         [Route("ConfirmEmail", Name = "ConfirmEmailRoute")]
         public async Task<HttpResponseMessage> GetConfirmEmail(string userId = "", string code = "")
         {
             if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(code))
             {
-                ModelState.AddModelError("Err", "User Id and Code are required");
+                ModelState.AddModelError("Error", "User Id and Code are required");
                 return Request.CreateResponse(HttpStatusCode.NotFound, ModelState);
             }
             IdentityResult result = await this.manager.ConfirmEmailAsync(userId, code);
@@ -133,15 +137,17 @@ namespace CRM.WebApi.Controllers
             if (disposing) this.manager.Dispose();
             base.Dispose(disposing);
         }
+
         private bool IsInRole(Role role)
         {
             return RequestContext.Principal.IsInRole(role.ToString());
         }
+
         [HttpGet, Route("reset")]
         public HttpResponseMessage ResetDatabaseToStock()
         {
             var context = new CRMContext();
-            context.ResetDatabaseToStock(); // stored proc
+            context.ResetDatabaseToStock(); // stored proc from SQL server.
             return Request.CreateResponse(HttpStatusCode.OK, "Reseted to defaults");
         }
     }

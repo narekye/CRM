@@ -13,7 +13,7 @@ namespace CRM.WebApi
     {
         private void ConfigureOAuth(IAppBuilder app)
         {
-            DataProtectionProvider = app.GetDataProtectionProvider();
+            DataProtectionProvider = app.GetDataProtectionProvider();  // current
 
             app.CreatePerOwinContext(CRMContext.Create);
             app.CreatePerOwinContext<CrmUserManager>(CrmUserManager.Create);

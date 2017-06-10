@@ -14,6 +14,7 @@ namespace CRM.WebApi.Providers
             context.Validated();
             return Task.FromResult<object>(null);
         }
+        
         public override async Task GrantResourceOwnerCredentials(OAuthGrantResourceOwnerCredentialsContext context)
         {
             var allowedOrigin = "*";
