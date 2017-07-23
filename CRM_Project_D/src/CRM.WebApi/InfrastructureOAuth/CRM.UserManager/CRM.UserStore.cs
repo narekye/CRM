@@ -8,7 +8,7 @@ using Microsoft.AspNet.Identity;
 
 namespace CRM.WebApi.InfrastructureOAuth.CRM.UserManager
 {
-    [ExceptionFilters]
+    [HandleExceptions]
     public partial class UserStore : IUserStore<User>, IQueryableUserStore<User>, IUserEmailStore<User>
     {
         private readonly CRMContext db;

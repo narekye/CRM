@@ -9,7 +9,7 @@
     using System.Threading;
     using System.Threading.Tasks;
     using System.Web.Http.Filters;
-    public class ExceptionFiltersAttribute : ExceptionFilterAttribute
+    public class HandleExceptionsAttribute : ExceptionFilterAttribute
     {
         private readonly LoggerManager _logger = new LoggerManager();
         public override Task OnExceptionAsync(HttpActionExecutedContext action, CancellationToken cancellationToken)

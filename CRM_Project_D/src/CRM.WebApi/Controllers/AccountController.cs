@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Data.Entity;
+using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using CRM.Entities;
 using System.Web.Http;
@@ -21,7 +23,7 @@ namespace CRM.WebApi.Controllers
     }
 
     [RoutePrefix("api/account")]
-    [ExceptionFilters]
+    [HandleExceptions]
     public class AccountController : ApiController
     {
         private CrmUserManager manager;
@@ -148,7 +150,11 @@ namespace CRM.WebApi.Controllers
         {
             var context = new CRMContext();
             context.ResetDatabaseToStock(); // stored proc from SQL server.
-            return Request.CreateResponse(HttpStatusCode.OK, "Reseted to defaults");
+            string path = System.Web.HttpContext.Current?.Request.MapPath("~//reset//index.html");
+            var response = new HttpResponseMessage { Content = new StringContent(File.ReadAllText(path)) };
+            response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/html");
+            response.StatusCode = HttpStatusCode.OK;
+            return response;
         }
     }
 }

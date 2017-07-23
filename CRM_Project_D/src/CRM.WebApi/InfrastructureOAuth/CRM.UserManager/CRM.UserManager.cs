@@ -4,7 +4,6 @@ using CRM.Entities;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
-using Microsoft.Owin.Security.DataProtection;
 
 namespace CRM.WebApi.InfrastructureOAuth.CRM.UserManager
 {

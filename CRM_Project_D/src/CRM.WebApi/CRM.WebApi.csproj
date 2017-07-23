@@ -17,10 +17,10 @@
     <AssemblyName>CRM.WebApi</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort />
-    <IISExpressAnonymousAuthentication />
-    <IISExpressWindowsAuthentication />
-    <IISExpressUseClassicPipelineMode />
+    <IISExpressSSLPort>9333</IISExpressSSLPort>
+    <IISExpressAnonymousAuthentication>enabled</IISExpressAnonymousAuthentication>
+    <IISExpressWindowsAuthentication>disabled</IISExpressWindowsAuthentication>
+    <IISExpressUseClassicPipelineMode>false</IISExpressUseClassicPipelineMode>
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
@@ -33,6 +33,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <IncludeIisSettings>false</IncludeIisSettings>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -225,6 +226,16 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="build\asset-manifest.json" />
+    <Content Include="build\index.html" />
+    <Content Include="build\manifest.json" />
+    <Content Include="build\service-worker.js" />
+    <Content Include="build\static\css\main.4700a3c8.css" />
+    <Content Include="build\static\css\main.4700a3c8.css.map" />
+    <Content Include="build\static\js\main.d34bb26f.js" />
+    <Content Include="build\static\js\main.d34bb26f.js.map" />
+    <Content Include="build\static\media\Quicksand-Regular.f87b9b4f.ttf" />
+    <Content Include="build\static\media\send_mail.c137de00.gif" />
     <Content Include="packages.config" />
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -249,15 +260,24 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="reset\index.html" />
+    <Content Include="reset\narekye.github\betc.png" />
+    <Content Include="reset\narekye.github\info.js" />
+    <Content Include="reset\narekye.github\main.js" />
+    <Content Include="reset\narekye.github\move.js" />
+    <Content Include="reset\narekye.github\walpaper.jpg" />
     <Content Include="Templates\cerberus.html" />
     <Content Include="Templates\log.html" />
     <Content Include="Templates\promotional.html" />
     <Content Include="Templates\simple.html" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ContactsController.cs" />
+    <Compile Include="Controllers\Core\BaseApiController.cs" />
     <Compile Include="Controllers\EmailListsController.cs" />
     <Compile Include="Controllers\SendEmailController.cs" />
     <Compile Include="Controllers\TemplateController.cs" />
@@ -304,7 +324,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>3769</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:9333/</IISUrl>
+          <IISUrl>https://localhost:9333/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

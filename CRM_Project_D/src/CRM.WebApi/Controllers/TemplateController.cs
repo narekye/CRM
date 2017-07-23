@@ -6,7 +6,7 @@
     using System.Net;
     using System.Net.Http;
     using InfrastructureModel.ApplicationManager;
-    [ExceptionFilters]
+    [HandleExceptions]
     public class TemplateController : ApiController
     {
         private readonly ApplicationManager manager;

@@ -8,7 +8,7 @@
     using InfrastructureModel;
     using System.Net.Http;
     using System.Net;
-    [ExceptionFilters]
+    [HandleExceptions]
     public class SendEmailController : ApiController
     {
         private readonly MailManager manager;

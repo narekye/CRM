@@ -7,7 +7,7 @@
     using System.Net.Http;
     using System.Net;
     using Filters;
-    [ExceptionFilters]
+    [HandleExceptions]
     public class EmailListsController : ApiController
     {
         private readonly ApplicationManager manager;
