@@ -226,16 +226,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="build\asset-manifest.json" />
-    <Content Include="build\index.html" />
-    <Content Include="build\manifest.json" />
-    <Content Include="build\service-worker.js" />
-    <Content Include="build\static\css\main.4700a3c8.css" />
-    <Content Include="build\static\css\main.4700a3c8.css.map" />
-    <Content Include="build\static\js\main.d34bb26f.js" />
-    <Content Include="build\static\js\main.d34bb26f.js.map" />
-    <Content Include="build\static\media\Quicksand-Regular.f87b9b4f.ttf" />
-    <Content Include="build\static\media\send_mail.c137de00.gif" />
     <Content Include="packages.config" />
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -252,6 +242,10 @@
     </None>
     <None Include="Properties\PublishProfiles\crmbetd - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\crmbetd - Web Deploy.pubxml" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -298,6 +292,11 @@
     <Compile Include="Models\Response\ContactViewModels.cs" />
     <Compile Include="Models\Response\EmailListViewModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="Providers\ApplicationOAuthProvider.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="InfrastructureOAuth\CRM.UserManager\CRM.UserStore.cs" />
@@ -320,16 +319,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
-          <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>3769</DevelopmentServerPort>
-          <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>https://localhost:9333/</IISUrl>
-          <NTLMAuthentication>False</NTLMAuthentication>
-          <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>
-          </CustomServerUrl>
-          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+          <SaveServerSettingsInUserFile>True</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>
     </VisualStudio>

@@ -1,4 +1,9 @@
-﻿namespace CRM.WebApi.Controllers
+﻿using System.Linq;
+using CRM.Entities;
+using CRM.WebApi.InfrastructureOAuth.CRM.UserManager;
+using Microsoft.AspNet.Identity;
+
+namespace CRM.WebApi.Controllers
 {
     using Filters;
     using InfrastructureModel;
@@ -20,18 +25,38 @@
     {
         private readonly ApplicationManager manager;
         private readonly LoggerManager logger;
-
+        private CrmUserManager managers;
         public ContactsController()
         {
             logger = new LoggerManager();
             manager = new ApplicationManager();
+            managers = CrmUserManager.UserManager;
         }
 
         public async Task<HttpResponseMessage> GetAllContactsAsync()
         {
             var data = await manager.GetAllContactsAsync();
             if (ReferenceEquals(data, null)) return Create404();
-            return Create200(data);
+            // ===
+            User user = new User()
+            {
+                Email = "jjjj@mail.ru",
+                Id = Guid.NewGuid().ToString(),
+                EmailConfirmed = true,
+                PhoneNumber = "789754654",
+                UserName = "narekye",
+            };
+            IdentityResult result = await managers.CreateAsync(user, "Anlegala88+");
+            if (result.Succeeded)
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, "Created");
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.NotAcceptable, result.Errors);
+            }
+            // === 
+            // return Create200(managers.Users.ToList());
         }
 
         [Authorize]
@@ -68,7 +93,7 @@
             return Create400();
         }
 
-        [Route("api/contacts/filter")]
+        // [Route("api/contacts/filter")]
         public async Task<HttpResponseMessage> PostFilterOrderBy([FromBody] RequestContact model)
         {
             var data = await manager.FilterOrderByRequestAsync(model);

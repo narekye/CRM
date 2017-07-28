@@ -1,13 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using CRM.Entities;
 using System.Web.Http;
-using CRM.WebApi.Filters;
+using CRM.Entities;
 using CRM.WebApi.InfrastructureModel;
 using CRM.WebApi.InfrastructureOAuth.CRM.UserManager;
 using CRM.WebApi.Models.Identity;
@@ -15,17 +16,15 @@ using Microsoft.AspNet.Identity;
 
 namespace CRM.WebApi.Controllers
 {
-    enum Role
-    {
-        SuperAdmin,
-        Admin,
-        User
-    }
-
-    [RoutePrefix("api/account")]
-    [HandleExceptions]
+  
     public class AccountController : ApiController
     {
+        private enum Role
+        {
+            SuperAdmin,
+            Admin
+        }
+
         private CrmUserManager manager;
         private MailManager mailmanager;
 
@@ -35,9 +34,10 @@ namespace CRM.WebApi.Controllers
             this.mailmanager = new MailManager();
         }
 
-        [Authorize]
-        [Route("admin/users")]
-        public async Task<HttpResponseMessage> GetAllUsersAsync()
+        [HttpGet]
+        // [Authorize]
+        // [Route("api/contacts/filter")]
+        public async Task<HttpResponseMessage> GetAllUsersAsync(int id)
         {
             if (!IsInRole(Role.SuperAdmin)) return Request.CreateResponse(HttpStatusCode.NotFound);
             var data = await this.manager.Users.ToListAsync();
@@ -84,7 +84,7 @@ namespace CRM.WebApi.Controllers
             if (!identity.Succeeded) return Request.CreateResponse(HttpStatusCode.NotAcceptable, identity.Errors);
 
             var code = await this.manager.GenerateEmailConfirmationTokenAsync(user.Id);
-            var callback = new Uri(Url.Link("ConfirmEmailRoute", new { userid = user.Id, code }));
+            var callback = new Uri(Url.Link("ConfirmEmailRoute", new {userid = user.Id, code}));
             if (await this.mailmanager.SendConfirmationEmail(user.Email, callback.ToString()))
             {
                 return Request.CreateResponse(HttpStatusCode.OK, "Email sended.");
@@ -151,7 +151,7 @@ namespace CRM.WebApi.Controllers
             var context = new CRMContext();
             context.ResetDatabaseToStock(); // stored proc from SQL server.
             string path = System.Web.HttpContext.Current?.Request.MapPath("~//reset//index.html");
-            var response = new HttpResponseMessage { Content = new StringContent(File.ReadAllText(path)) };
+            var response = new HttpResponseMessage {Content = new StringContent(File.ReadAllText(path))};
             response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/html");
             response.StatusCode = HttpStatusCode.OK;
             return response;

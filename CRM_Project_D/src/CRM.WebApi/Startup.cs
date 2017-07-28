@@ -5,6 +5,7 @@ using Microsoft.Owin;
 using Owin;
 using System.Collections.Generic;
 using System.Web.Http;
+using System.Web.Http.Cors;
 using Microsoft.Owin.Security.DataProtection;
 
 [assembly: OwinStartup(typeof(CRM.WebApi.Startup))]
@@ -29,7 +30,8 @@ namespace CRM.WebApi
                         .SerializerSettings
                         .ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
             config.MapHttpAttributeRoutes();
-            config.EnableCors(); //
+            // var cors = new EnableCorsAttribute("http://localhost:3000", "*", "*");
+            config.EnableCors(/*cors*/); //
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
                 routeTemplate: "api/{controller}/{id}",
