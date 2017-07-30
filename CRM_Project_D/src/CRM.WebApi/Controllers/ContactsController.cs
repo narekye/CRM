@@ -37,26 +37,7 @@ namespace CRM.WebApi.Controllers
         {
             var data = await manager.GetAllContactsAsync();
             if (ReferenceEquals(data, null)) return Create404();
-            // ===
-            User user = new User()
-            {
-                Email = "jjjj@mail.ru",
-                Id = Guid.NewGuid().ToString(),
-                EmailConfirmed = true,
-                PhoneNumber = "789754654",
-                UserName = "narekye",
-            };
-            IdentityResult result = await managers.CreateAsync(user, "Anlegala88+");
-            if (result.Succeeded)
-            {
-                return Request.CreateResponse(HttpStatusCode.OK, "Created");
-            }
-            else
-            {
-                return Request.CreateResponse(HttpStatusCode.NotAcceptable, result.Errors);
-            }
-            // === 
-            // return Create200(managers.Users.ToList());
+            return Create200(data);
         }
 
         [Authorize]
