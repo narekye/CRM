@@ -17,15 +17,16 @@ namespace CRM.WebApi
 
             app.CreatePerOwinContext(CRMContext.Create);
             app.CreatePerOwinContext<CrmUserManager>(CrmUserManager.Create);
-
+            
             var options = new OAuthAuthorizationServerOptions
             {
+                
                 AllowInsecureHttp = true,
                 TokenEndpointPath = new PathString("/api/token"),
                 AccessTokenExpireTimeSpan = TimeSpan.FromDays(1),
                 Provider = new ApplicationOAuthProvider()
             };
-
+            
             app.UseOAuthAuthorizationServer(options);
             app.UseOAuthBearerAuthentication
             (

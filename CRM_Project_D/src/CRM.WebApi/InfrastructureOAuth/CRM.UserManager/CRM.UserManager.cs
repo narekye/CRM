@@ -32,10 +32,10 @@ namespace CRM.WebApi.InfrastructureOAuth.CRM.UserManager
             manager.PasswordValidator = new PasswordValidator
             {
                 RequiredLength = 8,
-                RequireNonLetterOrDigit = true,
-                RequireDigit = false,
+                RequireNonLetterOrDigit = false,
+                RequireDigit = true,
                 RequireLowercase = true,
-                RequireUppercase = false,
+                RequireUppercase = true
             };
             return manager;
         }
