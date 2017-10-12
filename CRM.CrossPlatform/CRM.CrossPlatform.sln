@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CRM.BLL", "CRM.BLL\CRM.BLL.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CRM.Web", "CRM.Web\CRM.Web.csproj", "{283A9C34-7019-4242-9E50-9ADBB8AD50CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRM.Infrastructure", "CRM.Infrastructure\CRM.Infrastructure.csproj", "{6C267D8C-F608-4A03-9811-F563AAFB6CF9}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,10 +27,6 @@ Global
 		{283A9C34-7019-4242-9E50-9ADBB8AD50CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{283A9C34-7019-4242-9E50-9ADBB8AD50CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{283A9C34-7019-4242-9E50-9ADBB8AD50CA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6C267D8C-F608-4A03-9811-F563AAFB6CF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6C267D8C-F608-4A03-9811-F563AAFB6CF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6C267D8C-F608-4A03-9811-F563AAFB6CF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6C267D8C-F608-4A03-9811-F563AAFB6CF9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

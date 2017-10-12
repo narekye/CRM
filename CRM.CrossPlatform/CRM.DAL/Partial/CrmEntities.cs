@@ -1,9 +1,8 @@
 ﻿using System;
-using CRM.DAL.Repository;
 
 namespace CRM.DAL.Entities
 {
-    public partial class CrmEntities : ICrmEntities
+    public partial class CrmEntities 
     {
         public override void Dispose()
         {
