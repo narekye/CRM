@@ -18,15 +18,15 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
             _database = new CRMContext();
             _database.Configuration.LazyLoadingEnabled = false;
         }
-        public async Task<List<ViewContactLess>> GetAllContactsAsync()
+        public async Task<List<ViewContactModel>> GetAllContactsAsync()
         {
             var list = await _database.Contacts.ToListAsync();
             if (ReferenceEquals(list, null)) return null;
-            var data = new List<ViewContactLess>();
+            var data = new List<ViewContactModel>();
             AutoMapper.Mapper.Map(list, data);
             return data;
         }
-        public async Task<bool> UpdateContactAsync(ViewContactLess model)
+        public async Task<bool> UpdateContactAsync(ViewContactModel model)
         {
             using (var transaction = _database.Database.BeginTransaction())
             {
@@ -49,7 +49,7 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
                 }
             }
         }
-        public async Task<bool> AddContactAsync(ViewContactLess model)
+        public async Task<bool> AddContactAsync(ViewContactModel model)
         {
             var contact = new Contact();
             AutoMapper.Mapper.Map(model, contact);
@@ -93,11 +93,11 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
             return await _database.Contacts.CountAsync() / 10 + 1;
         }
         #region FilterOrderPaging
-        public async Task<List<ViewContactLess>> FilterOrderByRequestAsync(RequestContact request)
+        public async Task<List<ViewContactModel>> FilterOrderByRequestAsync(RequestContact request)
         {
             if (ReferenceEquals(request, null)) return null;
-            ViewContactLess filter = request.FilterBy;
-            List<ViewContactLess> result = new List<ViewContactLess>();
+            ViewContactModel filter = request.FilterBy;
+            List<ViewContactModel> result = new List<ViewContactModel>();
             try
             {
                 if (filter.FullName != null)
@@ -135,7 +135,7 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
                 throw new Exception(ex.Message);
             }
         }
-        public async Task<List<ViewContactLess>> FilterSortAsync(RequestContact model, FilterBy filter)
+        public async Task<List<ViewContactModel>> FilterSortAsync(RequestContact model, FilterBy filter)
         {
             var data = new List<Contact>();
             var sortby = model.SortBy;
@@ -243,7 +243,7 @@ namespace CRM.WebApi.InfrastructureModel.ApplicationManager
                     data = Sort(data, OrderBy.Descending);
             }
             #endregion
-            var list = new List<ViewContactLess>();
+            var list = new List<ViewContactModel>();
             AutoMapper.Mapper.Map(data, list);
             return list;
         }

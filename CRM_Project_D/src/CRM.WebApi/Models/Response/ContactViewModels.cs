@@ -1,12 +1,12 @@
 ﻿namespace CRM.WebApi.Models.Response
 {
+    using Microsoft.Practices.EnterpriseLibrary.Validation.Validators;
+    using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
-    using Microsoft.Practices.EnterpriseLibrary.Validation.Validators;
-    using Newtonsoft.Json;
     [JsonObject]
-    public class ViewContact
+    public class ContactModel
     {
         [JsonProperty("Full Name")]
         public string FullName { get; set; }
@@ -20,7 +20,7 @@
     }
     [JsonObject]
     [NotNullValidator]
-    public class ViewContactLess
+    public class ViewContactModel
     {
         [JsonProperty("Full Name"), Required]
         [StringLength(100, MinimumLength = 1, ErrorMessage = "The full name must be specified.")]

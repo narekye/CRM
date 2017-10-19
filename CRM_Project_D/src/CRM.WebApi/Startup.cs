@@ -42,10 +42,10 @@ namespace CRM.WebApi
         {
             AutoMapper.Mapper.Initialize(p => p.CreateProfile("ModelsToViewModels", z =>
             {
-                z.CreateMap(typeof(Contact), typeof(ViewContact));
-                z.CreateMap(typeof(Contact), typeof(ViewContactLess));
-                z.CreateMap(typeof(ViewContactLess), typeof(Contact));
-                z.CreateMap(typeof(List<Contact>), typeof(List<ViewContact>));
+                z.CreateMap(typeof(Contact), typeof(ContactModel));
+                z.CreateMap(typeof(Contact), typeof(ViewContactModel));
+                z.CreateMap(typeof(ViewContactModel), typeof(Contact));
+                z.CreateMap(typeof(List<Contact>), typeof(List<ContactModel>));
                 z.CreateMap(typeof(EmailList), typeof(ViewEmailList));
                 z.CreateMap(typeof(EmailList), typeof(ViewEmailListLess));
                 z.CreateMap(typeof(RequestEmailList), typeof(EmailList));

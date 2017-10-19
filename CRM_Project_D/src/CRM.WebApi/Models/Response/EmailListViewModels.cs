@@ -5,7 +5,7 @@
     {
         public int EmailListID { get; set; }
         public string EmailListName { get; set; }
-        public List<ViewContactLess> Contacts { get; set; }
+        public List<ViewContactModel> Contacts { get; set; }
     }
     public class ViewEmailListLess
     {

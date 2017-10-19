@@ -41,7 +41,7 @@ namespace CRM.WebApi.Controllers
         }
 
         [Authorize]
-        public async Task<HttpResponseMessage> PutContactAsync([FromBody] ViewContactLess c)
+        public async Task<HttpResponseMessage> PutContactAsync([FromBody] ViewContactModel c)
         {
             if (ReferenceEquals(c, null) || !ModelState.IsValid) return Create502();
             if (await manager.UpdateContactAsync(c)) return Create202();
@@ -49,7 +49,7 @@ namespace CRM.WebApi.Controllers
         }
 
         [Authorize]
-        public async Task<HttpResponseMessage> PostContactAsync([FromBody] ViewContactLess c)
+        public async Task<HttpResponseMessage> PostContactAsync([FromBody] ViewContactModel c)
         {
             if (ReferenceEquals(c, null) || !ModelState.IsValid)
                 return Create400();

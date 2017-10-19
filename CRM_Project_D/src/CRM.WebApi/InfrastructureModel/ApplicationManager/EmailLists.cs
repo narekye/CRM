@@ -26,9 +26,9 @@
                 .FirstOrDefaultAsync(p => p.EmailListID == id.Value);
             if (ReferenceEquals(data, null)) return null;
             ViewEmailList result = new ViewEmailList();
-            result.Contacts = new List<ViewContactLess>();
+            result.Contacts = new List<ViewContactModel>();
             var contacts = data.Contacts.ToList();
-            var contactless = new List<ViewContactLess>();
+            var contactless = new List<ViewContactModel>();
             AutoMapper.Mapper.Map(data, result);
             AutoMapper.Mapper.Map(contacts, contactless);
             result.Contacts = contactless;
